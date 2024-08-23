@@ -10,7 +10,7 @@ def read_json(filename='data.json'):
     '''
     Lee un archivo json y lo convierte en un diccionario.
     '''
-    with open(filename, 'r') as file:
+    with open(filename, 'r', encoding="utf8") as file:
         d = json.load(file)
         file.close()
         return d
@@ -19,9 +19,12 @@ def write_json(dat, filename='data.json'):
     '''
     Escribe un diccionario en un archivo json.
     '''
-    with open(filename, 'w') as file:
+    with open(filename, 'w', encoding="utf8") as file:
         json.dump(dat, file, indent=4)
         file.close()
+
+def verify_endings(datf, datr):
+
 
 
 def main():
@@ -33,7 +36,6 @@ def main():
 
     f = read_json()
     data = response.json()
-
 
     lists = [(key, value) for _, (key, value) in \
             enumerate(zip([i for i in f if isinstance(f[i], list)], \
@@ -47,12 +49,19 @@ def main():
 
     data = dict(lists)
 
-
+    irregularities = f['irregularities']
+    del f['irregularities']
+    
     for i in data:
         for j in data[i]:
-            if j['uuid'] not in [l['uuid'] for k in f for l in f[k]]:
-                f[i].append(j)
+            try:
+                if j['uuid'] not in [l['uuid'] for k in f for l in f[k]]:
+                    f[i].append(j)
+            except KeyError:
+                if j['id'] not in [l['id'] for l in irregularities]:
+                    irregularities.append(j)
 
+    f['irregularities'] = irregularities
     write_json(f)
 
 if __name__ == '__main__':
