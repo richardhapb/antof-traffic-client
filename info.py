@@ -4,7 +4,13 @@ Actualiza el archivo data.json con la información de la API de Waze.
 
 import json
 import time
+import datetime
+import pytz
 import requests
+
+timezone = pytz.timezone("America/Santiago")
+# 15000 = 2.5 minutos, el promedio entre periodos
+now = int(datetime.datetime.now(timezone).timestamp()) * 1000 - 150000
 
 def read_json(filename='data.json'):
     '''
@@ -25,6 +31,30 @@ def write_json(dat, filename='data.json'):
 
 def verify_endings(datf, datr):
 
+    try:
+        irregularities = datf['irregularities']
+        del datf['irregularities']
+    except KeyError:
+        irregularities = []
+    try:
+        r_irregularities = datr['irregularities']
+        del datr['irregularities']
+    except KeyError:
+        r_irregularities = []
+
+    for i in datf:
+        for ij, j in enumerate(datf[i]):
+            try:
+                if j['uuid'] not in [l['uuid'] for k in datr for l in datr[k]]:
+                    if "endreport" not in j:
+                        datf[i][ij]['endreport'] = now
+            except KeyError:
+                print(json.dumps(j, indent=2))
+                if j['id'] not in [l['id'] for l in r_irregularities]:
+                    if "endreport" not in j:
+                        datf[i][ij]['endreport'] = now
+
+    return datf
 
 
 def main():
@@ -49,8 +79,11 @@ def main():
 
     data = dict(lists)
 
-    irregularities = f['irregularities']
-    del f['irregularities']
+    try:
+        irregularities = f['irregularities']
+        del f['irregularities']
+    except KeyError:
+        irregularities = []
     
     for i in data:
         for j in data[i]:
@@ -62,6 +95,7 @@ def main():
                     irregularities.append(j)
 
     f['irregularities'] = irregularities
+    f = verify_endings(f, data)
     write_json(f)
 
 if __name__ == '__main__':
