@@ -1,0 +1,1137 @@
+{
+    "alerts": [
+        {
+            "country": "CI",
+            "city": "Antofagasta",
+            "reportRating": 2,
+            "reportByMunicipalityUser": "false",
+            "confidence": 1,
+            "reliability": 7,
+            "type": "JAM",
+            "uuid": "28aa8ebf-128d-44f6-9156-f764fda7eab3",
+            "roadType": 6,
+            "magvar": 347,
+            "subtype": "JAM_STAND_STILL_TRAFFIC",
+            "street": "Av. Edmundo P\u00e9rez Zujovic",
+            "location": {
+                "x": -70.396084,
+                "y": -23.631082
+            },
+            "pubMillis": 1724371875000
+        },
+        {
+            "country": "CI",
+            "city": "Antofagasta",
+            "reportRating": 2,
+            "reportByMunicipalityUser": "false",
+            "confidence": 0,
+            "reliability": 8,
+            "type": "HAZARD",
+            "uuid": "42b246ac-6110-4c72-9703-7b4807f61c65",
+            "roadType": 2,
+            "magvar": 204,
+            "subtype": "HAZARD_ON_SHOULDER_CAR_STOPPED",
+            "street": "Av. Angamos",
+            "location": {
+                "x": -70.405524,
+                "y": -23.669991
+            },
+            "pubMillis": 1724371576000
+        },
+        {
+            "country": "CI",
+            "city": "Antofagasta",
+            "reportRating": 3,
+            "reportByMunicipalityUser": "false",
+            "confidence": 0,
+            "reliability": 5,
+            "type": "HAZARD",
+            "uuid": "dfa9ecec-668b-4849-aba7-e510e90e4852",
+            "roadType": 1,
+            "magvar": 129,
+            "subtype": "HAZARD_ON_ROAD",
+            "street": "Ocho Norte",
+            "location": {
+                "x": -70.383433,
+                "y": -23.645873
+            },
+            "pubMillis": 1724373150000
+        },
+        {
+            "country": "CI",
+            "city": "Antofagasta",
+            "reportRating": 0,
+            "reportByMunicipalityUser": "false",
+            "confidence": 0,
+            "reliability": 6,
+            "type": "ACCIDENT",
+            "uuid": "4962ee3e-8471-4802-a633-561043a987c5",
+            "roadType": 2,
+            "magvar": 356,
+            "subtype": "",
+            "street": "Av. Iquique",
+            "location": {
+                "x": -70.393371,
+                "y": -23.639493
+            },
+            "pubMillis": 1724371300000
+        },
+        {
+            "country": "CI",
+            "city": "Antofagasta",
+            "reportRating": 4,
+            "reportByMunicipalityUser": "false",
+            "confidence": 2,
+            "reliability": 9,
+            "type": "HAZARD",
+            "uuid": "11539024-3bd1-4025-85ab-b68f111d7516",
+            "roadType": 1,
+            "magvar": 44,
+            "subtype": "HAZARD_ON_ROAD_POT_HOLE",
+            "street": "14 de Febrero",
+            "location": {
+                "x": -70.393155,
+                "y": -23.650194
+            },
+            "pubMillis": 1724375049000
+        }
+    ],
+    "jams": [
+        {
+            "country": "CI",
+            "level": 4,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.393847,
+                    "y": -23.587314
+                },
+                {
+                    "x": -70.39343,
+                    "y": -23.587636
+                },
+                {
+                    "x": -70.393244,
+                    "y": -23.587777
+                },
+                {
+                    "x": -70.392996,
+                    "y": -23.58795
+                },
+                {
+                    "x": -70.392553,
+                    "y": -23.588086
+                },
+                {
+                    "x": -70.392164,
+                    "y": -23.588189
+                },
+                {
+                    "x": -70.392048,
+                    "y": -23.588186
+                }
+            ],
+            "speedKMH": 4.58,
+            "length": 214,
+            "turnType": "NONE",
+            "uuid": 1795195824,
+            "endNode": "Los Aromos",
+            "speed": 1.2722222222222221,
+            "segments": [
+                {
+                    "fromNode": 251279464,
+                    "ID": 308614050,
+                    "toNode": 163791477,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 163791477,
+                    "ID": 419854037,
+                    "toNode": 322820115,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 322820115,
+                    "ID": 419854038,
+                    "toNode": 156082569,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 156082569,
+                    "ID": 153798124,
+                    "toNode": 157133503,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 157133503,
+                    "ID": 153798125,
+                    "toNode": 157133486,
+                    "isForward": true
+                }
+            ],
+            "roadType": 1,
+            "delay": 135,
+            "street": "Los Cha\u00f1ares",
+            "id": 1795195824,
+            "pubMillis": 1724372882771
+        },
+        {
+            "country": "CI",
+            "level": 3,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.378414,
+                    "y": -23.576328
+                },
+                {
+                    "x": -70.378357,
+                    "y": -23.576981
+                },
+                {
+                    "x": -70.378341,
+                    "y": -23.577201
+                },
+                {
+                    "x": -70.378308,
+                    "y": -23.577556
+                },
+                {
+                    "x": -70.378243,
+                    "y": -23.578361
+                }
+            ],
+            "speedKMH": 4.28,
+            "length": 225,
+            "turnType": "NONE",
+            "uuid": 1794960734,
+            "endNode": "Padre Juan Orione",
+            "speed": 1.1888888888888889,
+            "segments": [
+                {
+                    "fromNode": 163700123,
+                    "ID": 164238798,
+                    "toNode": 163666538,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 163666538,
+                    "ID": 164148844,
+                    "toNode": 156975168,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 156975168,
+                    "ID": 153408137,
+                    "toNode": 156976895,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 156976895,
+                    "ID": 153408136,
+                    "toNode": 156742924,
+                    "isForward": false
+                }
+            ],
+            "roadType": 1,
+            "delay": 90,
+            "street": "Raul Cisternas",
+            "id": 1794960734,
+            "pubMillis": 1724372706180
+        },
+        {
+            "country": "CI",
+            "level": 3,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.379221,
+                    "y": -23.582195
+                },
+                {
+                    "x": -70.379274,
+                    "y": -23.581546
+                },
+                {
+                    "x": -70.379331,
+                    "y": -23.580733
+                },
+                {
+                    "x": -70.379373,
+                    "y": -23.580312
+                },
+                {
+                    "x": -70.379415,
+                    "y": -23.579869
+                },
+                {
+                    "x": -70.379443,
+                    "y": -23.579524
+                },
+                {
+                    "x": -70.379475,
+                    "y": -23.579146
+                },
+                {
+                    "x": -70.37953,
+                    "y": -23.578445
+                }
+            ],
+            "speedKMH": 12.2,
+            "length": 416,
+            "turnType": "NONE",
+            "uuid": 1795433334,
+            "endNode": "Padre Juan Orione",
+            "speed": 3.388888888888889,
+            "segments": [
+                {
+                    "fromNode": 156104808,
+                    "ID": 164165301,
+                    "toNode": 163672279,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 163672279,
+                    "ID": 164166166,
+                    "toNode": 163672615,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 163672615,
+                    "ID": 164166167,
+                    "toNode": 163669771,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 163669771,
+                    "ID": 164239233,
+                    "toNode": 163700305,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 163700305,
+                    "ID": 164239234,
+                    "toNode": 163672158,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 163672158,
+                    "ID": 164165154,
+                    "toNode": 163672225,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 163672225,
+                    "ID": 164165153,
+                    "toNode": 155025673,
+                    "isForward": false
+                }
+            ],
+            "roadType": 2,
+            "delay": 66,
+            "street": "Av. \u00d3scar Bonilla",
+            "id": 1795433334,
+            "pubMillis": 1724373052702
+        },
+        {
+            "country": "CI",
+            "level": 4,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.378361,
+                    "y": -23.62006
+                },
+                {
+                    "x": -70.378887,
+                    "y": -23.61977
+                },
+                {
+                    "x": -70.379387,
+                    "y": -23.619506
+                },
+                {
+                    "x": -70.379907,
+                    "y": -23.61922
+                },
+                {
+                    "x": -70.380409,
+                    "y": -23.618948
+                },
+                {
+                    "x": -70.380917,
+                    "y": -23.618677
+                }
+            ],
+            "speedKMH": 3.59,
+            "length": 303,
+            "turnType": "NONE",
+            "uuid": 1795531680,
+            "endNode": "Puerto Montt",
+            "speed": 0.9972222222222222,
+            "segments": [
+                {
+                    "fromNode": 156886586,
+                    "ID": 153158743,
+                    "toNode": 156871301,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 156871301,
+                    "ID": 153158744,
+                    "toNode": 154994600,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 154994600,
+                    "ID": 148758501,
+                    "toNode": 156869788,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 156869788,
+                    "ID": 153154665,
+                    "toNode": 156869458,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 156869458,
+                    "ID": 153154666,
+                    "toNode": 156869377,
+                    "isForward": true
+                }
+            ],
+            "roadType": 1,
+            "delay": 242,
+            "street": "Vicu\u00f1a",
+            "id": 1795531680,
+            "pubMillis": 1724373138579
+        },
+        {
+            "country": "CI",
+            "level": 1,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.410973,
+                    "y": -23.673726
+                },
+                {
+                    "x": -70.40974,
+                    "y": -23.672895
+                },
+                {
+                    "x": -70.408881,
+                    "y": -23.672317
+                },
+                {
+                    "x": -70.407405,
+                    "y": -23.671306
+                },
+                {
+                    "x": -70.407279,
+                    "y": -23.67122
+                },
+                {
+                    "x": -70.40698,
+                    "y": -23.671007
+                },
+                {
+                    "x": -70.407018,
+                    "y": -23.670888
+                },
+                {
+                    "x": -70.407076,
+                    "y": -23.670792
+                }
+            ],
+            "speedKMH": 11.29,
+            "length": 534,
+            "turnType": "NONE",
+            "uuid": 1795433346,
+            "endNode": "Acceso Av. Grecia",
+            "speed": 3.136111111111111,
+            "segments": [
+                {
+                    "fromNode": 154044244,
+                    "ID": 146619100,
+                    "toNode": 154044032,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 154044032,
+                    "ID": 146618709,
+                    "toNode": 154044045,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 154044045,
+                    "ID": 421439052,
+                    "toNode": 323867530,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 323867530,
+                    "ID": 421439051,
+                    "toNode": 154043977,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 154043977,
+                    "ID": 146618529,
+                    "toNode": 153284784,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 153284784,
+                    "ID": 412730200,
+                    "toNode": 153284785,
+                    "isForward": true
+                }
+            ],
+            "roadType": 2,
+            "delay": 63,
+            "street": "Jos\u00e9 Toribio Medina",
+            "id": 1795433346,
+            "pubMillis": 1724373052949
+        },
+        {
+            "country": "CI",
+            "level": 3,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.397411,
+                    "y": -23.654228
+                },
+                {
+                    "x": -70.396569,
+                    "y": -23.653419
+                },
+                {
+                    "x": -70.39581,
+                    "y": -23.65271
+                },
+                {
+                    "x": -70.395031,
+                    "y": -23.651966
+                },
+                {
+                    "x": -70.394215,
+                    "y": -23.651207
+                },
+                {
+                    "x": -70.393424,
+                    "y": -23.650447
+                }
+            ],
+            "speedKMH": 11.16,
+            "length": 583,
+            "turnType": "NONE",
+            "uuid": 1794268346,
+            "endNode": "Antonio Jos\u00e9 de Sucre",
+            "speed": 3.1,
+            "segments": [
+                {
+                    "fromNode": 154042494,
+                    "ID": 146806664,
+                    "toNode": 154128650,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 154128650,
+                    "ID": 146806665,
+                    "toNode": 154127956,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 154127956,
+                    "ID": 146805203,
+                    "toNode": 154127652,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 154127652,
+                    "ID": 146809283,
+                    "toNode": 154129712,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 154129712,
+                    "ID": 146809950,
+                    "toNode": 154129995,
+                    "isForward": true
+                }
+            ],
+            "roadType": 1,
+            "delay": 101,
+            "street": "14 de Febrero",
+            "id": 1794268346,
+            "pubMillis": 1724372188932
+        },
+        {
+            "country": "CI",
+            "level": 3,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.387162,
+                    "y": -23.617512
+                },
+                {
+                    "x": -70.387779,
+                    "y": -23.617382
+                },
+                {
+                    "x": -70.388084,
+                    "y": -23.617322
+                },
+                {
+                    "x": -70.388626,
+                    "y": -23.617213
+                },
+                {
+                    "x": -70.388959,
+                    "y": -23.617176
+                },
+                {
+                    "x": -70.389067,
+                    "y": -23.617171
+                },
+                {
+                    "x": -70.390151,
+                    "y": -23.616994
+                },
+                {
+                    "x": -70.39033,
+                    "y": -23.616932
+                },
+                {
+                    "x": -70.390411,
+                    "y": -23.616905
+                },
+                {
+                    "x": -70.390904,
+                    "y": -23.616689
+                },
+                {
+                    "x": -70.392201,
+                    "y": -23.616616
+                }
+            ],
+            "speedKMH": 7.48,
+            "length": 528,
+            "turnType": "NONE",
+            "uuid": 1795546104,
+            "endNode": "Av. Edmundo P\u00e9rez Zujovic",
+            "speed": 2.077777777777778,
+            "segments": [
+                {
+                    "fromNode": 163626481,
+                    "ID": 164053725,
+                    "toNode": 154434823,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 154434823,
+                    "ID": 306355425,
+                    "toNode": 249823329,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 249823329,
+                    "ID": 306355424,
+                    "toNode": 178048749,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 178048749,
+                    "ID": 192804500,
+                    "toNode": 154434812,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 154434812,
+                    "ID": 280713208,
+                    "toNode": 232612322,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 232612322,
+                    "ID": 280713207,
+                    "toNode": 156410951,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 156410951,
+                    "ID": 413624250,
+                    "toNode": 154352346,
+                    "isForward": false
+                }
+            ],
+            "roadType": 1,
+            "delay": 104,
+            "street": "V\u00edctor Jara",
+            "id": 1795546104,
+            "pubMillis": 1724373138152
+        },
+        {
+            "country": "CI",
+            "level": 3,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.390489,
+                    "y": -23.581281
+                },
+                {
+                    "x": -70.390502,
+                    "y": -23.581135
+                },
+                {
+                    "x": -70.390547,
+                    "y": -23.58063
+                },
+                {
+                    "x": -70.390591,
+                    "y": -23.580082
+                },
+                {
+                    "x": -70.390661,
+                    "y": -23.57933
+                },
+                {
+                    "x": -70.390689,
+                    "y": -23.578985
+                },
+                {
+                    "x": -70.390765,
+                    "y": -23.578195
+                },
+                {
+                    "x": -70.390811,
+                    "y": -23.577742
+                },
+                {
+                    "x": -70.390861,
+                    "y": -23.577376
+                },
+                {
+                    "x": -70.3909,
+                    "y": -23.576991
+                },
+                {
+                    "x": -70.390933,
+                    "y": -23.576659
+                }
+            ],
+            "speedKMH": 15.24,
+            "length": 513,
+            "turnType": "NONE",
+            "uuid": 1795532680,
+            "endNode": "Av. Arturo P\u00e9rez Canto",
+            "speed": 4.233333333333333,
+            "segments": [
+                {
+                    "fromNode": 339688766,
+                    "ID": 445451179,
+                    "toNode": 339688617,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 339688617,
+                    "ID": 445450952,
+                    "toNode": 320709361,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 320709361,
+                    "ID": 416588974,
+                    "toNode": 320709377,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 320709377,
+                    "ID": 419809093,
+                    "toNode": 322790819,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 322790819,
+                    "ID": 419809094,
+                    "toNode": 320709317,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 320709317,
+                    "ID": 420732803,
+                    "toNode": 323399774,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 323399774,
+                    "ID": 420732804,
+                    "toNode": 320709238,
+                    "isForward": true
+                }
+            ],
+            "roadType": 2,
+            "delay": 62,
+            "street": "Av. Pedro Aguirre Cerda",
+            "id": 1795532680,
+            "pubMillis": 1724373141285
+        },
+        {
+            "country": "CI",
+            "level": 2,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.375356,
+                    "y": -23.623952
+                },
+                {
+                    "x": -70.375248,
+                    "y": -23.623523
+                },
+                {
+                    "x": -70.375143,
+                    "y": -23.623104
+                },
+                {
+                    "x": -70.375038,
+                    "y": -23.622695
+                },
+                {
+                    "x": -70.374917,
+                    "y": -23.622241
+                },
+                {
+                    "x": -70.374772,
+                    "y": -23.62168
+                },
+                {
+                    "x": -70.374659,
+                    "y": -23.621229
+                },
+                {
+                    "x": -70.37455,
+                    "y": -23.620802
+                },
+                {
+                    "x": -70.374429,
+                    "y": -23.620369
+                },
+                {
+                    "x": -70.374289,
+                    "y": -23.619943
+                },
+                {
+                    "x": -70.374146,
+                    "y": -23.619514
+                }
+            ],
+            "speedKMH": 7.53,
+            "length": 509,
+            "turnType": "NONE",
+            "uuid": 1799224846,
+            "endNode": "Cobija",
+            "speed": 2.091666666666667,
+            "segments": [
+                {
+                    "fromNode": 163932862,
+                    "ID": 164805758,
+                    "toNode": 163932868,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 163932868,
+                    "ID": 164806159,
+                    "toNode": 163933023,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 163933023,
+                    "ID": 164806252,
+                    "toNode": 163933071,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 163933071,
+                    "ID": 164806251,
+                    "toNode": 163932950,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 163932950,
+                    "ID": 164806598,
+                    "toNode": 163933213,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 163933213,
+                    "ID": 164806602,
+                    "toNode": 163933214,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 163933214,
+                    "ID": 164806608,
+                    "toNode": 163933216,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 163933216,
+                    "ID": 164806607,
+                    "toNode": 155055579,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 155055579,
+                    "ID": 164806669,
+                    "toNode": 163933240,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 163933240,
+                    "ID": 164806668,
+                    "toNode": 156528328,
+                    "isForward": false
+                }
+            ],
+            "roadType": 1,
+            "delay": 86,
+            "street": "Fresia",
+            "id": 1799224846,
+            "pubMillis": 1724376458788
+        },
+        {
+            "country": "CI",
+            "level": 3,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.398723,
+                    "y": -23.668489
+                },
+                {
+                    "x": -70.398913,
+                    "y": -23.668327
+                },
+                {
+                    "x": -70.398994,
+                    "y": -23.668258
+                },
+                {
+                    "x": -70.399226,
+                    "y": -23.668117
+                },
+                {
+                    "x": -70.399318,
+                    "y": -23.668072
+                },
+                {
+                    "x": -70.399476,
+                    "y": -23.668001
+                },
+                {
+                    "x": -70.400045,
+                    "y": -23.667739
+                },
+                {
+                    "x": -70.400556,
+                    "y": -23.667514
+                },
+                {
+                    "x": -70.401096,
+                    "y": -23.667294
+                },
+                {
+                    "x": -70.401799,
+                    "y": -23.666987
+                },
+                {
+                    "x": -70.403159,
+                    "y": -23.666425
+                }
+            ],
+            "speedKMH": 10.29,
+            "length": 508,
+            "turnType": "NONE",
+            "uuid": 1799317226,
+            "endNode": "Av. Angamos",
+            "speed": 2.8583333333333334,
+            "segments": [
+                {
+                    "fromNode": 153933072,
+                    "ID": 395700724,
+                    "toNode": 306965303,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 306965303,
+                    "ID": 395700723,
+                    "toNode": 153932395,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 153932395,
+                    "ID": 149372466,
+                    "toNode": 155262315,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 155262315,
+                    "ID": 149372467,
+                    "toNode": 154008765,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 154008765,
+                    "ID": 146537740,
+                    "toNode": 154008767,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 154008767,
+                    "ID": 146537741,
+                    "toNode": 153933095,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 153933095,
+                    "ID": 147534555,
+                    "toNode": 154454350,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 154454350,
+                    "ID": 147534557,
+                    "toNode": 153933134,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 153933134,
+                    "ID": 261968731,
+                    "toNode": 153950634,
+                    "isForward": false
+                }
+            ],
+            "roadType": 1,
+            "delay": 111,
+            "street": "General Borgo\u00f1o",
+            "id": 1799317226,
+            "pubMillis": 1724376543409
+        },
+        {
+            "country": "CI",
+            "level": 2,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.389067,
+                    "y": -23.617171
+                },
+                {
+                    "x": -70.390151,
+                    "y": -23.616994
+                },
+                {
+                    "x": -70.39033,
+                    "y": -23.616932
+                },
+                {
+                    "x": -70.390411,
+                    "y": -23.616905
+                },
+                {
+                    "x": -70.390904,
+                    "y": -23.616689
+                },
+                {
+                    "x": -70.392201,
+                    "y": -23.616616
+                }
+            ],
+            "speedKMH": 6.52,
+            "length": 329,
+            "turnType": "NONE",
+            "uuid": 1799316090,
+            "endNode": "Av. Edmundo P\u00e9rez Zujovic",
+            "speed": 1.8111111111111111,
+            "segments": [
+                {
+                    "fromNode": 232612322,
+                    "ID": 280713207,
+                    "toNode": 156410951,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 156410951,
+                    "ID": 413624250,
+                    "toNode": 154352346,
+                    "isForward": false
+                }
+            ],
+            "roadType": 1,
+            "delay": 97,
+            "street": "V\u00edctor Jara",
+            "id": 1799316090,
+            "pubMillis": 1724376540218
+        },
+        {
+            "country": "CI",
+            "level": 3,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.384139,
+                    "y": -23.619437
+                },
+                {
+                    "x": -70.384728,
+                    "y": -23.620369
+                },
+                {
+                    "x": -70.385332,
+                    "y": -23.621328
+                },
+                {
+                    "x": -70.385906,
+                    "y": -23.622261
+                }
+            ],
+            "speedKMH": 6.93,
+            "length": 361,
+            "turnType": "NONE",
+            "uuid": 1799388330,
+            "endNode": "Pisagua",
+            "speed": 1.925,
+            "segments": [
+                {
+                    "fromNode": 156886768,
+                    "ID": 153195268,
+                    "toNode": 154994269,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 154994269,
+                    "ID": 153195332,
+                    "toNode": 154994353,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 154994353,
+                    "ID": 163462290,
+                    "toNode": 154994356,
+                    "isForward": true
+                }
+            ],
+            "roadType": 1,
+            "delay": 113,
+            "street": "Osorno",
+            "id": 1799388330,
+            "pubMillis": 1724376625230
+        }
+    ]
+}
