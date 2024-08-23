@@ -1132,6 +1132,630 @@
             "street": "Osorno",
             "id": 1799388330,
             "pubMillis": 1724376625230
+        },
+        {
+            "country": "CI",
+            "level": 3,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.396569,
+                    "y": -23.653419
+                },
+                {
+                    "x": -70.39581,
+                    "y": -23.65271
+                },
+                {
+                    "x": -70.395031,
+                    "y": -23.651966
+                },
+                {
+                    "x": -70.394215,
+                    "y": -23.651207
+                },
+                {
+                    "x": -70.393424,
+                    "y": -23.650447
+                }
+            ],
+            "speedKMH": 9.6,
+            "length": 459,
+            "turnType": "NONE",
+            "uuid": 1799519912,
+            "endNode": "Antonio Jos\u00e9 de Sucre",
+            "speed": 2.6666666666666665,
+            "segments": [
+                {
+                    "fromNode": 154128650,
+                    "ID": 146806665,
+                    "toNode": 154127956,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 154127956,
+                    "ID": 146805203,
+                    "toNode": 154127652,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 154127652,
+                    "ID": 146809283,
+                    "toNode": 154129712,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 154129712,
+                    "ID": 146809950,
+                    "toNode": 154129995,
+                    "isForward": true
+                }
+            ],
+            "roadType": 1,
+            "delay": 101,
+            "street": "14 de Febrero",
+            "id": 1799519912,
+            "pubMillis": 1724376792024
+        },
+        {
+            "country": "CI",
+            "level": 2,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.382149,
+                    "y": -23.602151
+                },
+                {
+                    "x": -70.382085,
+                    "y": -23.601205
+                },
+                {
+                    "x": -70.382027,
+                    "y": -23.600163
+                },
+                {
+                    "x": -70.381996,
+                    "y": -23.599715
+                },
+                {
+                    "x": -70.381954,
+                    "y": -23.599167
+                },
+                {
+                    "x": -70.381909,
+                    "y": -23.598681
+                },
+                {
+                    "x": -70.381883,
+                    "y": -23.598222
+                }
+            ],
+            "speedKMH": 12.41,
+            "length": 437,
+            "turnType": "NONE",
+            "uuid": 1799777260,
+            "endNode": "Pasaje Sargento Candelaria",
+            "speed": 3.4472222222222224,
+            "segments": [
+                {
+                    "fromNode": 154384767,
+                    "ID": 147375553,
+                    "toNode": 154384669,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 154384669,
+                    "ID": 164420402,
+                    "toNode": 163775211,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 163775211,
+                    "ID": 164421141,
+                    "toNode": 163775542,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 163775542,
+                    "ID": 164421142,
+                    "toNode": 154387419,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 154387419,
+                    "ID": 164419247,
+                    "toNode": 163774726,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 163774726,
+                    "ID": 164419248,
+                    "toNode": 163774685,
+                    "isForward": true
+                }
+            ],
+            "roadType": 1,
+            "delay": 62,
+            "street": "Bandera",
+            "id": 1799777260,
+            "pubMillis": 1724377126478
+        },
+        {
+            "country": "CI",
+            "level": 3,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.385366,
+                    "y": -23.617237
+                },
+                {
+                    "x": -70.385392,
+                    "y": -23.617356
+                },
+                {
+                    "x": -70.385451,
+                    "y": -23.617639
+                },
+                {
+                    "x": -70.385498,
+                    "y": -23.617905
+                },
+                {
+                    "x": -70.385551,
+                    "y": -23.618054
+                },
+                {
+                    "x": -70.385599,
+                    "y": -23.618125
+                },
+                {
+                    "x": -70.3857,
+                    "y": -23.618312
+                },
+                {
+                    "x": -70.386007,
+                    "y": -23.618816
+                },
+                {
+                    "x": -70.386619,
+                    "y": -23.619819
+                },
+                {
+                    "x": -70.386935,
+                    "y": -23.620316
+                }
+            ],
+            "speedKMH": 10.48,
+            "length": 380,
+            "turnType": "NONE",
+            "uuid": 1799814056,
+            "endNode": "Chiu Chiu",
+            "speed": 2.911111111111111,
+            "segments": [
+                {
+                    "fromNode": 172538855,
+                    "ID": 179685857,
+                    "toNode": 156104268,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 156104268,
+                    "ID": 330724487,
+                    "toNode": 265238021,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 265238021,
+                    "ID": 330724488,
+                    "toNode": 156465813,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 156465813,
+                    "ID": 152191237,
+                    "toNode": 156104276,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 156104276,
+                    "ID": 151342398,
+                    "toNode": 156104279,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 156104279,
+                    "ID": 164053939,
+                    "toNode": 163626550,
+                    "isForward": true
+                }
+            ],
+            "roadType": 2,
+            "delay": 74,
+            "street": "Azapa",
+            "id": 1799814056,
+            "pubMillis": 1724377124792
+        },
+        {
+            "country": "CI",
+            "level": 3,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.378087,
+                    "y": -23.580215
+                },
+                {
+                    "x": -70.378569,
+                    "y": -23.580257
+                },
+                {
+                    "x": -70.379373,
+                    "y": -23.580312
+                },
+                {
+                    "x": -70.379854,
+                    "y": -23.580343
+                },
+                {
+                    "x": -70.380286,
+                    "y": -23.580375
+                }
+            ],
+            "speedKMH": 5.32,
+            "length": 224,
+            "turnType": "NONE",
+            "uuid": 1799969528,
+            "endNode": "Nicol\u00e1s Gonz\u00e1lez",
+            "speed": 1.4777777777777779,
+            "segments": [
+                {
+                    "fromNode": 163700353,
+                    "ID": 164239348,
+                    "toNode": 163700358,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 163700358,
+                    "ID": 164239347,
+                    "toNode": 163669771,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 163669771,
+                    "ID": 164166049,
+                    "toNode": 163672561,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 163672561,
+                    "ID": 164166048,
+                    "toNode": 163672187,
+                    "isForward": false
+                }
+            ],
+            "roadType": 1,
+            "delay": 83,
+            "street": "Mar\u00eda Elena",
+            "id": 1799969528,
+            "pubMillis": 1724377292964
+        },
+        {
+            "country": "CI",
+            "level": 3,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.401201,
+                    "y": -23.677427
+                },
+                {
+                    "x": -70.399993,
+                    "y": -23.676608
+                },
+                {
+                    "x": -70.398814,
+                    "y": -23.675848
+                }
+            ],
+            "speedKMH": 7.11,
+            "length": 300,
+            "turnType": "NONE",
+            "uuid": 1800314486,
+            "endNode": "Las Encinas",
+            "speed": 1.975,
+            "segments": [
+                {
+                    "fromNode": 155071350,
+                    "ID": 148932461,
+                    "toNode": 156369557,
+                    "isForward": true
+                }
+            ],
+            "roadType": 1,
+            "delay": 101,
+            "street": "Coronel Emilio Sotomayor",
+            "id": 1800314486,
+            "pubMillis": 1724377711381
+        },
+        {
+            "country": "CI",
+            "level": 4,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.402009,
+                    "y": -23.671719
+                },
+                {
+                    "x": -70.401875,
+                    "y": -23.671607
+                },
+                {
+                    "x": -70.401339,
+                    "y": -23.670319
+                }
+            ],
+            "speedKMH": 3.69,
+            "length": 171,
+            "turnType": "NONE",
+            "uuid": 1800307714,
+            "endNode": "Angol",
+            "speed": 1.025,
+            "segments": [
+                {
+                    "fromNode": 153957632,
+                    "ID": 152499537,
+                    "toNode": 156596830,
+                    "isForward": true
+                }
+            ],
+            "roadType": 1,
+            "delay": 149,
+            "street": "Eduardo Orchard",
+            "id": 1800307714,
+            "pubMillis": 1724377713083
+        },
+        {
+            "country": "CI",
+            "level": 3,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.382203,
+                    "y": -23.602876
+                },
+                {
+                    "x": -70.382176,
+                    "y": -23.602529
+                },
+                {
+                    "x": -70.382168,
+                    "y": -23.602387
+                },
+                {
+                    "x": -70.382149,
+                    "y": -23.602151
+                },
+                {
+                    "x": -70.382085,
+                    "y": -23.601205
+                },
+                {
+                    "x": -70.382027,
+                    "y": -23.600163
+                },
+                {
+                    "x": -70.381996,
+                    "y": -23.599715
+                },
+                {
+                    "x": -70.381954,
+                    "y": -23.599167
+                },
+                {
+                    "x": -70.381909,
+                    "y": -23.598681
+                },
+                {
+                    "x": -70.381883,
+                    "y": -23.598222
+                }
+            ],
+            "speedKMH": 13.3,
+            "length": 518,
+            "turnType": "NONE",
+            "uuid": 1800174496,
+            "endNode": "Pasaje Sargento Candelaria",
+            "speed": 3.6944444444444446,
+            "segments": [
+                {
+                    "fromNode": 154384769,
+                    "ID": 412938815,
+                    "toNode": 318370950,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 318370950,
+                    "ID": 412938814,
+                    "toNode": 240386749,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 240386749,
+                    "ID": 306347345,
+                    "toNode": 154384767,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 154384767,
+                    "ID": 147375553,
+                    "toNode": 154384669,
+                    "isForward": false
+                },
+                {
+                    "fromNode": 154384669,
+                    "ID": 164420402,
+                    "toNode": 163775211,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 163775211,
+                    "ID": 164421141,
+                    "toNode": 163775542,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 163775542,
+                    "ID": 164421142,
+                    "toNode": 154387419,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 154387419,
+                    "ID": 164419247,
+                    "toNode": 163774726,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 163774726,
+                    "ID": 164419248,
+                    "toNode": 163774685,
+                    "isForward": true
+                }
+            ],
+            "roadType": 1,
+            "delay": 69,
+            "street": "Bandera",
+            "id": 1800174496,
+            "pubMillis": 1724377543029
+        },
+        {
+            "country": "CI",
+            "level": 3,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.376161,
+                    "y": -23.580436
+                },
+                {
+                    "x": -70.376157,
+                    "y": -23.58054
+                },
+                {
+                    "x": -70.376172,
+                    "y": -23.580685
+                },
+                {
+                    "x": -70.37623,
+                    "y": -23.580831
+                },
+                {
+                    "x": -70.376317,
+                    "y": -23.580977
+                },
+                {
+                    "x": -70.376432,
+                    "y": -23.581103
+                },
+                {
+                    "x": -70.376588,
+                    "y": -23.581208
+                },
+                {
+                    "x": -70.376802,
+                    "y": -23.58129
+                },
+                {
+                    "x": -70.377052,
+                    "y": -23.581376
+                }
+            ],
+            "speedKMH": 4.15,
+            "length": 152,
+            "turnType": "NONE",
+            "uuid": 1800174578,
+            "endNode": "R\u00edo Maule",
+            "speed": 1.1527777777777777,
+            "segments": [
+                {
+                    "fromNode": 326598264,
+                    "ID": 425492817,
+                    "toNode": 163672281,
+                    "isForward": true
+                }
+            ],
+            "roadType": 1,
+            "delay": 106,
+            "street": "Gonzalo Castro Toro",
+            "id": 1800174578,
+            "pubMillis": 1724377545119
+        },
+        {
+            "country": "CI",
+            "level": 2,
+            "city": "Antofagasta",
+            "line": [
+                {
+                    "x": -70.397411,
+                    "y": -23.654228
+                },
+                {
+                    "x": -70.396569,
+                    "y": -23.653419
+                },
+                {
+                    "x": -70.39581,
+                    "y": -23.65271
+                },
+                {
+                    "x": -70.395031,
+                    "y": -23.651966
+                },
+                {
+                    "x": -70.394215,
+                    "y": -23.651207
+                }
+            ],
+            "speedKMH": 13.4,
+            "length": 466,
+            "turnType": "NONE",
+            "uuid": 1800372528,
+            "endNode": "Antonio Jos\u00e9 de Sucre",
+            "speed": 3.7222222222222223,
+            "segments": [
+                {
+                    "fromNode": 154042494,
+                    "ID": 146806664,
+                    "toNode": 154128650,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 154128650,
+                    "ID": 146806665,
+                    "toNode": 154127956,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 154127956,
+                    "ID": 146805203,
+                    "toNode": 154127652,
+                    "isForward": true
+                },
+                {
+                    "fromNode": 154127652,
+                    "ID": 146809283,
+                    "toNode": 154129712,
+                    "isForward": true
+                }
+            ],
+            "roadType": 1,
+            "delay": 68,
+            "street": "14 de Febrero",
+            "id": 1800372528,
+            "pubMillis": 1724377789078
         }
     ]
 }
