@@ -5,6 +5,7 @@ from shapely.geometry import Point
 import json
 import contextily as cx
 import matplotlib.pyplot as plt
+from scipy.spatial import cKDTree
 
 
 PERIM_X = [-70.42034224747098, -70.36743722434367]
@@ -64,27 +65,37 @@ def haversine(coordx:list, coordy:list):
     # Distancia en metros
     return c * r * 1000
 
-def freq_nearby(df, nearby_meters=200):
-    '''
-    Cuenta cuántos puntos hay cerca para cada punto en GeoDataFrame
-    '''
-    df['freq'] = 0
-    df = df.reset_index(drop=True)
-    par = len(df) % 2 == 0
-    if par:
-        center = len(df) // 2 + 1
-    else:
-        center = len(df) // 2
-
-    j = center
-    for i in range(0, center):
-        dist = df.iloc[i].geometry.distance(df.iloc[j].geometry)
-        if dist < nearby_meters:
-            df.at[i, 'freq'] += 1
-            df.at[j, 'freq'] += 1
-        j += 1
-        
-    return df
+def freq_nearby(gdf, nearby_meters=200):
+    """
+    Cuenta cuántos puntos cercanos hay dentro de un radio especificado para cada punto en el GeoDataFrame.
+    
+    Parámetros:
+    - gdf: GeoDataFrame que contiene geometrías de puntos.
+    - radius: Radio de búsqueda en metros.
+    
+    Retorna:
+    - GeoDataFrame con una columna adicional 'freq'.
+    """
+    # Asegura que el GeoDataFrame esté en un CRS proyectado con unidades en metros
+    if gdf.crs.is_geographic:
+        gdf = gdf.to_crs(epsg=3857)
+    
+    # Extraer coordenadas x e y
+    coords = np.vstack((gdf.geometry.x, gdf.geometry.y)).T
+    
+    # Construir el cKDTree
+    tree = cKDTree(coords)
+    
+    # Consultar el árbol
+    indices = tree.query_ball_point(coords, r=nearby_meters)
+    
+    # Contar vecinos (excluyendo el propio punto)
+    neighbor_counts = [len(ind) - 1 for ind in indices]
+    
+    # Añadir los conteos al GeoDataFrame
+    gdf['freq'] = neighbor_counts
+    
+    return gdf
 
 def separate_coords(df):
     '''
@@ -138,19 +149,51 @@ def hourly_group(data:pd.DataFrame):
 
     return hourly_reports
 
-def filter_nearby(data:gpd.GeoDataFrame, nearby_meters:float=200):
-    '''
-    Filtra los puntos cercanos a una distancia dada
-    '''
-    unique = [True] * len(data)
-    for i in range(0, len(data)):
-        for j in range(i+1, len(data)):
-            if not unique[j]:
-                continue
-            dist = haversine([data.iloc[i].x, data.iloc[j].x], [data.iloc[i].y, data.iloc[j].y])
-            if dist < nearby_meters:
-                unique[j] = False
-    return unique
+import geopandas as gpd
+import numpy as np
+from scipy.spatial import cKDTree
+
+def filter_nearby(gdf, threshold = 300):
+    """
+    Filtra los puntos que tienen otros puntos cercanos dentro de un umbral dado.
+    Retorna un GeoDataFrame con puntos únicos sin vecinos cercanos.
+
+    Parámetros:
+    - gdf: GeoDataFrame con geometrías de puntos.
+    - threshold: Distancia umbral en metros.
+
+    Retorna:
+    - GeoDataFrame filtrado.
+    """
+    # Verificar y reproyectar si es necesario
+    if gdf.crs.is_geographic:
+        gdf = gdf.to_crs(epsg=3857)
+
+    # Extraer coordenadas x e y
+    coords = np.vstack((gdf.geometry.x, gdf.geometry.y)).T
+
+    # Construir el cKDTree
+    tree = cKDTree(coords)
+
+    # Inicializar un arreglo booleano para marcar los puntos a conservar
+    n_points = len(gdf)
+    keep = np.ones(n_points, dtype=bool)
+
+    # Iterar sobre cada punto
+    for idx in range(n_points):
+        if keep[idx]:
+            # Encontrar los índices de los puntos dentro del umbral
+            indices = tree.query_ball_point(coords[idx], r=threshold)
+            # Excluir el propio punto
+            indices = [i for i in indices if i != idx]
+            # Marcar los vecinos cercanos como False (eliminados)
+            keep[indices] = False
+        else:
+            continue
+
+    # Filtrar el GeoDataFrame
+    gdf_filtered = gdf[keep].reset_index(drop=True)
+    return gdf_filtered
 
 def plot_map(data:gpd.GeoDataFrame, title:str, cmap:str='viridis', markersize:int = 10, ax:plt.axes=None, figsize:tuple=(4.5, 9.5)):
     '''
