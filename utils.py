@@ -3,10 +3,16 @@ import numpy as np
 import geopandas as gpd
 from shapely.geometry import Point
 import json
+import contextily as cx
+import matplotlib.pyplot as plt
 
 
-PERIM_X = [-70.45534224747098, -70.32743722434367]
-PERIM_Y = [-23.701724880116387, -23.411242421131792]
+PERIM_X = [-70.42034224747098, -70.36743722434367]
+PERIM_Y = [-23.721724880116387, -23.511242421131792]
+
+PERIM_AFTA = gpd.GeoDataFrame(geometry=gpd.points_from_xy(PERIM_X, PERIM_Y))
+PERIM_AFTA.crs = "EPSG:4326"
+PERIM_AFTA = PERIM_AFTA.to_crs("EPSG:3857")
 
 def load_data(file:str='data.json'):
     '''
@@ -140,3 +146,23 @@ def filter_nearby(data:gpd.GeoDataFrame, nearby_meters:float=200):
             if dist < nearby_meters:
                 unique[j] = False
     return unique
+
+def plot_map(data:gpd.GeoDataFrame, title:str, cmap:str='viridis', markersize:int = 10, ax:plt.axes=None, figsize:tuple=(4.5, 9.5)):
+    '''
+    Grafica un GeoDataFrame en un eje de coordenadas
+    '''
+    if ax is None:
+        fig, ax = plt.subplots()
+        fig.set_size_inches(figsize)
+
+    sc = data.to_crs(epsg=3857).geometry.plot(ax=ax, cmap=cmap, alpha=0.8, markersize=markersize, c=data.freq)
+    ax.set_xlim(PERIM_AFTA.total_bounds[0], PERIM_AFTA.total_bounds[2])
+    ax.set_ylim(PERIM_AFTA.total_bounds[1], PERIM_AFTA.total_bounds[3])
+    cx.add_basemap(ax, source=cx.providers.OpenStreetMap.Mapnik)
+    cbar = sc.get_figure().colorbar(sc.collections[0], ax=ax)
+    cbar.set_label('Frecuencia')
+    ax.set_xlabel('Longitud')
+    ax.set_ylabel('Latitud')
+    plt.xticks(rotation=45)
+    ax.set_title(title)
+    return fig, ax
