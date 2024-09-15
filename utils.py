@@ -64,14 +64,18 @@ def haversine(coordx:list, coordy:list):
     # Distancia en metros
     return c * r * 1000
 
-def nearby(row, df, nearby_meters=200):
+def freq_nearby(df, nearby_meters=200):
     '''
-    Cuenta cuántos puntos hay cerca de un punto dado
+    Cuenta cuántos puntos hay cerca para cada punto en GeoDataFrame
     '''
-    c = 0
-    for i in df.index:
-        c += 1 if row.geometry.distance(df.loc[i, 'geometry']) <= nearby_meters else 0
-    return c
+    count = 0
+    for i in range(0, len(df)):
+        for j in range(i+1, len(df)):
+            dist = df.iloc[i].geometry.distance(df.iloc[j].geometry)
+            if dist < nearby_meters:
+                count += 1
+        df['freq'] = count
+    return df
 
 def separate_coords(df):
     '''
