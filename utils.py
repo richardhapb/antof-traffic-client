@@ -68,13 +68,22 @@ def freq_nearby(df, nearby_meters=200):
     '''
     Cuenta cuántos puntos hay cerca para cada punto en GeoDataFrame
     '''
-    count = 0
-    for i in range(0, len(df)):
-        for j in range(i+1, len(df)):
-            dist = df.iloc[i].geometry.distance(df.iloc[j].geometry)
-            if dist < nearby_meters:
-                count += 1
-        df['freq'] = count
+    df['freq'] = 0
+    df = df.reset_index(drop=True)
+    par = len(df) % 2 == 0
+    if par:
+        center = len(df) // 2 + 1
+    else:
+        center = len(df) // 2
+
+    j = center
+    for i in range(0, center):
+        dist = df.iloc[i].geometry.distance(df.iloc[j].geometry)
+        if dist < nearby_meters:
+            df.at[i, 'freq'] += 1
+            df.at[j, 'freq'] += 1
+        j += 1
+        
     return df
 
 def separate_coords(df):
