@@ -6,6 +6,7 @@ import json
 import contextily as cx
 import matplotlib.pyplot as plt
 from scipy.spatial import cKDTree
+import requests
 
 
 PERIM_X = [-70.42034224747098, -70.36743722434367]
@@ -14,6 +15,8 @@ PERIM_Y = [-23.721724880116387, -23.511242421131792]
 PERIM_AFTA = gpd.GeoDataFrame(geometry=gpd.points_from_xy(PERIM_X, PERIM_Y))
 PERIM_AFTA.crs = "EPSG:4326"
 PERIM_AFTA = PERIM_AFTA.to_crs("EPSG:3857")
+
+API_FERIADOS = "https://api.boostr.cl/holidays/2024.json"
 
 
 def load_data(file: str = "data.json"):
@@ -151,11 +154,18 @@ def extract_event(data: gpd.GeoDataFrame, concept: str):
 
     # Ya se encuentra en GMT-4
     dat["endreport"] = pd.to_datetime(data["endreport"], unit="ms")
+    dat["endreport"] = dat["endreport"].dt.tz_localize("America/Santiago")
+
+    feriados = get_holidays()
 
     dat = dat.rename(columns={"pubMillis": "inicio", "endreport": "fin"})
     dat["hour"] = dat["inicio"].dt.hour
     dat["day"] = dat["inicio"].dt.dayofweek
-    dat["day_type"] = dat["day"].apply(lambda x: "Semana" if x < 5 else "Fin de semana")
+    dat["day_type"] = dat["inicio"].apply(
+        lambda x: "f"
+        if (x.weekday() >= 5) | (x.strftime("%Y-%m-%d") in feriados)
+        else "s"
+    )
     return dat
 
 
@@ -163,8 +173,41 @@ def hourly_group(data: pd.DataFrame):
     """
     Transforma un DataFrame de eventos en un reporte por hora
     """
+
+    df = data[["day_type", "hour", "inicio", "fin"]].copy()
+
+    df.reset_index(inplace=True, drop=True)
+
+    def calculate_hours(df):
+        for i in range(df.shape[0]):
+            hours = (df.loc[i, "fin"] - df.loc[i, "inicio"]).total_seconds() / 3600
+            if np.isnan(hours):
+                continue
+            for h in range(1, int(hours) + 1):
+                df = pd.concat(
+                    [
+                        df,
+                        pd.DataFrame(
+                            {
+                                "day_type": [df.loc[i, "day_type"]],
+                                "hour": [df.loc[i, "hour"] + h]
+                                if (df.loc[i, "hour"] + h) < 24
+                                else [df.loc[i, "hour"] + h - 24],
+                                "inicio": [df.loc[i, "inicio"]],
+                                "fin": [df.loc[i, "fin"]],
+                            },
+                        ),
+                    ],
+                    ignore_index=True,
+                )
+        return df
+
+    df = calculate_hours(df)
+
     # Agrupar por hora y tipo de día
-    hourly_reports = data.groupby(["day_type", "hour"]).size().unstack(level=0)
+    hourly_reports = (
+        df[["day_type", "hour"]].groupby(["day_type", "hour"]).size().unstack(level=0)
+    )
 
     # Crear un índice que incluya todas las horas del día
     all_hours = pd.Index(range(24), name="hour")
@@ -246,3 +289,12 @@ def plot_map(
     plt.xticks(rotation=45)
     ax.set_title(title)
     return fig, ax
+
+
+def get_holidays():
+    feriados = requests.get(API_FERIADOS).json()
+
+    feriados = feriados["data"]
+    feriados = [f["date"] for f in feriados]
+
+    return feriados
