@@ -139,12 +139,18 @@ def separate_coords(df):
     return dfg
 
 
-def extract_event(data: gpd.GeoDataFrame, concept: str):
+def extract_event(data: gpd.GeoDataFrame, concept: list, extra_col: list = []):
     """
     Extraer los eventos de un tipo específico de un GeoDataFrame
     """
-    dat = data[data["type"] == concept][
-        ["uuid", "street", "pubMillis", "endreport", "x", "y", "geometry"]
+
+    dat = data.copy()
+
+    if "geometry" not in dat.columns:
+        dat = separate_coords(dat)
+
+    dat = dat[dat["type"].isin(concept)][
+        ["uuid", "street", "pubMillis", "endreport", "x", "y", "geometry"] + extra_col
     ]
 
     dat["pubMillis"] = pd.to_datetime(data["pubMillis"], unit="ms", utc=True)
@@ -160,7 +166,7 @@ def extract_event(data: gpd.GeoDataFrame, concept: str):
 
     dat = dat.rename(columns={"pubMillis": "inicio", "endreport": "fin"})
     dat["hour"] = dat["inicio"].dt.hour
-    dat["day"] = dat["inicio"].dt.dayofweek
+    dat["week_day"] = dat["inicio"].dt.dayofweek
     dat["day_type"] = dat["inicio"].apply(
         lambda x: "f"
         if (x.weekday() >= 5) | (x.strftime("%Y-%m-%d") in feriados)
