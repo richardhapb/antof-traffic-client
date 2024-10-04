@@ -1,5 +1,5 @@
 .venv
 antofTraffic
 .DS_Store
-__pycache__data.json
+__pycache__
 data.json
