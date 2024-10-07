@@ -14,6 +14,10 @@ TODO
 
 Desarrollar modelo random forest distribuido en dos ejes principales:
 
-1. Evaluar probabilidad de que se produzca una alerta
-2. Categorizar alerta entre jams y accidents
-   1. Se deben equilibrar las categorías, hay menos accidents que jams
+- [ ] Evaluar probabilidad de que se produzca una alerta
+- [ ] Categorizar alerta entre jams y accidents
+  - [ ] Se deben equilibrar las categorías, hay menos accidents que jams
+- [ ] Predecir calle en donde se producirá el evento
+- [ ] Revisar políticas de privacidad de Waze para ver porque no hay datos de usuarios que no han reportado nada.
+- [ ] En hourly_group agregar el street para luego no filtrar los datos en modelo ML
+

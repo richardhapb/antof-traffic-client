@@ -1,5 +1,5 @@
 '''
-Actualiza el archivo data.json con la información de la API de Waze.
+Actualiza el archivo waze.json con la información de la API de Waze.
 '''
 
 import json
@@ -12,7 +12,7 @@ timezone = pytz.timezone("America/Santiago")
 # 15000 = 2.5 minutos, el promedio entre periodos
 now = int(datetime.datetime.now(timezone).timestamp()) * 1000 - 150000
 
-def read_json(filename='data.json'):
+def read_json(filename='data/waze.json'):
     '''
     Lee un archivo json y lo convierte en un diccionario.
     '''
@@ -21,7 +21,7 @@ def read_json(filename='data.json'):
         file.close()
         return d
 
-def write_json(dat, filename='data.json'):
+def write_json(dat, filename='data/waze.json'):
     '''
     Escribe un diccionario en un archivo json.
     '''
@@ -59,7 +59,7 @@ def verify_endings(datf, datr):
 
 def main():
     '''
-    Actualiza el archivo data.json con la información de la API de Waze.
+    Actualiza el archivo waze.json con la información de la API de Waze.
     '''
     url = "https://www.waze.com/row-partnerhub-api/partners/18532407453/waze-feeds/d44195e2-2952-4b2f-8539-af8e85b661c5?format=1"
     response = requests.get(url, timeout=10)
