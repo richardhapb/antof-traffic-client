@@ -19,7 +19,7 @@ PERIM_AFTA = PERIM_AFTA.to_crs("EPSG:3857")
 API_FERIADOS = "https://api.boostr.cl/holidays/2024.json"
 
 
-def load_data(file: str = "data.json"):
+def load_data(file: str = "data/waze.json"):
     """
     Carga un archivo JSON en un DataFrame
     """

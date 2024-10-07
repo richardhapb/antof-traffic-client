@@ -18,6 +18,7 @@ Av. Grecia,-70.402463,-23.650814,JAM,12,4,s,23,8,2024,58
 Av. Grecia,-70.402506,-23.655789,JAM,13,4,s,23,8,2024,0
 Av. Grecia,-70.402621,-23.6546,JAM,13,4,s,23,8,2024,1
 Av. Balmaceda,-70.399316,-23.645355,JAM,13,4,s,23,8,2024,0
+Av. Séptimo de Línea,-70.396203,-23.640586,JAM,13,4,s,23,8,2024,3
 Av. Edmundo Pérez Zujovic,-70.395669,-23.636586,JAM,13,4,s,23,8,2024,8
 Av. Grecia,-70.402536,-23.652761,JAM,13,4,s,23,8,2024,10
 Av. Edmundo Pérez Zujovic,-70.395696,-23.633673,JAM,13,4,s,23,8,2024,16
@@ -34,7 +35,6 @@ Av. Iquique,-70.392617,-23.62376,JAM,13,4,s,23,8,2024,47
 Av. Edmundo Pérez Zujovic,-70.396332,-23.626363,JAM,13,4,s,23,8,2024,48
 Av. Balmaceda,-70.401423,-23.646553,JAM,13,4,s,23,8,2024,56
 Av. Edmundo Pérez Zujovic,-70.395712,-23.635413,JAM,14,4,s,23,8,2024,3
-Av. Salvador Allende,-70.391652,-23.628484,JAM,14,4,s,23,8,2024,13
 Av. Iquique,-70.393906,-23.631183,JAM,14,4,s,23,8,2024,16
 Av. Edmundo Pérez Zujovic,-70.392748,-23.620187,JAM,14,4,s,23,8,2024,14
 Av. Edmundo Pérez Zujovic,-70.395834,-23.635564,JAM,14,4,s,23,8,2024,23
@@ -58,7 +58,6 @@ Av. Edmundo Pérez Zujovic,-70.39264,-23.619946,JAM,16,4,s,23,8,2024,15
 Av. Edmundo Pérez Zujovic,-70.39433,-23.622569,JAM,16,4,s,23,8,2024,44
 Av. Edmundo Pérez Zujovic,-70.392026,-23.611008,JAM,16,4,s,23,8,2024,46
 Av. Pedro Aguirre Cerda,-70.389896,-23.588443,JAM,17,4,s,23,8,2024,8
-Av. Salvador Allende,-70.389062,-23.628256,JAM,17,4,s,23,8,2024,19
 Av. Edmundo Pérez Zujovic,-70.396502,-23.59158,JAM,17,4,s,23,8,2024,26
 Av. Edmundo Pérez Zujovic,-70.396341,-23.591243,ACCIDENT,17,4,s,23,8,2024,37
 Av. Edmundo Pérez Zujovic,-70.397014,-23.592668,JAM,17,4,s,23,8,2024,35
@@ -102,6 +101,7 @@ Av. Pedro Aguirre Cerda,-70.389177,-23.618192,JAM,19,4,s,23,8,2024,22
 Av. Edmundo Pérez Zujovic,-70.395678,-23.633135,JAM,19,4,s,23,8,2024,22
 Av. Pedro Aguirre Cerda,-70.388847,-23.605074,JAM,19,4,s,23,8,2024,24
 Av. Grecia,-70.402469,-23.656596,JAM,19,4,s,23,8,2024,33
+Av. Séptimo de Línea,-70.396073,-23.64016,JAM,20,4,s,23,8,2024,3
 Av. Edmundo Pérez Zujovic,-70.396154,-23.630697,JAM,20,4,s,23,8,2024,5
 Av. Edmundo Pérez Zujovic,-70.395679,-23.632478,JAM,20,4,s,23,8,2024,18
 Av. Edmundo Pérez Zujovic,-70.395955,-23.631551,JAM,20,4,s,23,8,2024,27
@@ -131,9 +131,11 @@ Av. Edmundo Pérez Zujovic,-70.397058,-23.593139,JAM,11,5,f,24,8,2024,40
 Av. Edmundo Pérez Zujovic,-70.39512,-23.588877,JAM,11,5,f,24,8,2024,41
 Av. Edmundo Pérez Zujovic,-70.393301,-23.585833,JAM,11,5,f,24,8,2024,42
 Av. Edmundo Pérez Zujovic,-70.393826,-23.586747,JAM,12,5,f,24,8,2024,9
+Av. Séptimo de Línea,-70.396015,-23.639528,ACCIDENT,12,5,f,24,8,2024,11
 Av. Óscar Bonilla,-70.379552,-23.578208,JAM,12,5,f,24,8,2024,8
 Av. Óscar Bonilla,-70.379386,-23.580174,JAM,12,5,f,24,8,2024,9
 Av. Edmundo Pérez Zujovic,-70.396023,-23.573796,ACCIDENT,12,5,f,24,8,2024,13
+Av. Séptimo de Línea,-70.395814,-23.638859,JAM,12,5,f,24,8,2024,18
 Av. Edmundo Pérez Zujovic,-70.396926,-23.572339,JAM,12,5,f,24,8,2024,26
 Av. Edmundo Pérez Zujovic,-70.396241,-23.62944,JAM,12,5,f,24,8,2024,23
 Av. Edmundo Pérez Zujovic,-70.396137,-23.630841,JAM,12,5,f,24,8,2024,29
@@ -145,11 +147,11 @@ Av. Pedro Aguirre Cerda,-70.388648,-23.615334,JAM,12,5,f,24,8,2024,55
 Av. Pedro Aguirre Cerda,-70.388945,-23.605335,JAM,12,5,f,24,8,2024,53
 Av. Pedro Aguirre Cerda,-70.388822,-23.616122,JAM,12,5,f,24,8,2024,55
 Av. Edmundo Pérez Zujovic,-70.394856,-23.623374,JAM,13,5,f,24,8,2024,1
-Av. Salvador Allende,-70.393406,-23.628439,JAM,12,5,f,24,8,2024,58
 Av. Edmundo Pérez Zujovic,-70.395945,-23.631579,JAM,13,5,f,24,8,2024,1
 Av. Edmundo Pérez Zujovic,-70.395809,-23.633277,JAM,13,5,f,24,8,2024,8
 Av. Edmundo Pérez Zujovic,-70.392676,-23.619635,JAM,13,5,f,24,8,2024,8
 Av. Edmundo Pérez Zujovic,-70.396301,-23.630477,JAM,13,5,f,24,8,2024,10
+Av. Séptimo de Línea,-70.396134,-23.639923,JAM,13,5,f,24,8,2024,12
 Av. Edmundo Pérez Zujovic,-70.395764,-23.625067,JAM,13,5,f,24,8,2024,12
 Av. Balmaceda,-70.398493,-23.644252,JAM,13,5,f,24,8,2024,26
 Av. Edmundo Pérez Zujovic,-70.395931,-23.63196,JAM,13,5,f,24,8,2024,31
@@ -161,6 +163,7 @@ Av. Balmaceda,-70.398002,-23.643734,JAM,13,5,f,24,8,2024,39
 Av. Edmundo Pérez Zujovic,-70.395856,-23.634367,JAM,13,5,f,24,8,2024,45
 Av. Grecia,-70.402526,-23.652546,JAM,13,5,f,24,8,2024,51
 Av. Edmundo Pérez Zujovic,-70.395798,-23.633125,JAM,13,5,f,24,8,2024,49
+Av. Séptimo de Línea,-70.395981,-23.639417,JAM,13,5,f,24,8,2024,48
 Av. Grecia,-70.402491,-23.651705,JAM,13,5,f,24,8,2024,51
 Av. Balmaceda,-70.402313,-23.647349,JAM,14,5,f,24,8,2024,33
 Av. Edmundo Pérez Zujovic,-70.396071,-23.590366,ACCIDENT,15,5,f,24,8,2024,49
@@ -190,6 +193,7 @@ Av. Antonio Rendic,-70.389456,-23.627532,ACCIDENT,18,6,f,25,8,2024,4
 Av. Edmundo Pérez Zujovic,-70.39689,-23.592133,JAM,18,6,f,25,8,2024,34
 Av. Pedro Aguirre Cerda,-70.390107,-23.587089,JAM,19,6,f,25,8,2024,23
 Av. Pedro Aguirre Cerda,-70.390926,-23.577747,JAM,19,6,f,25,8,2024,35
+Av. Séptimo de Línea,-70.396207,-23.640599,JAM,19,6,f,25,8,2024,56
 Av. Edmundo Pérez Zujovic,-70.396579,-23.591419,ACCIDENT,20,6,f,25,8,2024,10
 Av. Iquique,-70.393363,-23.639809,JAM,20,6,f,25,8,2024,52
 Av. Iquique,-70.393378,-23.639371,JAM,20,6,f,25,8,2024,53
@@ -208,7 +212,6 @@ Av. Pedro Aguirre Cerda,-70.389747,-23.591655,JAM,7,0,s,26,8,2024,13
 Av. Pedro Aguirre Cerda,-70.388678,-23.615472,JAM,7,0,s,26,8,2024,15
 Av. Edmundo Pérez Zujovic,-70.397258,-23.571347,JAM,7,0,s,26,8,2024,14
 Av. Iquique,-70.39411,-23.628825,JAM,7,0,s,26,8,2024,16
-Av. Salvador Allende,-70.39449,-23.628603,JAM,7,0,s,26,8,2024,15
 Av. Edmundo Pérez Zujovic,-70.393825,-23.586745,JAM,7,0,s,26,8,2024,19
 Av. Edmundo Pérez Zujovic,-70.396344,-23.595964,JAM,7,0,s,26,8,2024,23
 Av. Grecia,-70.402637,-23.652416,JAM,7,0,s,26,8,2024,27
@@ -327,7 +330,6 @@ Av. Argentina,-70.399723,-23.670346,JAM,7,1,s,27,8,2024,22
 Av. Pedro Aguirre Cerda,-70.390831,-23.569638,JAM,7,1,s,27,8,2024,26
 Av. Edmundo Pérez Zujovic,-70.397003,-23.572174,JAM,7,1,s,27,8,2024,28
 Av. Edmundo Pérez Zujovic,-70.392363,-23.616865,JAM,7,1,s,27,8,2024,36
-Av. Salvador Allende,-70.387917,-23.628326,JAM,7,1,s,27,8,2024,33
 Av. Edmundo Pérez Zujovic,-70.392238,-23.606092,JAM,7,1,s,27,8,2024,37
 Av. Pedro Aguirre Cerda,-70.390182,-23.586219,JAM,7,1,s,27,8,2024,38
 Av. Pedro Aguirre Cerda,-70.390939,-23.571779,JAM,7,1,s,27,8,2024,37
@@ -352,7 +354,6 @@ Av. Argentina,-70.397967,-23.664425,JAM,7,1,s,27,8,2024,59
 Av. Iquique,-70.393843,-23.634303,JAM,8,1,s,27,8,2024,2
 Av. Pedro Aguirre Cerda,-70.389948,-23.58779,JAM,8,1,s,27,8,2024,3
 Av. Edmundo Pérez Zujovic,-70.396281,-23.590802,JAM,8,1,s,27,8,2024,11
-Av. Salvador Allende,-70.38741,-23.628356,JAM,8,1,s,27,8,2024,10
 Av. Grecia,-70.402722,-23.650896,JAM,8,1,s,27,8,2024,12
 Av. Pedro Aguirre Cerda,-70.390821,-23.569952,JAM,8,1,s,27,8,2024,12
 Av. Pedro Aguirre Cerda,-70.39084,-23.570811,JAM,8,1,s,27,8,2024,20
@@ -387,21 +388,16 @@ Av. Balmaceda,-70.401475,-23.647044,JAM,10,1,s,27,8,2024,15
 Av. Balmaceda,-70.401128,-23.646757,JAM,10,1,s,27,8,2024,16
 Av. Edmundo Pérez Zujovic,-70.394028,-23.587173,JAM,10,1,s,27,8,2024,29
 Av. Iquique,-70.393401,-23.640588,JAM,10,1,s,27,8,2024,31
-Av. Salvador Allende,-70.394747,-23.628611,JAM,10,1,s,27,8,2024,41
 Av. Edmundo Pérez Zujovic,-70.396143,-23.590824,JAM,10,1,s,27,8,2024,39
-Av. Salvador Allende,-70.396189,-23.628544,ACCIDENT,11,1,s,27,8,2024,0
-Av. Salvador Allende,-70.396077,-23.628544,ACCIDENT,11,1,s,27,8,2024,0
 Av. Edmundo Pérez Zujovic,-70.393754,-23.586585,JAM,11,1,s,27,8,2024,10
 Av. Iquique,-70.394019,-23.628827,JAM,11,1,s,27,8,2024,25
 Av. Iquique,-70.393998,-23.629588,JAM,11,1,s,27,8,2024,24
-Av. Salvador Allende,-70.395176,-23.628624,JAM,12,1,s,27,8,2024,12
 Av. Edmundo Pérez Zujovic,-70.39525,-23.588874,JAM,12,1,s,27,8,2024,13
 Av. Edmundo Pérez Zujovic,-70.394104,-23.587286,JAM,12,1,s,27,8,2024,15
 Av. Edmundo Pérez Zujovic,-70.393407,-23.585793,JAM,12,1,s,27,8,2024,38
 Av. Edmundo Pérez Zujovic,-70.395603,-23.58949,JAM,12,1,s,27,8,2024,54
 Av. Edmundo Pérez Zujovic,-70.394317,-23.58758,JAM,12,1,s,27,8,2024,53
 Av. Iquique,-70.393952,-23.630438,JAM,13,1,s,27,8,2024,7
-Av. Salvador Allende,-70.389632,-23.62833,JAM,14,1,s,27,8,2024,0
 Av. Óscar Bonilla,-70.378494,-23.599258,JAM,14,1,s,27,8,2024,7
 Av. Edmundo Pérez Zujovic,-70.393528,-23.586074,ACCIDENT,14,1,s,27,8,2024,24
 Av. Edmundo Pérez Zujovic,-70.395732,-23.589717,JAM,14,1,s,27,8,2024,54
@@ -460,7 +456,6 @@ Av. Iquique,-70.393366,-23.639572,JAM,19,1,s,27,8,2024,23
 Av. Pedro Aguirre Cerda,-70.391012,-23.575701,JAM,19,1,s,27,8,2024,25
 Av. Pedro Aguirre Cerda,-70.390758,-23.568862,JAM,19,1,s,27,8,2024,24
 Av. Edmundo Pérez Zujovic,-70.391971,-23.611786,JAM,19,1,s,27,8,2024,37
-Av. Salvador Allende,-70.389854,-23.628307,JAM,19,1,s,27,8,2024,56
 Av. Edmundo Pérez Zujovic,-70.394931,-23.597607,ACCIDENT,20,1,s,27,8,2024,12
 Av. Edmundo Pérez Zujovic,-70.391888,-23.614557,JAM,20,1,s,27,8,2024,32
 Av. Grecia,-70.402744,-23.648818,ACCIDENT,20,1,s,27,8,2024,53
@@ -470,10 +465,12 @@ Av. Grecia,-70.40461,-23.66521,ACCIDENT,0,2,s,28,8,2024,3
 Av. Grecia,-70.403398,-23.659729,ACCIDENT,0,2,s,28,8,2024,9
 Av. Edmundo Pérez Zujovic,-70.392175,-23.603935,JAM,6,2,s,28,8,2024,30
 Av. Edmundo Pérez Zujovic,-70.392127,-23.610541,JAM,7,2,s,28,8,2024,1
+Av. Séptimo de Línea,-70.39638,-23.640702,JAM,7,2,s,28,8,2024,6
 Av. Edmundo Pérez Zujovic,-70.393334,-23.585263,JAM,7,2,s,28,8,2024,14
 Av. Antonio Rendic,-70.389391,-23.630027,JAM,7,2,s,28,8,2024,18
 Av. Edmundo Pérez Zujovic,-70.392579,-23.619079,JAM,7,2,s,28,8,2024,18
 Av. Pedro Aguirre Cerda,-70.391152,-23.573091,JAM,7,2,s,28,8,2024,23
+Av. Séptimo de Línea,-70.395853,-23.638993,JAM,7,2,s,28,8,2024,23
 Av. Pedro Aguirre Cerda,-70.390835,-23.569519,JAM,7,2,s,28,8,2024,24
 Av. Pedro Aguirre Cerda,-70.391058,-23.576424,JAM,7,2,s,28,8,2024,30
 Av. Pedro Aguirre Cerda,-70.391175,-23.57503,JAM,7,2,s,28,8,2024,28
@@ -552,7 +549,6 @@ Av. Grecia,-70.402377,-23.648525,JAM,18,2,s,28,8,2024,24
 Av. Balmaceda,-70.400525,-23.645884,JAM,18,2,s,28,8,2024,26
 Av. Balmaceda,-70.400126,-23.645648,JAM,18,2,s,28,8,2024,26
 Av. Edmundo Pérez Zujovic,-70.396213,-23.629861,JAM,18,2,s,28,8,2024,28
-Av. Salvador Allende,-70.388943,-23.628261,JAM,18,2,s,28,8,2024,32
 Av. Iquique,-70.393981,-23.631331,JAM,18,2,s,28,8,2024,34
 Av. Edmundo Pérez Zujovic,-70.395729,-23.634915,JAM,18,2,s,28,8,2024,30
 Av. Antonio Rendic,-70.38874,-23.639271,JAM,18,2,s,28,8,2024,43
@@ -567,6 +563,7 @@ Av. Edmundo Pérez Zujovic,-70.394398,-23.622897,JAM,19,2,s,28,8,2024,17
 Av. Iquique,-70.394007,-23.629358,JAM,19,2,s,28,8,2024,40
 Av. Argentina,-70.401397,-23.673134,JAM,19,2,s,28,8,2024,53
 Av. Antonio Rendic,-70.388668,-23.64041,JAM,20,2,s,28,8,2024,35
+Av. Séptimo de Línea,-70.395617,-23.638279,JAM,21,2,s,28,8,2024,13
 Av. Edmundo Pérez Zujovic,-70.393645,-23.586339,JAM,7,3,s,29,8,2024,9
 Av. Pedro Aguirre Cerda,-70.389796,-23.590936,JAM,7,3,s,29,8,2024,11
 Av. Edmundo Pérez Zujovic,-70.391884,-23.613358,JAM,7,3,s,29,8,2024,12
@@ -624,6 +621,7 @@ Av. Edmundo Pérez Zujovic,-70.395763,-23.637574,JAM,10,3,s,29,8,2024,1
 Av. Iquique,-70.393777,-23.635268,JAM,10,3,s,29,8,2024,0
 Av. Edmundo Pérez Zujovic,-70.395807,-23.633254,JAM,10,3,s,29,8,2024,19
 Av. Grecia,-70.403486,-23.660305,JAM,10,3,s,29,8,2024,26
+Av. Séptimo de Línea,-70.396089,-23.640213,JAM,10,3,s,29,8,2024,39
 Av. Edmundo Pérez Zujovic,-70.396534,-23.591325,ACCIDENT,12,3,s,29,8,2024,41
 Av. Edmundo Pérez Zujovic,-70.396652,-23.591575,ACCIDENT,12,3,s,29,8,2024,43
 Av. Edmundo Pérez Zujovic,-70.394504,-23.588052,ACCIDENT,12,3,s,29,8,2024,45
@@ -685,6 +683,7 @@ Av. Edmundo Pérez Zujovic,-70.395842,-23.635272,JAM,19,3,s,29,8,2024,5
 Av. Edmundo Pérez Zujovic,-70.395929,-23.631968,JAM,19,3,s,29,8,2024,5
 Av. Edmundo Pérez Zujovic,-70.396322,-23.630087,JAM,19,3,s,29,8,2024,4
 Av. Edmundo Pérez Zujovic,-70.3919,-23.610798,JAM,19,3,s,29,8,2024,9
+Av. Séptimo de Línea,-70.395905,-23.639166,JAM,19,3,s,29,8,2024,6
 Av. Edmundo Pérez Zujovic,-70.392163,-23.604387,JAM,19,3,s,29,8,2024,10
 Av. Edmundo Pérez Zujovic,-70.396209,-23.590963,JAM,19,3,s,29,8,2024,9
 Av. Edmundo Pérez Zujovic,-70.394135,-23.622491,JAM,19,3,s,29,8,2024,6
@@ -719,6 +718,7 @@ Av. Edmundo Pérez Zujovic,-70.392213,-23.608546,JAM,7,4,s,30,8,2024,23
 Av. Argentina,-70.395559,-23.655867,JAM,7,4,s,30,8,2024,22
 Av. Edmundo Pérez Zujovic,-70.39594,-23.625092,JAM,7,4,s,30,8,2024,24
 Av. Balmaceda,-70.398674,-23.644443,JAM,7,4,s,30,8,2024,28
+Av. Séptimo de Línea,-70.396063,-23.639687,JAM,7,4,s,30,8,2024,27
 Av. Edmundo Pérez Zujovic,-70.393879,-23.576863,JAM,7,4,s,30,8,2024,33
 Av. Grecia,-70.402635,-23.652375,JAM,7,4,s,30,8,2024,40
 Av. Iquique,-70.39409,-23.629291,JAM,7,4,s,30,8,2024,41
@@ -768,6 +768,7 @@ Av. Edmundo Pérez Zujovic,-70.395803,-23.633189,JAM,10,4,s,30,8,2024,29
 Av. Edmundo Pérez Zujovic,-70.394686,-23.62334,JAM,10,4,s,30,8,2024,43
 Av. Pedro Aguirre Cerda,-70.390655,-23.58063,JAM,10,4,s,30,8,2024,43
 Av. Edmundo Pérez Zujovic,-70.396439,-23.62655,JAM,10,4,s,30,8,2024,59
+Av. Séptimo de Línea,-70.395762,-23.638577,JAM,11,4,s,30,8,2024,8
 Av. Edmundo Pérez Zujovic,-70.395837,-23.635441,JAM,11,4,s,30,8,2024,6
 Av. Edmundo Pérez Zujovic,-70.395808,-23.636614,JAM,11,4,s,30,8,2024,4
 Av. Grecia,-70.40261,-23.654362,JAM,11,4,s,30,8,2024,16
@@ -782,6 +783,7 @@ Av. Balmaceda,-70.396762,-23.642659,JAM,12,4,s,30,8,2024,6
 Nicolás Tirado,-70.38985,-23.592016,JAM,12,4,s,30,8,2024,12
 Nicolás Tirado,-70.388069,-23.591887,ACCIDENT,12,4,s,30,8,2024,21
 Av. Edmundo Pérez Zujovic,-70.39579,-23.637008,JAM,12,4,s,30,8,2024,34
+Av. Séptimo de Línea,-70.396172,-23.640044,JAM,12,4,s,30,8,2024,37
 Av. Edmundo Pérez Zujovic,-70.396945,-23.595101,JAM,12,4,s,30,8,2024,41
 Av. Grecia,-70.406943,-23.669419,JAM,12,4,s,30,8,2024,44
 Av. Edmundo Pérez Zujovic,-70.395821,-23.63353,JAM,12,4,s,30,8,2024,44
@@ -790,11 +792,13 @@ Av. Edmundo Pérez Zujovic,-70.395822,-23.632365,JAM,12,4,s,30,8,2024,48
 Av. Balmaceda,-70.396833,-23.642903,JAM,12,4,s,30,8,2024,50
 Av. Grecia,-70.402604,-23.651406,JAM,12,4,s,30,8,2024,59
 Av. Balmaceda,-70.400347,-23.645772,JAM,12,4,s,30,8,2024,57
+Av. Séptimo de Línea,-70.395765,-23.638633,JAM,13,4,s,30,8,2024,2
 Av. Balmaceda,-70.396711,-23.642392,JAM,13,4,s,30,8,2024,3
 Av. Pedro Aguirre Cerda,-70.39035,-23.582916,JAM,13,4,s,30,8,2024,5
 Av. Edmundo Pérez Zujovic,-70.394545,-23.623125,JAM,13,4,s,30,8,2024,7
 Av. Edmundo Pérez Zujovic,-70.392113,-23.606138,JAM,13,4,s,30,8,2024,6
 Av. Grecia,-70.40341,-23.660108,JAM,13,4,s,30,8,2024,9
+Av. Séptimo de Línea,-70.3963,-23.640903,JAM,13,4,s,30,8,2024,18
 Av. Pedro Aguirre Cerda,-70.389893,-23.589772,JAM,13,4,s,30,8,2024,15
 Av. Edmundo Pérez Zujovic,-70.395731,-23.634446,JAM,13,4,s,30,8,2024,20
 Av. Edmundo Pérez Zujovic,-70.396781,-23.595414,JAM,13,4,s,30,8,2024,25
@@ -846,6 +850,7 @@ Av. Edmundo Pérez Zujovic,-70.394311,-23.587798,JAM,16,4,s,30,8,2024,30
 Av. Pedro Aguirre Cerda,-70.389612,-23.593659,JAM,16,4,s,30,8,2024,27
 Av. Pedro Aguirre Cerda,-70.389485,-23.597225,JAM,16,4,s,30,8,2024,31
 Av. Pedro Aguirre Cerda,-70.389864,-23.588823,JAM,16,4,s,30,8,2024,31
+Av. Séptimo de Línea,-70.395752,-23.638321,JAM,16,4,s,30,8,2024,33
 Nicolás Tirado,-70.388238,-23.591889,JAM,16,4,s,30,8,2024,33
 Av. Balmaceda,-70.398828,-23.644976,JAM,16,4,s,30,8,2024,35
 Av. Balmaceda,-70.399899,-23.6455,JAM,16,4,s,30,8,2024,36
@@ -853,11 +858,12 @@ Av. Edmundo Pérez Zujovic,-70.395806,-23.632599,JAM,17,4,s,30,8,2024,1
 Av. Edmundo Pérez Zujovic,-70.395855,-23.634336,JAM,17,4,s,30,8,2024,7
 Av. Pedro Aguirre Cerda,-70.389609,-23.5938,JAM,17,4,s,30,8,2024,24
 Av. Grecia,-70.40264,-23.658121,JAM,17,4,s,30,8,2024,23
-Av. Salvador Allende,-70.393738,-23.628468,JAM,17,4,s,30,8,2024,28
 Av. Grecia,-70.403615,-23.66161,JAM,17,4,s,30,8,2024,36
 Av. Edmundo Pérez Zujovic,-70.3932,-23.585263,JAM,17,4,s,30,8,2024,33
 Av. Balmaceda,-70.399693,-23.645342,JAM,17,4,s,30,8,2024,34
 Av. Balmaceda,-70.397034,-23.642533,JAM,17,4,s,30,8,2024,32
+Av. Séptimo de Línea,-70.396359,-23.640636,JAM,17,4,s,30,8,2024,42
+Av. Séptimo de Línea,-70.395754,-23.638385,JAM,17,4,s,30,8,2024,40
 Av. Antonio Rendic,-70.389457,-23.627121,JAM,17,4,s,30,8,2024,47
 Av. Edmundo Pérez Zujovic,-70.392891,-23.578078,JAM,17,4,s,30,8,2024,56
 Av. Argentina,-70.392615,-23.64451,JAM,17,4,s,30,8,2024,56
@@ -881,6 +887,7 @@ Av. Edmundo Pérez Zujovic,-70.396361,-23.591284,ACCIDENT,18,4,s,30,8,2024,36
 Av. Pedro Aguirre Cerda,-70.388239,-23.613253,ACCIDENT,18,4,s,30,8,2024,37
 Av. Edmundo Pérez Zujovic,-70.396825,-23.595074,JAM,18,4,s,30,8,2024,38
 Av. Edmundo Pérez Zujovic,-70.395763,-23.637583,JAM,18,4,s,30,8,2024,38
+Av. Séptimo de Línea,-70.395765,-23.638638,JAM,18,4,s,30,8,2024,38
 Av. Pedro Aguirre Cerda,-70.39078,-23.568232,JAM,18,4,s,30,8,2024,47
 Av. Edmundo Pérez Zujovic,-70.393969,-23.587322,JAM,18,4,s,30,8,2024,44
 Av. Edmundo Pérez Zujovic,-70.396448,-23.595841,JAM,18,4,s,30,8,2024,52
@@ -888,6 +895,7 @@ Av. Argentina,-70.393448,-23.643032,JAM,18,4,s,30,8,2024,48
 Av. Balmaceda,-70.40092,-23.64617,JAM,18,4,s,30,8,2024,53
 Av. Balmaceda,-70.396904,-23.642227,JAM,18,4,s,30,8,2024,48
 Av. Edmundo Pérez Zujovic,-70.396178,-23.625818,JAM,18,4,s,30,8,2024,58
+Av. Séptimo de Línea,-70.396668,-23.641612,JAM,18,4,s,30,8,2024,54
 Av. Edmundo Pérez Zujovic,-70.395853,-23.634886,JAM,18,4,s,30,8,2024,57
 Av. Edmundo Pérez Zujovic,-70.394405,-23.622908,JAM,18,4,s,30,8,2024,59
 Av. Pedro Aguirre Cerda,-70.38996,-23.587604,JAM,19,4,s,30,8,2024,6
@@ -928,22 +936,24 @@ Av. Edmundo Pérez Zujovic,-70.39218,-23.603761,ACCIDENT,10,5,f,31,8,2024,31
 Av. Grecia,-70.402714,-23.658352,JAM,10,5,f,31,8,2024,48
 Av. Grecia,-70.403552,-23.660696,JAM,10,5,f,31,8,2024,47
 Av. Edmundo Pérez Zujovic,-70.395829,-23.633708,JAM,11,5,f,31,8,2024,4
-Av. Salvador Allende,-70.39384,-23.628582,JAM,11,5,f,31,8,2024,7
-Av. Salvador Allende,-70.394657,-23.628608,JAM,11,5,f,31,8,2024,6
 Av. Edmundo Pérez Zujovic,-70.394069,-23.587237,JAM,11,5,f,31,8,2024,27
+Av. Séptimo de Línea,-70.396077,-23.639736,JAM,11,5,f,31,8,2024,30
 Av. Edmundo Pérez Zujovic,-70.39716,-23.593229,JAM,11,5,f,31,8,2024,36
 Nicolás Tirado,-70.388467,-23.591891,JAM,11,5,f,31,8,2024,42
+Av. Séptimo de Línea,-70.396516,-23.641133,JAM,11,5,f,31,8,2024,42
 Av. Pedro Aguirre Cerda,-70.389903,-23.58837,ACCIDENT,11,5,f,31,8,2024,55
 Av. Edmundo Pérez Zujovic,-70.395859,-23.634451,JAM,11,5,f,31,8,2024,53
 Av. Pedro Aguirre Cerda,-70.389877,-23.588664,JAM,11,5,f,31,8,2024,54
+Av. Séptimo de Línea,-70.395747,-23.638182,JAM,11,5,f,31,8,2024,55
 Av. Edmundo Pérez Zujovic,-70.395768,-23.63749,JAM,11,5,f,31,8,2024,55
 Av. Pedro Aguirre Cerda,-70.389774,-23.589999,JAM,11,5,f,31,8,2024,54
 Av. Edmundo Pérez Zujovic,-70.395844,-23.635216,JAM,11,5,f,31,8,2024,59
+Av. Séptimo de Línea,-70.396608,-23.641422,JAM,11,5,f,31,8,2024,58
 Av. Óscar Bonilla,-70.379084,-23.583819,ACCIDENT,12,5,f,31,8,2024,2
-Av. Salvador Allende,-70.396173,-23.628544,JAM,12,5,f,31,8,2024,4
-Av. Salvador Allende,-70.393901,-23.628483,JAM,12,5,f,31,8,2024,3
 Av. Edmundo Pérez Zujovic,-70.395829,-23.635968,JAM,12,5,f,31,8,2024,7
 Av. Iquique,-70.392706,-23.624657,JAM,12,5,f,31,8,2024,19
+Av. Séptimo de Línea,-70.395765,-23.638643,JAM,12,5,f,31,8,2024,20
+Av. Séptimo de Línea,-70.396333,-23.640555,JAM,12,5,f,31,8,2024,22
 Av. Pedro Aguirre Cerda,-70.389685,-23.59136,JAM,12,5,f,31,8,2024,30
 Av. Edmundo Pérez Zujovic,-70.396292,-23.630648,JAM,12,5,f,31,8,2024,32
 Av. Pedro Aguirre Cerda,-70.38992,-23.588166,JAM,12,5,f,31,8,2024,32
@@ -1003,11 +1013,9 @@ Av. Pedro Aguirre Cerda,-70.390014,-23.62115,JAM,11,6,f,1,9,2024,27
 Av. Antonio Rendic,-70.387558,-23.623734,JAM,11,6,f,1,9,2024,34
 Av. Pedro Aguirre Cerda,-70.389894,-23.620695,JAM,12,6,f,1,9,2024,7
 Av. Pedro Aguirre Cerda,-70.390098,-23.587195,JAM,12,6,f,1,9,2024,16
-Av. Salvador Allende,-70.393781,-23.628472,JAM,12,6,f,1,9,2024,15
-Av. Salvador Allende,-70.394499,-23.628505,JAM,12,6,f,1,9,2024,21
 Av. Edmundo Pérez Zujovic,-70.393352,-23.583579,JAM,12,6,f,1,9,2024,19
-Av. Salvador Allende,-70.394524,-23.628505,JAM,12,6,f,1,9,2024,21
 Nicolás Tirado,-70.389229,-23.59201,JAM,13,6,f,1,9,2024,8
+Av. Séptimo de Línea,-70.395808,-23.63884,JAM,13,6,f,1,9,2024,35
 Av. Óscar Bonilla,-70.379522,-23.578565,JAM,13,6,f,1,9,2024,51
 Av. Pedro Aguirre Cerda,-70.390505,-23.582254,ACCIDENT,15,6,f,1,9,2024,15
 Av. Óscar Bonilla,-70.379473,-23.579172,JAM,18,6,f,1,9,2024,40
@@ -1038,6 +1046,7 @@ Av. Antonio Rendic,-70.389139,-23.626544,ACCIDENT,7,0,s,2,9,2024,18
 Av. Edmundo Pérez Zujovic,-70.39185,-23.6142,JAM,7,0,s,2,9,2024,16
 Av. Pedro Aguirre Cerda,-70.389752,-23.591459,JAM,7,0,s,2,9,2024,21
 Av. Edmundo Pérez Zujovic,-70.396431,-23.627001,JAM,7,0,s,2,9,2024,23
+Av. Séptimo de Línea,-70.395831,-23.638919,JAM,7,0,s,2,9,2024,25
 Av. Edmundo Pérez Zujovic,-70.395645,-23.624622,JAM,7,0,s,2,9,2024,22
 Av. Balmaceda,-70.398633,-23.6444,JAM,7,0,s,2,9,2024,26
 Av. Pedro Aguirre Cerda,-70.38839,-23.61391,JAM,7,0,s,2,9,2024,27
@@ -1077,6 +1086,7 @@ Av. Antonio Rendic,-70.38294,-23.616509,ACCIDENT,9,0,s,2,9,2024,6
 Av. Antonio Rendic,-70.383231,-23.616837,ACCIDENT,9,0,s,2,9,2024,5
 Av. Edmundo Pérez Zujovic,-70.396438,-23.626605,JAM,9,0,s,2,9,2024,13
 Av. Edmundo Pérez Zujovic,-70.393105,-23.620692,JAM,9,0,s,2,9,2024,18
+Av. Séptimo de Línea,-70.395752,-23.638326,JAM,9,0,s,2,9,2024,31
 Av. Edmundo Pérez Zujovic,-70.394882,-23.575448,JAM,9,0,s,2,9,2024,31
 Av. Edmundo Pérez Zujovic,-70.39209,-23.615572,JAM,10,0,s,2,9,2024,0
 Av. Edmundo Pérez Zujovic,-70.395161,-23.623855,JAM,10,0,s,2,9,2024,9
@@ -1124,6 +1134,7 @@ Av. Grecia,-70.403622,-23.661979,JAM,17,0,s,2,9,2024,57
 Av. Edmundo Pérez Zujovic,-70.39643,-23.627038,JAM,17,0,s,2,9,2024,56
 Av. Edmundo Pérez Zujovic,-70.396203,-23.625554,JAM,17,0,s,2,9,2024,56
 Av. Grecia,-70.403569,-23.660904,JAM,18,0,s,2,9,2024,0
+Av. Séptimo de Línea,-70.396341,-23.640578,JAM,17,0,s,2,9,2024,59
 Av. Iquique,-70.393927,-23.626208,JAM,18,0,s,2,9,2024,2
 Av. Iquique,-70.393359,-23.639845,JAM,18,0,s,2,9,2024,12
 Av. Pedro Aguirre Cerda,-70.389844,-23.590362,JAM,18,0,s,2,9,2024,10
@@ -1134,6 +1145,7 @@ Av. Grecia,-70.403844,-23.664685,JAM,18,0,s,2,9,2024,20
 Av. Edmundo Pérez Zujovic,-70.396119,-23.596226,JAM,18,0,s,2,9,2024,18
 Av. Argentina,-70.393201,-23.651848,JAM,18,0,s,2,9,2024,23
 Av. Edmundo Pérez Zujovic,-70.397163,-23.593167,JAM,18,0,s,2,9,2024,21
+Av. Séptimo de Línea,-70.396706,-23.641732,ACCIDENT,18,0,s,2,9,2024,22
 Av. Edmundo Pérez Zujovic,-70.392552,-23.60164,JAM,18,0,s,2,9,2024,21
 Av. Edmundo Pérez Zujovic,-70.393672,-23.5864,JAM,18,0,s,2,9,2024,20
 Av. Pedro Aguirre Cerda,-70.388663,-23.608054,JAM,18,0,s,2,9,2024,23
@@ -1142,6 +1154,7 @@ Av. Antonio Rendic,-70.389445,-23.629258,JAM,18,0,s,2,9,2024,24
 Av. Edmundo Pérez Zujovic,-70.395679,-23.63321,JAM,18,0,s,2,9,2024,27
 Av. Edmundo Pérez Zujovic,-70.395674,-23.6328,JAM,18,0,s,2,9,2024,27
 Av. Balmaceda,-70.398387,-23.64414,JAM,18,0,s,2,9,2024,31
+Av. Séptimo de Línea,-70.396648,-23.64155,JAM,18,0,s,2,9,2024,32
 Av. Grecia,-70.402605,-23.657975,JAM,18,0,s,2,9,2024,33
 Av. Edmundo Pérez Zujovic,-70.392053,-23.608305,JAM,18,0,s,2,9,2024,29
 Av. Edmundo Pérez Zujovic,-70.396083,-23.590392,JAM,18,0,s,2,9,2024,32
@@ -1177,6 +1190,7 @@ Av. Edmundo Pérez Zujovic,-70.395775,-23.63733,JAM,7,1,s,3,9,2024,25
 Av. Grecia,-70.403687,-23.663319,JAM,7,1,s,3,9,2024,26
 Av. Pedro Aguirre Cerda,-70.389802,-23.590859,JAM,7,1,s,3,9,2024,24
 Av. Argentina,-70.39998,-23.670863,JAM,7,1,s,3,9,2024,26
+Av. Séptimo de Línea,-70.396267,-23.640345,JAM,7,1,s,3,9,2024,24
 Av. Grecia,-70.405122,-23.66583,JAM,7,1,s,3,9,2024,22
 Av. Edmundo Pérez Zujovic,-70.396444,-23.626228,JAM,7,1,s,3,9,2024,23
 Av. Antonio Rendic,-70.389552,-23.627427,JAM,7,1,s,3,9,2024,37
@@ -1184,7 +1198,6 @@ Av. Grecia,-70.402799,-23.650137,JAM,7,1,s,3,9,2024,36
 Av. Edmundo Pérez Zujovic,-70.392204,-23.607795,JAM,7,1,s,3,9,2024,36
 Av. Edmundo Pérez Zujovic,-70.395863,-23.631791,JAM,7,1,s,3,9,2024,41
 Av. Pedro Aguirre Cerda,-70.390819,-23.570019,ACCIDENT,7,1,s,3,9,2024,43
-Av. Salvador Allende,-70.388524,-23.628289,JAM,7,1,s,3,9,2024,43
 Av. Edmundo Pérez Zujovic,-70.392292,-23.616414,JAM,7,1,s,3,9,2024,44
 Av. Grecia,-70.402791,-23.649884,JAM,7,1,s,3,9,2024,44
 Av. Pedro Aguirre Cerda,-70.390779,-23.568253,JAM,7,1,s,3,9,2024,50
@@ -1233,6 +1246,7 @@ Av. Argentina,-70.39636,-23.659539,JAM,17,1,s,3,9,2024,40
 Nicolás Tirado,-70.387859,-23.591892,JAM,17,1,s,3,9,2024,54
 Av. Óscar Bonilla,-70.378534,-23.595156,JAM,18,1,s,3,9,2024,10
 Av. Grecia,-70.403539,-23.660548,JAM,18,1,s,3,9,2024,8
+Av. Séptimo de Línea,-70.396088,-23.640211,JAM,18,1,s,3,9,2024,15
 Av. Grecia,-70.402616,-23.654487,JAM,18,1,s,3,9,2024,10
 Av. Edmundo Pérez Zujovic,-70.392109,-23.606289,JAM,18,1,s,3,9,2024,23
 Av. Antonio Rendic,-70.387919,-23.624305,JAM,18,1,s,3,9,2024,23
@@ -1298,7 +1312,6 @@ Nicolás Tirado,-70.388581,-23.591892,ACCIDENT,7,2,s,4,9,2024,28
 Av. Edmundo Pérez Zujovic,-70.39553,-23.574533,JAM,7,2,s,4,9,2024,39
 Av. Iquique,-70.392617,-23.623749,JAM,7,2,s,4,9,2024,38
 Av. Pedro Aguirre Cerda,-70.390045,-23.587918,JAM,7,2,s,4,9,2024,36
-Av. Salvador Allende,-70.388648,-23.62828,JAM,7,2,s,4,9,2024,35
 Av. Iquique,-70.392978,-23.625281,JAM,7,2,s,4,9,2024,39
 Av. Pedro Aguirre Cerda,-70.389143,-23.603042,JAM,7,2,s,4,9,2024,38
 Av. Edmundo Pérez Zujovic,-70.395917,-23.625344,JAM,7,2,s,4,9,2024,44
@@ -1382,6 +1395,7 @@ Av. Edmundo Pérez Zujovic,-70.394514,-23.623076,JAM,18,2,s,4,9,2024,41
 Av. Iquique,-70.39337,-23.639507,JAM,18,2,s,4,9,2024,42
 Av. Edmundo Pérez Zujovic,-70.396904,-23.594721,JAM,18,2,s,4,9,2024,41
 Av. Edmundo Pérez Zujovic,-70.395363,-23.624176,JAM,18,2,s,4,9,2024,43
+Av. Séptimo de Línea,-70.396294,-23.640881,JAM,18,2,s,4,9,2024,47
 Av. Argentina,-70.39324,-23.643248,JAM,18,2,s,4,9,2024,49
 Av. Edmundo Pérez Zujovic,-70.396156,-23.630683,JAM,18,2,s,4,9,2024,49
 Av. Edmundo Pérez Zujovic,-70.393489,-23.599802,JAM,18,2,s,4,9,2024,50
@@ -1399,7 +1413,6 @@ Av. Balmaceda,-70.39676,-23.642647,JAM,19,2,s,4,9,2024,12
 Av. Iquique,-70.393929,-23.630818,JAM,19,2,s,4,9,2024,19
 Av. Iquique,-70.393585,-23.642677,JAM,19,2,s,4,9,2024,17
 Av. Iquique,-70.393392,-23.639142,JAM,19,2,s,4,9,2024,24
-Av. Salvador Allende,-70.395421,-23.628637,JAM,19,2,s,4,9,2024,30
 Av. Iquique,-70.394094,-23.62919,JAM,19,2,s,4,9,2024,50
 Av. Óscar Bonilla,-70.37964,-23.577145,JAM,20,2,s,4,9,2024,34
 Av. Grecia,-70.402562,-23.653323,JAM,20,2,s,4,9,2024,40
@@ -1506,7 +1519,6 @@ Av. Grecia,-70.40245,-23.656294,JAM,18,3,s,5,9,2024,25
 Av. Argentina,-70.398142,-23.664545,JAM,18,3,s,5,9,2024,31
 Av. Edmundo Pérez Zujovic,-70.391862,-23.614333,JAM,18,3,s,5,9,2024,28
 Av. Argentina,-70.396581,-23.661754,JAM,18,3,s,5,9,2024,27
-Av. Salvador Allende,-70.394221,-23.628595,JAM,18,3,s,5,9,2024,33
 Av. Iquique,-70.393589,-23.642726,JAM,18,3,s,5,9,2024,36
 Av. Iquique,-70.393651,-23.642321,JAM,18,3,s,5,9,2024,34
 Av. Grecia,-70.40258,-23.656381,JAM,18,3,s,5,9,2024,36
@@ -1534,6 +1546,7 @@ Av. Edmundo Pérez Zujovic,-70.392276,-23.609759,JAM,19,3,s,5,9,2024,4
 Av. Grecia,-70.402663,-23.653161,JAM,19,3,s,5,9,2024,8
 Av. Pedro Aguirre Cerda,-70.389783,-23.620648,JAM,19,3,s,5,9,2024,14
 Av. Pedro Aguirre Cerda,-70.389563,-23.619846,JAM,19,3,s,5,9,2024,15
+Av. Séptimo de Línea,-70.396148,-23.640407,JAM,19,3,s,5,9,2024,13
 Av. Edmundo Pérez Zujovic,-70.39221,-23.616721,JAM,19,3,s,5,9,2024,22
 Av. Edmundo Pérez Zujovic,-70.397047,-23.593458,ACCIDENT,19,3,s,5,9,2024,23
 Av. Pedro Aguirre Cerda,-70.389598,-23.59432,JAM,19,3,s,5,9,2024,23
@@ -1542,7 +1555,6 @@ Av. Grecia,-70.407059,-23.669701,JAM,19,3,s,5,9,2024,29
 Av. Edmundo Pérez Zujovic,-70.393668,-23.621787,JAM,19,3,s,5,9,2024,37
 Av. Edmundo Pérez Zujovic,-70.396784,-23.592149,JAM,19,3,s,5,9,2024,41
 Av. Edmundo Pérez Zujovic,-70.397059,-23.59299,JAM,19,3,s,5,9,2024,50
-Av. Salvador Allende,-70.39455,-23.628506,JAM,19,3,s,5,9,2024,51
 Av. Pedro Aguirre Cerda,-70.389808,-23.589539,JAM,19,3,s,5,9,2024,55
 Av. Pedro Aguirre Cerda,-70.389536,-23.595998,JAM,19,3,s,5,9,2024,53
 Av. Edmundo Pérez Zujovic,-70.397059,-23.593064,ACCIDENT,20,3,s,5,9,2024,58
@@ -1588,9 +1600,11 @@ Av. Edmundo Pérez Zujovic,-70.396428,-23.627175,JAM,9,4,s,6,9,2024,23
 Av. Edmundo Pérez Zujovic,-70.392249,-23.60554,JAM,9,4,s,6,9,2024,32
 Av. Edmundo Pérez Zujovic,-70.395852,-23.634922,JAM,9,4,s,6,9,2024,39
 Av. Pedro Aguirre Cerda,-70.390824,-23.570374,ACCIDENT,9,4,s,6,9,2024,38
+Av. Séptimo de Línea,-70.396561,-23.641276,JAM,9,4,s,6,9,2024,40
 Av. Pedro Aguirre Cerda,-70.390832,-23.569594,ACCIDENT,9,4,s,6,9,2024,37
 Av. Edmundo Pérez Zujovic,-70.392725,-23.601186,JAM,9,4,s,6,9,2024,41
 Av. Balmaceda,-70.397243,-23.642931,JAM,10,4,s,6,9,2024,0
+Av. Séptimo de Línea,-70.396103,-23.639823,JAM,9,4,s,6,9,2024,59
 Av. Óscar Bonilla,-70.378977,-23.584949,JAM,17,4,s,6,9,2024,55
 Av. Edmundo Pérez Zujovic,-70.392114,-23.606122,JAM,18,4,s,6,9,2024,7
 Av. Edmundo Pérez Zujovic,-70.395761,-23.632124,JAM,18,4,s,6,9,2024,15
@@ -1611,7 +1625,9 @@ Av. Edmundo Pérez Zujovic,-70.3962,-23.625857,JAM,18,4,s,6,9,2024,18
 Av. Edmundo Pérez Zujovic,-70.395439,-23.624296,JAM,18,4,s,6,9,2024,14
 Av. Grecia,-70.403541,-23.660563,JAM,18,4,s,6,9,2024,6
 Av. Edmundo Pérez Zujovic,-70.397024,-23.593902,JAM,18,4,s,6,9,2024,24
+Av. Séptimo de Línea,-70.396108,-23.639838,JAM,18,4,s,6,9,2024,28
 Av. Edmundo Pérez Zujovic,-70.395706,-23.58991,JAM,18,4,s,6,9,2024,25
+Av. Séptimo de Línea,-70.39674,-23.641832,JAM,18,4,s,6,9,2024,35
 Av. Grecia,-70.402537,-23.652785,JAM,18,4,s,6,9,2024,42
 Av. Pedro Aguirre Cerda,-70.389637,-23.592519,JAM,18,4,s,6,9,2024,53
 Av. Argentina,-70.394781,-23.654188,JAM,19,4,s,6,9,2024,2
@@ -1622,6 +1638,7 @@ Av. Edmundo Pérez Zujovic,-70.392882,-23.582347,JAM,19,4,s,6,9,2024,16
 Av. Balmaceda,-70.398762,-23.644925,JAM,19,4,s,6,9,2024,22
 Av. Edmundo Pérez Zujovic,-70.392145,-23.60502,JAM,19,4,s,6,9,2024,21
 Av. Grecia,-70.402658,-23.653023,JAM,19,4,s,6,9,2024,22
+Av. Séptimo de Línea,-70.395845,-23.639425,JAM,19,4,s,6,9,2024,50
 Av. Edmundo Pérez Zujovic,-70.393302,-23.585836,JAM,19,4,s,6,9,2024,52
 Av. Antonio Rendic,-70.384225,-23.610177,JAM,20,4,s,6,9,2024,2
 Av. Edmundo Pérez Zujovic,-70.39175,-23.614021,JAM,20,4,s,6,9,2024,10
@@ -1633,7 +1650,6 @@ Av. Edmundo Pérez Zujovic,-70.392481,-23.619293,JAM,22,4,s,6,9,2024,15
 Av. Edmundo Pérez Zujovic,-70.395925,-23.625359,JAM,22,4,s,6,9,2024,22
 Av. Edmundo Pérez Zujovic,-70.393538,-23.621596,JAM,22,4,s,6,9,2024,17
 Av. Pedro Aguirre Cerda,-70.390466,-23.582764,JAM,1,5,f,7,9,2024,12
-Av. Salvador Allende,-70.385943,-23.628424,JAM,7,5,f,7,9,2024,29
 Av. Iquique,-70.392625,-23.624206,JAM,9,5,f,7,9,2024,17
 Av. Edmundo Pérez Zujovic,-70.395854,-23.634842,ACCIDENT,10,5,f,7,9,2024,36
 Av. Edmundo Pérez Zujovic,-70.395901,-23.632044,JAM,10,5,f,7,9,2024,41
@@ -1650,13 +1666,11 @@ Av. Edmundo Pérez Zujovic,-70.391895,-23.61315,JAM,11,5,f,7,9,2024,13
 Av. Edmundo Pérez Zujovic,-70.395725,-23.634318,ACCIDENT,11,5,f,7,9,2024,11
 Av. Edmundo Pérez Zujovic,-70.395683,-23.636212,ACCIDENT,11,5,f,7,9,2024,16
 Av. Edmundo Pérez Zujovic,-70.394294,-23.622516,JAM,11,5,f,7,9,2024,20
-Av. Salvador Allende,-70.393799,-23.628474,JAM,11,5,f,7,9,2024,29
 Av. Edmundo Pérez Zujovic,-70.395769,-23.637457,ACCIDENT,11,5,f,7,9,2024,33
 Av. Pedro Aguirre Cerda,-70.388782,-23.607726,JAM,11,5,f,7,9,2024,37
 Av. Iquique,-70.39411,-23.628821,JAM,11,5,f,7,9,2024,40
 Av. Edmundo Pérez Zujovic,-70.395811,-23.636553,JAM,11,5,f,7,9,2024,43
 Av. Edmundo Pérez Zujovic,-70.395852,-23.634914,ACCIDENT,11,5,f,7,9,2024,42
-Av. Salvador Allende,-70.394475,-23.628603,JAM,11,5,f,7,9,2024,44
 Av. Edmundo Pérez Zujovic,-70.391938,-23.612366,JAM,11,5,f,7,9,2024,48
 Av. Edmundo Pérez Zujovic,-70.395843,-23.635249,JAM,11,5,f,7,9,2024,49
 Nicolás Tirado,-70.388011,-23.591887,JAM,11,5,f,7,9,2024,53
@@ -1707,6 +1721,7 @@ Av. Pedro Aguirre Cerda,-70.389877,-23.589961,JAM,10,6,f,8,9,2024,54
 Av. Iquique,-70.392711,-23.624667,JAM,11,6,f,8,9,2024,32
 Av. Pedro Aguirre Cerda,-70.39016,-23.586469,JAM,11,6,f,8,9,2024,58
 Av. Edmundo Pérez Zujovic,-70.393243,-23.583177,JAM,12,6,f,8,9,2024,46
+Av. Séptimo de Línea,-70.395947,-23.639305,JAM,14,6,f,8,9,2024,2
 Av. Grecia,-70.402627,-23.652153,JAM,15,6,f,8,9,2024,43
 Av. Edmundo Pérez Zujovic,-70.397002,-23.570898,ACCIDENT,16,6,f,8,9,2024,41
 Av. Pedro Aguirre Cerda,-70.390253,-23.58406,JAM,17,6,f,8,9,2024,13
@@ -1731,7 +1746,6 @@ Av. Antonio Rendic,-70.388342,-23.624991,JAM,7,0,s,9,9,2024,25
 Av. Edmundo Pérez Zujovic,-70.392227,-23.608697,JAM,7,0,s,9,9,2024,22
 Av. Edmundo Pérez Zujovic,-70.39193,-23.612527,JAM,7,0,s,9,9,2024,22
 Av. Edmundo Pérez Zujovic,-70.393382,-23.621141,JAM,7,0,s,9,9,2024,29
-Av. Salvador Allende,-70.393417,-23.62844,JAM,7,0,s,9,9,2024,28
 Av. Pedro Aguirre Cerda,-70.391149,-23.575353,ACCIDENT,7,0,s,9,9,2024,32
 Av. Pedro Aguirre Cerda,-70.390463,-23.58281,ACCIDENT,7,0,s,9,9,2024,35
 Av. Pedro Aguirre Cerda,-70.390384,-23.583877,ACCIDENT,7,0,s,9,9,2024,35
@@ -1752,7 +1766,6 @@ Av. Edmundo Pérez Zujovic,-70.39323,-23.585539,JAM,8,0,s,9,9,2024,12
 Av. Edmundo Pérez Zujovic,-70.395674,-23.632719,JAM,8,0,s,9,9,2024,12
 Av. Grecia,-70.403663,-23.662978,JAM,8,0,s,9,9,2024,15
 Av. Argentina,-70.393318,-23.65186,JAM,8,0,s,9,9,2024,21
-Av. Salvador Allende,-70.392294,-23.628515,JAM,8,0,s,9,9,2024,22
 Av. Pedro Aguirre Cerda,-70.391003,-23.572771,JAM,8,0,s,9,9,2024,27
 Av. Pedro Aguirre Cerda,-70.389737,-23.593125,JAM,8,0,s,9,9,2024,39
 Av. Edmundo Pérez Zujovic,-70.395528,-23.624437,JAM,8,0,s,9,9,2024,38
@@ -1813,19 +1826,16 @@ Av. Edmundo Pérez Zujovic,-70.396436,-23.626715,JAM,7,1,s,10,9,2024,13
 Av. Edmundo Pérez Zujovic,-70.393329,-23.62106,JAM,7,1,s,10,9,2024,11
 Av. Edmundo Pérez Zujovic,-70.394547,-23.587895,JAM,7,1,s,10,9,2024,10
 Av. Edmundo Pérez Zujovic,-70.393359,-23.584758,JAM,7,1,s,10,9,2024,13
-Av. Salvador Allende,-70.393865,-23.62848,JAM,7,1,s,10,9,2024,17
 Av. Pedro Aguirre Cerda,-70.391025,-23.576825,JAM,7,1,s,10,9,2024,17
 Av. Iquique,-70.393123,-23.625515,JAM,7,1,s,10,9,2024,22
-Av. Salvador Allende,-70.394805,-23.628512,JAM,7,1,s,10,9,2024,25
 Av. Edmundo Pérez Zujovic,-70.391887,-23.613296,JAM,7,1,s,10,9,2024,22
 Av. Edmundo Pérez Zujovic,-70.396034,-23.625244,JAM,7,1,s,10,9,2024,22
 Av. Edmundo Pérez Zujovic,-70.393214,-23.58309,JAM,7,1,s,10,9,2024,27
 Av. Argentina,-70.40031,-23.671519,JAM,7,1,s,10,9,2024,26
 Av. Pedro Aguirre Cerda,-70.390984,-23.572058,ACCIDENT,7,1,s,10,9,2024,33
 Av. Edmundo Pérez Zujovic,-70.392207,-23.60764,ACCIDENT,7,1,s,10,9,2024,34
-Av. Salvador Allende,-70.395781,-23.628544,JAM,7,1,s,10,9,2024,31
-Av. Salvador Allende,-70.389963,-23.6283,JAM,7,1,s,10,9,2024,39
 Av. Pedro Aguirre Cerda,-70.391115,-23.575757,ACCIDENT,7,1,s,10,9,2024,37
+Av. Séptimo de Línea,-70.396651,-23.642102,JAM,7,1,s,10,9,2024,39
 Av. Pedro Aguirre Cerda,-70.390197,-23.586043,JAM,7,1,s,10,9,2024,37
 Av. Iquique,-70.392195,-23.622403,ACCIDENT,7,1,s,10,9,2024,42
 Av. Iquique,-70.394172,-23.627778,JAM,7,1,s,10,9,2024,45
@@ -1833,15 +1843,12 @@ Av. Edmundo Pérez Zujovic,-70.396016,-23.590553,ACCIDENT,7,1,s,10,9,2024,46
 Av. Pedro Aguirre Cerda,-70.390755,-23.568971,JAM,7,1,s,10,9,2024,48
 Av. Antonio Rendic,-70.385454,-23.620366,JAM,7,1,s,10,9,2024,48
 Av. Grecia,-70.403321,-23.659898,JAM,7,1,s,10,9,2024,47
-Av. Salvador Allende,-70.391445,-23.628082,JAM,7,1,s,10,9,2024,48
 Av. Edmundo Pérez Zujovic,-70.397225,-23.571488,JAM,7,1,s,10,9,2024,52
 Av. Pedro Aguirre Cerda,-70.39108,-23.576174,JAM,7,1,s,10,9,2024,53
 Av. Edmundo Pérez Zujovic,-70.392282,-23.603946,JAM,7,1,s,10,9,2024,54
 Av. Antonio Rendic,-70.386496,-23.622031,JAM,7,1,s,10,9,2024,53
-Av. Salvador Allende,-70.388933,-23.628262,JAM,7,1,s,10,9,2024,51
 Av. Edmundo Pérez Zujovic,-70.395772,-23.632088,JAM,7,1,s,10,9,2024,57
 Av. Pedro Aguirre Cerda,-70.390898,-23.577981,JAM,7,1,s,10,9,2024,56
-Av. Salvador Allende,-70.390979,-23.628118,JAM,8,1,s,10,9,2024,6
 Av. Edmundo Pérez Zujovic,-70.392292,-23.609461,JAM,8,1,s,10,9,2024,3
 Av. Antonio Rendic,-70.384759,-23.619254,JAM,8,1,s,10,9,2024,2
 Av. Grecia,-70.402515,-23.655739,JAM,8,1,s,10,9,2024,11
@@ -1857,7 +1864,6 @@ Av. Antonio Rendic,-70.388736,-23.63933,JAM,8,1,s,10,9,2024,28
 Av. Edmundo Pérez Zujovic,-70.392401,-23.617264,JAM,8,1,s,10,9,2024,31
 Av. Antonio Rendic,-70.388638,-23.640951,JAM,8,1,s,10,9,2024,33
 Av. Pedro Aguirre Cerda,-70.390763,-23.579418,JAM,8,1,s,10,9,2024,33
-Av. Salvador Allende,-70.393514,-23.628448,JAM,8,1,s,10,9,2024,38
 Av. Edmundo Pérez Zujovic,-70.39563,-23.637578,JAM,8,1,s,10,9,2024,41
 Av. Antonio Rendic,-70.387453,-23.623591,JAM,8,1,s,10,9,2024,39
 Av. Edmundo Pérez Zujovic,-70.392327,-23.602739,JAM,8,1,s,10,9,2024,43
@@ -1865,16 +1871,16 @@ Av. Edmundo Pérez Zujovic,-70.395836,-23.596555,JAM,8,1,s,10,9,2024,50
 Av. Antonio Rendic,-70.38584,-23.620982,JAM,8,1,s,10,9,2024,55
 Av. Antonio Rendic,-70.388359,-23.625019,JAM,9,1,s,10,9,2024,1
 Av. Antonio Rendic,-70.389443,-23.629289,JAM,9,1,s,10,9,2024,2
+Av. Séptimo de Línea,-70.395857,-23.639005,JAM,9,1,s,10,9,2024,12
 Av. Edmundo Pérez Zujovic,-70.395753,-23.637799,JAM,9,1,s,10,9,2024,18
-Av. Salvador Allende,-70.390547,-23.628337,JAM,9,1,s,10,9,2024,15
 Av. Edmundo Pérez Zujovic,-70.392422,-23.617479,JAM,9,1,s,10,9,2024,21
 Av. Balmaceda,-70.398625,-23.644392,JAM,9,1,s,10,9,2024,22
 Av. Edmundo Pérez Zujovic,-70.395569,-23.624502,JAM,9,1,s,10,9,2024,26
 Av. Edmundo Pérez Zujovic,-70.394121,-23.622264,JAM,9,1,s,10,9,2024,27
-Av. Salvador Allende,-70.395723,-23.628542,JAM,9,1,s,10,9,2024,38
 Av. Edmundo Pérez Zujovic,-70.392057,-23.615432,JAM,9,1,s,10,9,2024,39
 Av. Pedro Aguirre Cerda,-70.389033,-23.617025,JAM,9,1,s,10,9,2024,46
 Av. Edmundo Pérez Zujovic,-70.396418,-23.627713,JAM,9,1,s,10,9,2024,56
+Av. Séptimo de Línea,-70.39591,-23.639182,JAM,9,1,s,10,9,2024,55
 Av. Edmundo Pérez Zujovic,-70.394765,-23.623229,JAM,10,1,s,10,9,2024,6
 Av. Edmundo Pérez Zujovic,-70.395854,-23.634867,JAM,10,1,s,10,9,2024,7
 Av. Edmundo Pérez Zujovic,-70.396187,-23.630254,JAM,10,1,s,10,9,2024,13
@@ -1884,22 +1890,17 @@ Av. Edmundo Pérez Zujovic,-70.396243,-23.625642,JAM,10,1,s,10,9,2024,55
 Av. Antonio Rendic,-70.388263,-23.60416,JAM,11,1,s,10,9,2024,24
 Av. Balmaceda,-70.4005,-23.645866,JAM,11,1,s,10,9,2024,22
 Av. Edmundo Pérez Zujovic,-70.395829,-23.636085,JAM,11,1,s,10,9,2024,52
-Av. Salvador Allende,-70.392513,-23.628525,JAM,12,1,s,10,9,2024,0
-Av. Salvador Allende,-70.391054,-23.628379,JAM,12,1,s,10,9,2024,2
 Av. Edmundo Pérez Zujovic,-70.395736,-23.634629,JAM,12,1,s,10,9,2024,36
 Av. Edmundo Pérez Zujovic,-70.395729,-23.634923,JAM,12,1,s,10,9,2024,32
-Av. Salvador Allende,-70.394026,-23.62859,JAM,13,1,s,10,9,2024,2
 Av. Edmundo Pérez Zujovic,-70.39424,-23.622653,JAM,13,1,s,10,9,2024,7
 Av. Edmundo Pérez Zujovic,-70.395924,-23.631631,JAM,13,1,s,10,9,2024,17
 Av. Edmundo Pérez Zujovic,-70.395682,-23.633299,JAM,13,1,s,10,9,2024,15
 Av. Edmundo Pérez Zujovic,-70.395735,-23.634564,JAM,13,1,s,10,9,2024,14
 Av. Edmundo Pérez Zujovic,-70.39568,-23.636296,JAM,13,1,s,10,9,2024,13
 Av. Edmundo Pérez Zujovic,-70.392304,-23.6177,JAM,13,1,s,10,9,2024,21
-Av. Salvador Allende,-70.393668,-23.628575,JAM,13,1,s,10,9,2024,21
 Av. Edmundo Pérez Zujovic,-70.396238,-23.629491,JAM,13,1,s,10,9,2024,18
 Av. Edmundo Pérez Zujovic,-70.393569,-23.586471,JAM,13,1,s,10,9,2024,26
 Av. Edmundo Pérez Zujovic,-70.395786,-23.637091,ACCIDENT,13,1,s,10,9,2024,35
-Av. Salvador Allende,-70.390117,-23.628305,JAM,13,1,s,10,9,2024,50
 Av. Edmundo Pérez Zujovic,-70.395691,-23.633545,JAM,13,1,s,10,9,2024,59
 Av. Edmundo Pérez Zujovic,-70.395727,-23.632244,JAM,14,1,s,10,9,2024,15
 Av. Edmundo Pérez Zujovic,-70.396347,-23.629628,JAM,14,1,s,10,9,2024,19
@@ -1909,8 +1910,11 @@ Av. Edmundo Pérez Zujovic,-70.395852,-23.63494,ACCIDENT,14,1,s,10,9,2024,29
 Av. Pedro Aguirre Cerda,-70.389589,-23.597181,JAM,14,1,s,10,9,2024,35
 Av. Edmundo Pérez Zujovic,-70.39566,-23.636811,ACCIDENT,14,1,s,10,9,2024,41
 Av. Edmundo Pérez Zujovic,-70.395656,-23.636909,JAM,14,1,s,10,9,2024,44
+Av. Séptimo de Línea,-70.396359,-23.641095,JAM,14,1,s,10,9,2024,46
 Av. Balmaceda,-70.397194,-23.643429,JAM,14,1,s,10,9,2024,59
+Av. Séptimo de Línea,-70.395628,-23.638521,JAM,14,1,s,10,9,2024,58
 Av. Edmundo Pérez Zujovic,-70.395784,-23.637147,ACCIDENT,15,1,s,10,9,2024,2
+Av. Séptimo de Línea,-70.396641,-23.64206,JAM,15,1,s,10,9,2024,7
 Av. Edmundo Pérez Zujovic,-70.395787,-23.637084,JAM,15,1,s,10,9,2024,28
 Av. Balmaceda,-70.397005,-23.642467,JAM,15,1,s,10,9,2024,30
 Av. Balmaceda,-70.397694,-23.643409,JAM,15,1,s,10,9,2024,30
@@ -1948,6 +1952,7 @@ Av. Edmundo Pérez Zujovic,-70.393773,-23.599302,JAM,18,1,s,10,9,2024,18
 Av. Edmundo Pérez Zujovic,-70.391836,-23.611739,JAM,18,1,s,10,9,2024,19
 Av. Edmundo Pérez Zujovic,-70.395672,-23.596548,JAM,18,1,s,10,9,2024,21
 Av. Edmundo Pérez Zujovic,-70.397054,-23.59329,JAM,18,1,s,10,9,2024,22
+Av. Séptimo de Línea,-70.395653,-23.638669,JAM,18,1,s,10,9,2024,21
 Av. Edmundo Pérez Zujovic,-70.392104,-23.606496,JAM,18,1,s,10,9,2024,21
 Av. Iquique,-70.394227,-23.627241,JAM,18,1,s,10,9,2024,27
 Av. Edmundo Pérez Zujovic,-70.396132,-23.5908,JAM,18,1,s,10,9,2024,23
@@ -1981,6 +1986,7 @@ Av. Edmundo Pérez Zujovic,-70.39335,-23.583573,JAM,7,2,s,11,9,2024,22
 Av. Edmundo Pérez Zujovic,-70.392211,-23.608517,JAM,7,2,s,11,9,2024,26
 Av. Edmundo Pérez Zujovic,-70.395437,-23.597019,JAM,7,2,s,11,9,2024,23
 Av. Edmundo Pérez Zujovic,-70.393892,-23.599092,JAM,7,2,s,11,9,2024,24
+Av. Séptimo de Línea,-70.395791,-23.638781,JAM,7,2,s,11,9,2024,31
 Av. Óscar Bonilla,-70.37878,-23.58901,JAM,7,2,s,11,9,2024,31
 Av. Edmundo Pérez Zujovic,-70.396436,-23.62674,JAM,7,2,s,11,9,2024,29
 Av. Pedro Aguirre Cerda,-70.390688,-23.580264,JAM,7,2,s,11,9,2024,30
@@ -2017,8 +2023,6 @@ Av. Edmundo Pérez Zujovic,-70.396031,-23.62555,JAM,13,2,s,11,9,2024,32
 Av. Edmundo Pérez Zujovic,-70.395775,-23.632079,JAM,13,2,s,11,9,2024,34
 Av. Edmundo Pérez Zujovic,-70.395683,-23.636214,JAM,13,2,s,11,9,2024,44
 Av. Iquique,-70.392993,-23.625307,JAM,13,2,s,11,9,2024,42
-Av. Salvador Allende,-70.391128,-23.628392,JAM,13,2,s,11,9,2024,51
-Av. Salvador Allende,-70.395576,-23.628536,JAM,14,2,s,11,9,2024,4
 Nicolás Tirado,-70.390711,-23.592201,JAM,14,2,s,11,9,2024,47
 Av. Argentina,-70.394231,-23.653476,ACCIDENT,15,2,s,11,9,2024,9
 Nicolás Tirado,-70.388991,-23.591899,ACCIDENT,15,2,s,11,9,2024,17
@@ -2046,7 +2050,6 @@ Av. Edmundo Pérez Zujovic,-70.39234,-23.616658,JAM,17,2,s,11,9,2024,27
 Av. Argentina,-70.395067,-23.654745,JAM,17,2,s,11,9,2024,37
 Av. Iquique,-70.393361,-23.63965,JAM,18,2,s,11,9,2024,11
 Av. Edmundo Pérez Zujovic,-70.39521,-23.623933,JAM,18,2,s,11,9,2024,18
-Av. Salvador Allende,-70.390288,-23.628318,JAM,18,2,s,11,9,2024,26
 Av. Iquique,-70.394233,-23.627191,JAM,18,2,s,11,9,2024,34
 Av. Edmundo Pérez Zujovic,-70.396143,-23.596017,JAM,18,2,s,11,9,2024,34
 Av. Edmundo Pérez Zujovic,-70.392127,-23.610544,JAM,18,2,s,11,9,2024,38
@@ -2065,7 +2068,6 @@ Av. Balmaceda,-70.396724,-23.642458,JAM,19,2,s,11,9,2024,20
 Av. Grecia,-70.403731,-23.663953,JAM,19,2,s,11,9,2024,26
 Av. Edmundo Pérez Zujovic,-70.39446,-23.587994,JAM,19,2,s,11,9,2024,24
 Av. Argentina,-70.392901,-23.64881,JAM,19,2,s,11,9,2024,41
-Av. Salvador Allende,-70.396189,-23.628544,JAM,19,2,s,11,9,2024,59
 Av. Pedro Aguirre Cerda,-70.389625,-23.593061,JAM,20,2,s,11,9,2024,2
 Av. Edmundo Pérez Zujovic,-70.3932,-23.585301,JAM,20,2,s,11,9,2024,0
 Av. Edmundo Pérez Zujovic,-70.392255,-23.617191,JAM,20,2,s,11,9,2024,5
@@ -2135,7 +2137,6 @@ Av. Antonio Rendic,-70.388945,-23.637371,JAM,17,3,s,12,9,2024,37
 Av. Antonio Rendic,-70.388896,-23.638171,JAM,17,3,s,12,9,2024,39
 Av. Antonio Rendic,-70.388879,-23.63845,JAM,17,3,s,12,9,2024,40
 Av. Antonio Rendic,-70.388874,-23.638541,ACCIDENT,17,3,s,12,9,2024,41
-Av. Salvador Allende,-70.388251,-23.628307,JAM,17,3,s,12,9,2024,48
 Av. Grecia,-70.402566,-23.656103,JAM,17,3,s,12,9,2024,50
 Av. Balmaceda,-70.397215,-23.642898,JAM,18,3,s,12,9,2024,4
 Av. Antonio Rendic,-70.388536,-23.642873,JAM,18,3,s,12,9,2024,9
@@ -2174,7 +2175,6 @@ Av. Pedro Aguirre Cerda,-70.389615,-23.596823,JAM,7,4,s,13,9,2024,17
 Av. Edmundo Pérez Zujovic,-70.392072,-23.615497,JAM,7,4,s,13,9,2024,19
 Av. Pedro Aguirre Cerda,-70.389615,-23.596823,ACCIDENT,7,4,s,13,9,2024,17
 Av. Edmundo Pérez Zujovic,-70.396425,-23.627358,JAM,7,4,s,13,9,2024,25
-Av. Salvador Allende,-70.386062,-23.628419,JAM,7,4,s,13,9,2024,28
 Av. Edmundo Pérez Zujovic,-70.392128,-23.605628,JAM,7,4,s,13,9,2024,35
 Av. Edmundo Pérez Zujovic,-70.396824,-23.59223,JAM,7,4,s,13,9,2024,38
 Av. Edmundo Pérez Zujovic,-70.392259,-23.605058,JAM,7,4,s,13,9,2024,46
@@ -2193,6 +2193,7 @@ Av. Edmundo Pérez Zujovic,-70.392396,-23.602333,JAM,9,4,s,13,9,2024,34
 Av. Edmundo Pérez Zujovic,-70.39575,-23.637853,JAM,9,4,s,13,9,2024,43
 Av. Antonio Rendic,-70.389317,-23.626842,JAM,9,4,s,13,9,2024,55
 Av. Iquique,-70.394106,-23.628913,JAM,9,4,s,13,9,2024,59
+Av. Séptimo de Línea,-70.396093,-23.639788,JAM,10,4,s,13,9,2024,5
 Av. Antonio Rendic,-70.388577,-23.643613,JAM,10,4,s,13,9,2024,4
 Av. Edmundo Pérez Zujovic,-70.396164,-23.631324,JAM,10,4,s,13,9,2024,0
 Av. Iquique,-70.393598,-23.636611,ACCIDENT,10,4,s,13,9,2024,0
@@ -2221,6 +2222,7 @@ Av. Antonio Rendic,-70.383762,-23.617817,JAM,12,4,s,13,9,2024,56
 Nicolás Tirado,-70.391409,-23.592237,JAM,13,4,s,13,9,2024,1
 Av. Pedro Aguirre Cerda,-70.389605,-23.593977,JAM,13,4,s,13,9,2024,9
 Av. Edmundo Pérez Zujovic,-70.39644,-23.626465,JAM,13,4,s,13,9,2024,19
+Av. Séptimo de Línea,-70.396682,-23.641657,JAM,13,4,s,13,9,2024,22
 Av. Pedro Aguirre Cerda,-70.389915,-23.588224,JAM,13,4,s,13,9,2024,21
 Av. Pedro Aguirre Cerda,-70.390793,-23.577932,JAM,13,4,s,13,9,2024,23
 Nicolás Tirado,-70.388055,-23.591887,JAM,13,4,s,13,9,2024,19
@@ -2234,6 +2236,7 @@ Av. Edmundo Pérez Zujovic,-70.39334,-23.621075,JAM,13,4,s,13,9,2024,55
 Av. Grecia,-70.402699,-23.648159,JAM,14,4,s,13,9,2024,6
 Av. Edmundo Pérez Zujovic,-70.392982,-23.620439,JAM,14,4,s,13,9,2024,6
 Av. Edmundo Pérez Zujovic,-70.395795,-23.636909,JAM,14,4,s,13,9,2024,16
+Av. Séptimo de Línea,-70.396622,-23.641468,JAM,14,4,s,13,9,2024,28
 Av. Edmundo Pérez Zujovic,-70.395836,-23.633877,JAM,14,4,s,13,9,2024,28
 Av. Pedro Aguirre Cerda,-70.39078,-23.568237,JAM,14,4,s,13,9,2024,35
 Av. Grecia,-70.403442,-23.660191,JAM,14,4,s,13,9,2024,37
@@ -2244,6 +2247,7 @@ Av. Antonio Rendic,-70.388954,-23.637218,JAM,14,4,s,13,9,2024,56
 Av. Edmundo Pérez Zujovic,-70.392212,-23.61608,JAM,15,4,s,13,9,2024,13
 Av. Grecia,-70.402766,-23.649325,JAM,15,4,s,13,9,2024,16
 Av. Edmundo Pérez Zujovic,-70.39414,-23.598652,JAM,15,4,s,13,9,2024,20
+Av. Séptimo de Línea,-70.396603,-23.641895,JAM,15,4,s,13,9,2024,24
 Av. Edmundo Pérez Zujovic,-70.395891,-23.631714,JAM,15,4,s,13,9,2024,30
 Av. Edmundo Pérez Zujovic,-70.396058,-23.631193,JAM,15,4,s,13,9,2024,27
 Av. Iquique,-70.39399,-23.626478,JAM,15,4,s,13,9,2024,28
@@ -2262,10 +2266,7 @@ Av. Edmundo Pérez Zujovic,-70.394639,-23.623029,JAM,17,4,s,13,9,2024,15
 Av. Edmundo Pérez Zujovic,-70.392419,-23.602228,JAM,17,4,s,13,9,2024,17
 Av. Antonio Rendic,-70.389506,-23.627238,JAM,17,4,s,13,9,2024,25
 Nicolás Tirado,-70.388874,-23.591897,ACCIDENT,17,4,s,13,9,2024,25
-Av. Salvador Allende,-70.392464,-23.628523,JAM,17,4,s,13,9,2024,28
-Av. Salvador Allende,-70.390453,-23.62833,JAM,17,4,s,13,9,2024,29
 Av. Antonio Rendic,-70.385041,-23.608965,JAM,17,4,s,13,9,2024,30
-Av. Salvador Allende,-70.391356,-23.628445,JAM,17,4,s,13,9,2024,29
 Av. Iquique,-70.394082,-23.629478,JAM,17,4,s,13,9,2024,40
 Av. Iquique,-70.392745,-23.624752,JAM,17,4,s,13,9,2024,38
 Av. Edmundo Pérez Zujovic,-70.39644,-23.626497,JAM,17,4,s,13,9,2024,45
@@ -2291,11 +2292,9 @@ Av. Iquique,-70.393885,-23.633442,ACCIDENT,18,4,s,13,9,2024,40
 Av. Edmundo Pérez Zujovic,-70.394291,-23.622733,JAM,19,4,s,13,9,2024,4
 Av. Iquique,-70.394245,-23.627098,JAM,19,4,s,13,9,2024,14
 Av. Iquique,-70.394017,-23.628982,ACCIDENT,19,4,s,13,9,2024,16
-Av. Salvador Allende,-70.394255,-23.628596,JAM,19,4,s,13,9,2024,14
 Av. Iquique,-70.394011,-23.629268,ACCIDENT,19,4,s,13,9,2024,19
 Av. Iquique,-70.394081,-23.629484,ACCIDENT,19,4,s,13,9,2024,18
 Av. Iquique,-70.393943,-23.630587,ACCIDENT,19,4,s,13,9,2024,21
-Av. Salvador Allende,-70.395788,-23.628658,JAM,19,4,s,13,9,2024,28
 Av. Iquique,-70.394053,-23.628131,JAM,19,4,s,13,9,2024,28
 Av. Edmundo Pérez Zujovic,-70.39587,-23.631769,JAM,19,4,s,13,9,2024,35
 Av. Grecia,-70.402606,-23.651312,JAM,19,4,s,13,9,2024,50
@@ -2325,8 +2324,11 @@ Av. Iquique,-70.39393,-23.6308,JAM,13,5,f,14,9,2024,21
 Av. Edmundo Pérez Zujovic,-70.395958,-23.631545,JAM,13,5,f,14,9,2024,32
 Av. Edmundo Pérez Zujovic,-70.39578,-23.632061,JAM,13,5,f,14,9,2024,32
 Av. Edmundo Pérez Zujovic,-70.396191,-23.630191,JAM,13,5,f,14,9,2024,34
+Av. Séptimo de Línea,-70.395668,-23.638744,ACCIDENT,13,5,f,14,9,2024,45
 Av. Edmundo Pérez Zujovic,-70.39572,-23.634216,JAM,13,5,f,14,9,2024,52
+Av. Séptimo de Línea,-70.395811,-23.63885,JAM,13,5,f,14,9,2024,59
 Av. Iquique,-70.39402,-23.628782,JAM,14,5,f,14,9,2024,3
+Av. Séptimo de Línea,-70.396427,-23.640852,JAM,14,5,f,14,9,2024,0
 Nicolás Tirado,-70.38792,-23.591888,JAM,14,5,f,14,9,2024,9
 Nicolás Tirado,-70.388959,-23.591899,JAM,14,5,f,14,9,2024,11
 Av. Iquique,-70.39401,-23.629288,JAM,14,5,f,14,9,2024,19
@@ -2371,15 +2373,16 @@ Av. Iquique,-70.39409,-23.626772,JAM,8,0,s,16,9,2024,34
 Av. Iquique,-70.394084,-23.627679,JAM,8,0,s,16,9,2024,33
 Av. Balmaceda,-70.399567,-23.645245,JAM,11,0,s,16,9,2024,2
 Av. Balmaceda,-70.39967,-23.64563,JAM,11,0,s,16,9,2024,9
+Av. Séptimo de Línea,-70.396315,-23.64095,JAM,11,0,s,16,9,2024,21
 Av. Iquique,-70.394199,-23.62666,JAM,11,0,s,16,9,2024,29
 Av. Edmundo Pérez Zujovic,-70.394648,-23.623044,JAM,11,0,s,16,9,2024,47
 Av. Balmaceda,-70.399068,-23.644835,JAM,12,0,s,16,9,2024,10
+Av. Séptimo de Línea,-70.396386,-23.640722,JAM,12,0,s,16,9,2024,8
 Av. Edmundo Pérez Zujovic,-70.396425,-23.627354,JAM,12,0,s,16,9,2024,27
 Av. Edmundo Pérez Zujovic,-70.3921,-23.615612,JAM,12,0,s,16,9,2024,34
 Av. Iquique,-70.393913,-23.63106,JAM,12,0,s,16,9,2024,43
 Av. Edmundo Pérez Zujovic,-70.39608,-23.631099,JAM,13,0,s,16,9,2024,1
 Av. Edmundo Pérez Zujovic,-70.396266,-23.62903,JAM,13,0,s,16,9,2024,2
-Av. Salvador Allende,-70.393646,-23.62846,JAM,13,0,s,16,9,2024,14
 Av. Edmundo Pérez Zujovic,-70.395677,-23.633083,JAM,14,0,s,16,9,2024,7
 Av. Iquique,-70.394013,-23.629196,JAM,14,0,s,16,9,2024,10
 Av. Edmundo Pérez Zujovic,-70.395708,-23.633952,JAM,14,0,s,16,9,2024,20
@@ -2392,7 +2395,6 @@ Av. Óscar Bonilla,-70.379729,-23.576069,JAM,15,0,s,16,9,2024,50
 Av. Edmundo Pérez Zujovic,-70.392022,-23.615283,JAM,15,0,s,16,9,2024,56
 Av. Balmaceda,-70.397628,-23.64334,JAM,16,0,s,16,9,2024,0
 Av. Edmundo Pérez Zujovic,-70.395427,-23.624488,JAM,16,0,s,16,9,2024,30
-Av. Salvador Allende,-70.388815,-23.628268,JAM,16,0,s,16,9,2024,50
 Av. Edmundo Pérez Zujovic,-70.396159,-23.630649,JAM,16,0,s,16,9,2024,54
 Nicolás Tirado,-70.390623,-23.592195,JAM,17,0,s,16,9,2024,22
 Av. Edmundo Pérez Zujovic,-70.392437,-23.618975,JAM,17,0,s,16,9,2024,37
@@ -2408,7 +2410,6 @@ Av. Pedro Aguirre Cerda,-70.390148,-23.586611,JAM,19,0,s,16,9,2024,14
 Av. Argentina,-70.393029,-23.650626,JAM,19,0,s,16,9,2024,56
 Av. Argentina,-70.393024,-23.649392,JAM,19,0,s,16,9,2024,59
 Av. Grecia,-70.404487,-23.665263,ACCIDENT,20,0,s,16,9,2024,24
-Av. Salvador Allende,-70.374564,-23.629174,ACCIDENT,20,0,s,16,9,2024,24
 Av. Grecia,-70.405076,-23.665767,ACCIDENT,20,0,s,16,9,2024,31
 Av. Grecia,-70.404691,-23.665417,ACCIDENT,21,0,s,16,9,2024,12
 Av. Antonio Rendic,-70.388003,-23.624438,JAM,9,1,s,17,9,2024,14
@@ -2458,9 +2459,7 @@ Av. Pedro Aguirre Cerda,-70.390842,-23.571841,ACCIDENT,21,1,s,17,9,2024,9
 Av. Edmundo Pérez Zujovic,-70.392144,-23.616366,JAM,22,1,s,17,9,2024,12
 Av. Pedro Aguirre Cerda,-70.389808,-23.590794,JAM,23,1,s,17,9,2024,24
 Av. Iquique,-70.393375,-23.639425,JAM,12,2,f,18,9,2024,14
-Av. Salvador Allende,-70.39501,-23.628618,JAM,12,2,f,18,9,2024,26
 Av. Edmundo Pérez Zujovic,-70.39641,-23.628162,JAM,12,2,f,18,9,2024,25
-Av. Salvador Allende,-70.395442,-23.628638,JAM,12,2,f,18,9,2024,49
 Av. Iquique,-70.393849,-23.634196,JAM,12,2,f,18,9,2024,52
 Av. Iquique,-70.39337,-23.639511,JAM,13,2,f,18,9,2024,0
 Av. Iquique,-70.393358,-23.639777,JAM,13,2,f,18,9,2024,24
@@ -2583,7 +2582,6 @@ Av. Edmundo Pérez Zujovic,-70.39583,-23.633734,JAM,9,0,s,23,9,2024,36
 Av. Edmundo Pérez Zujovic,-70.39576,-23.63764,JAM,9,0,s,23,9,2024,37
 Av. Grecia,-70.402653,-23.652874,JAM,9,0,s,23,9,2024,42
 Av. Balmaceda,-70.399279,-23.64502,JAM,9,0,s,23,9,2024,45
-Av. Salvador Allende,-70.392681,-23.628533,JAM,11,0,s,23,9,2024,27
 Av. Pedro Aguirre Cerda,-70.390923,-23.577772,ACCIDENT,11,0,s,23,9,2024,46
 Av. Antonio Rendic,-70.388798,-23.638329,JAM,12,0,s,23,9,2024,7
 Av. Antonio Rendic,-70.388723,-23.639517,JAM,12,0,s,23,9,2024,7
@@ -2611,6 +2609,7 @@ Av. Iquique,-70.393459,-23.641292,JAM,18,0,s,23,9,2024,22
 Av. Edmundo Pérez Zujovic,-70.39217,-23.604113,JAM,18,0,s,23,9,2024,24
 Av. Grecia,-70.403464,-23.660248,JAM,18,0,s,23,9,2024,25
 Av. Iquique,-70.394003,-23.629461,JAM,18,0,s,23,9,2024,26
+Av. Séptimo de Línea,-70.395863,-23.639027,JAM,18,0,s,23,9,2024,27
 Av. Argentina,-70.396268,-23.658425,JAM,18,0,s,23,9,2024,27
 Av. Grecia,-70.40278,-23.649641,ACCIDENT,18,0,s,23,9,2024,28
 Av. Antonio Rendic,-70.38955,-23.627493,JAM,18,0,s,23,9,2024,30
@@ -2665,8 +2664,8 @@ Av. Argentina,-70.393645,-23.652415,JAM,7,1,s,24,9,2024,50
 Av. Argentina,-70.394713,-23.654055,JAM,7,1,s,24,9,2024,52
 Av. Edmundo Pérez Zujovic,-70.395773,-23.574173,JAM,7,1,s,24,9,2024,54
 Av. Pedro Aguirre Cerda,-70.389479,-23.597354,ACCIDENT,7,1,s,24,9,2024,56
-Av. Salvador Allende,-70.395319,-23.628526,JAM,7,1,s,24,9,2024,55
 Av. Argentina,-70.394763,-23.654352,ACCIDENT,7,1,s,24,9,2024,54
+Av. Séptimo de Línea,-70.395879,-23.639079,JAM,7,1,s,24,9,2024,54
 Av. Argentina,-70.394169,-23.653245,JAM,7,1,s,24,9,2024,51
 Av. Edmundo Pérez Zujovic,-70.396213,-23.595938,JAM,7,1,s,24,9,2024,59
 Av. Óscar Bonilla,-70.378726,-23.591171,JAM,7,1,s,24,9,2024,58
@@ -2895,6 +2894,7 @@ Av. Pedro Aguirre Cerda,-70.390212,-23.58586,JAM,20,3,s,26,9,2024,19
 Av. Edmundo Pérez Zujovic,-70.393771,-23.621733,JAM,7,4,s,27,9,2024,10
 Av. Balmaceda,-70.398805,-23.64458,ACCIDENT,7,4,s,27,9,2024,13
 Av. Balmaceda,-70.397169,-23.642831,JAM,7,4,s,27,9,2024,15
+Av. Séptimo de Línea,-70.396718,-23.641768,JAM,7,4,s,27,9,2024,14
 Av. Edmundo Pérez Zujovic,-70.393655,-23.586362,JAM,7,4,s,27,9,2024,13
 Av. Pedro Aguirre Cerda,-70.38886,-23.61629,ACCIDENT,7,4,s,27,9,2024,20
 Av. Pedro Aguirre Cerda,-70.390155,-23.586525,JAM,7,4,s,27,9,2024,17
@@ -2908,7 +2908,9 @@ Av. Antonio Rendic,-70.389485,-23.628677,JAM,7,4,s,27,9,2024,28
 Av. Pedro Aguirre Cerda,-70.388388,-23.61387,JAM,7,4,s,27,9,2024,32
 Av. Grecia,-70.407019,-23.669604,ACCIDENT,7,4,s,27,9,2024,30
 Av. Antonio Rendic,-70.389452,-23.629155,JAM,7,4,s,27,9,2024,28
+Av. Séptimo de Línea,-70.396147,-23.639968,JAM,7,4,s,27,9,2024,36
 Av. Edmundo Pérez Zujovic,-70.39626,-23.590759,JAM,7,4,s,27,9,2024,36
+Av. Séptimo de Línea,-70.396512,-23.641121,JAM,7,4,s,27,9,2024,34
 Av. Antonio Rendic,-70.388273,-23.624873,JAM,7,4,s,27,9,2024,37
 Av. Iquique,-70.393812,-23.634814,JAM,7,4,s,27,9,2024,36
 Av. Edmundo Pérez Zujovic,-70.392828,-23.582228,JAM,7,4,s,27,9,2024,42
@@ -2943,6 +2945,7 @@ Av. Iquique,-70.394205,-23.626685,JAM,8,4,s,27,9,2024,4
 Av. Edmundo Pérez Zujovic,-70.397053,-23.592909,JAM,8,4,s,27,9,2024,7
 Av. Edmundo Pérez Zujovic,-70.395787,-23.596612,JAM,8,4,s,27,9,2024,5
 Av. Pedro Aguirre Cerda,-70.389707,-23.594068,JAM,8,4,s,27,9,2024,3
+Av. Séptimo de Línea,-70.396661,-23.64159,JAM,8,4,s,27,9,2024,12
 Av. Antonio Rendic,-70.389098,-23.633095,JAM,8,4,s,27,9,2024,12
 Av. Edmundo Pérez Zujovic,-70.395847,-23.635094,JAM,8,4,s,27,9,2024,9
 Av. Grecia,-70.40261,-23.658009,JAM,8,4,s,27,9,2024,22
@@ -2960,10 +2963,6 @@ Av. Balmaceda,-70.397577,-23.643286,JAM,9,4,s,27,9,2024,33
 Av. Grecia,-70.403097,-23.659404,JAM,10,4,s,27,9,2024,31
 Av. Balmaceda,-70.397327,-23.643022,JAM,10,4,s,27,9,2024,48
 Av. Iquique,-70.394018,-23.628857,JAM,11,4,s,27,9,2024,19
-Av. Salvador Allende,-70.392518,-23.628525,JAM,11,4,s,27,9,2024,37
-Av. Salvador Allende,-70.393589,-23.628572,JAM,11,4,s,27,9,2024,36
-Av. Salvador Allende,-70.389712,-23.628322,JAM,11,4,s,27,9,2024,39
-Av. Salvador Allende,-70.390819,-23.628356,JAM,11,4,s,27,9,2024,38
 Av. Edmundo Pérez Zujovic,-70.3961,-23.631014,JAM,11,4,s,27,9,2024,48
 Av. Pedro Aguirre Cerda,-70.388883,-23.604385,JAM,12,4,s,27,9,2024,11
 Av. Edmundo Pérez Zujovic,-70.396383,-23.591332,JAM,12,4,s,27,9,2024,34
@@ -2987,6 +2986,7 @@ Av. Balmaceda,-70.400833,-23.646105,JAM,13,4,s,27,9,2024,34
 Av. Antonio Rendic,-70.389333,-23.629461,JAM,13,4,s,27,9,2024,35
 Av. Edmundo Pérez Zujovic,-70.393684,-23.599187,JAM,13,4,s,27,9,2024,35
 Av. Argentina,-70.396185,-23.657584,JAM,13,4,s,27,9,2024,39
+Av. Séptimo de Línea,-70.395983,-23.63987,JAM,13,4,s,27,9,2024,43
 Nicolás Tirado,-70.389474,-23.591909,JAM,13,4,s,27,9,2024,42
 Av. Balmaceda,-70.399298,-23.645341,JAM,13,4,s,27,9,2024,41
 Av. Antonio Rendic,-70.389322,-23.62685,JAM,13,4,s,27,9,2024,49
@@ -2996,7 +2996,6 @@ Av. Grecia,-70.402515,-23.652421,JAM,14,4,s,27,9,2024,5
 Av. Pedro Aguirre Cerda,-70.389007,-23.617395,JAM,14,4,s,27,9,2024,9
 Av. Edmundo Pérez Zujovic,-70.39624,-23.629459,JAM,14,4,s,27,9,2024,9
 Av. Pedro Aguirre Cerda,-70.390745,-23.56937,JAM,14,4,s,27,9,2024,5
-Av. Salvador Allende,-70.39118,-23.628403,JAM,14,4,s,27,9,2024,11
 Av. Edmundo Pérez Zujovic,-70.395314,-23.588985,ACCIDENT,14,4,s,27,9,2024,20
 Av. Balmaceda,-70.40221,-23.647255,JAM,14,4,s,27,9,2024,32
 Av. Edmundo Pérez Zujovic,-70.396182,-23.63033,JAM,14,4,s,27,9,2024,45
@@ -3071,6 +3070,7 @@ Av. Antonio Rendic,-70.383558,-23.617498,JAM,19,4,s,27,9,2024,6
 Av. Edmundo Pérez Zujovic,-70.392083,-23.607211,JAM,19,4,s,27,9,2024,12
 Nicolás Tirado,-70.390824,-23.592207,JAM,19,4,s,27,9,2024,20
 Av. Grecia,-70.402553,-23.653136,JAM,19,4,s,27,9,2024,54
+Av. Séptimo de Línea,-70.395931,-23.639702,JAM,19,4,s,27,9,2024,55
 Av. Balmaceda,-70.401572,-23.647122,JAM,19,4,s,27,9,2024,56
 Av. Edmundo Pérez Zujovic,-70.395728,-23.634963,JAM,19,4,s,27,9,2024,56
 Av. Edmundo Pérez Zujovic,-70.396159,-23.630645,JAM,20,4,s,27,9,2024,21
@@ -3083,8 +3083,6 @@ Av. Edmundo Pérez Zujovic,-70.395533,-23.624657,JAM,20,4,s,27,9,2024,28
 Av. Edmundo Pérez Zujovic,-70.39328,-23.599896,JAM,20,4,s,27,9,2024,32
 Av. Edmundo Pérez Zujovic,-70.392077,-23.607446,JAM,20,4,s,27,9,2024,31
 Av. Antonio Rendic,-70.384775,-23.619277,ACCIDENT,21,4,s,27,9,2024,22
-Av. Salvador Allende,-70.381165,-23.628638,ACCIDENT,7,5,f,28,9,2024,51
-Av. Salvador Allende,-70.381654,-23.62862,ACCIDENT,8,5,f,28,9,2024,28
 Av. Balmaceda,-70.396785,-23.641949,JAM,9,5,f,28,9,2024,32
 Av. Pedro Aguirre Cerda,-70.389663,-23.595648,JAM,10,5,f,28,9,2024,47
 Av. Grecia,-70.402599,-23.654131,JAM,10,5,f,28,9,2024,52
@@ -3104,18 +3102,21 @@ Av. Edmundo Pérez Zujovic,-70.396276,-23.628823,ACCIDENT,12,5,f,28,9,2024,51
 Av. Balmaceda,-70.398663,-23.644431,JAM,12,5,f,28,9,2024,50
 Av. Balmaceda,-70.397093,-23.642672,JAM,12,5,f,28,9,2024,48
 Av. Balmaceda,-70.398266,-23.644012,ACCIDENT,12,5,f,28,9,2024,49
-Av. Salvador Allende,-70.393742,-23.628469,JAM,12,5,f,28,9,2024,59
 Av. Grecia,-70.402679,-23.653583,JAM,12,5,f,28,9,2024,58
+Av. Séptimo de Línea,-70.396119,-23.639873,JAM,13,5,f,28,9,2024,5
 Av. Edmundo Pérez Zujovic,-70.395691,-23.633546,JAM,13,5,f,28,9,2024,4
 Av. Edmundo Pérez Zujovic,-70.395852,-23.634936,JAM,13,5,f,28,9,2024,10
 Av. Edmundo Pérez Zujovic,-70.396148,-23.630759,JAM,13,5,f,28,9,2024,8
+Av. Séptimo de Línea,-70.396276,-23.640374,JAM,13,5,f,28,9,2024,10
 Av. Edmundo Pérez Zujovic,-70.395802,-23.632661,JAM,13,5,f,28,9,2024,16
 Av. Edmundo Pérez Zujovic,-70.395725,-23.635053,JAM,13,5,f,28,9,2024,19
 Av. Balmaceda,-70.401856,-23.647356,JAM,13,5,f,28,9,2024,20
 Av. Edmundo Pérez Zujovic,-70.395681,-23.63327,JAM,13,5,f,28,9,2024,23
 Av. Edmundo Pérez Zujovic,-70.395816,-23.633408,JAM,13,5,f,28,9,2024,24
 Av. Edmundo Pérez Zujovic,-70.396222,-23.629724,JAM,13,5,f,28,9,2024,32
+Av. Séptimo de Línea,-70.395751,-23.638301,JAM,14,5,f,28,9,2024,4
 Av. Edmundo Pérez Zujovic,-70.395753,-23.637796,JAM,14,5,f,28,9,2024,3
+Av. Séptimo de Línea,-70.396533,-23.641186,JAM,14,5,f,28,9,2024,5
 Av. Balmaceda,-70.396928,-23.642285,JAM,14,5,f,28,9,2024,6
 Av. Balmaceda,-70.398433,-23.644189,JAM,14,5,f,28,9,2024,7
 Av. Balmaceda,-70.400132,-23.645651,JAM,14,5,f,28,9,2024,23
@@ -3146,8 +3147,6 @@ Av. Pedro Aguirre Cerda,-70.389886,-23.58985,JAM,10,6,f,29,9,2024,35
 Av. Antonio Rendic,-70.382534,-23.612588,JAM,11,6,f,29,9,2024,53
 Av. Antonio Rendic,-70.383237,-23.611667,ACCIDENT,11,6,f,29,9,2024,53
 Av. Iquique,-70.392787,-23.624851,JAM,12,6,f,29,9,2024,2
-Av. Salvador Allende,-70.393596,-23.628456,JAM,12,6,f,29,9,2024,5
-Av. Salvador Allende,-70.394236,-23.628498,JAM,12,6,f,29,9,2024,25
 Av. Iquique,-70.392618,-23.622932,JAM,12,6,f,29,9,2024,30
 Av. Óscar Bonilla,-70.378489,-23.598083,JAM,12,6,f,29,9,2024,49
 Av. Edmundo Pérez Zujovic,-70.39478,-23.588215,JAM,13,6,f,29,9,2024,3
@@ -3156,10 +3155,12 @@ Av. Edmundo Pérez Zujovic,-70.39579,-23.63292,JAM,13,6,f,29,9,2024,41
 Av. Edmundo Pérez Zujovic,-70.395839,-23.635375,JAM,13,6,f,29,9,2024,41
 Av. Edmundo Pérez Zujovic,-70.395764,-23.637553,JAM,13,6,f,29,9,2024,49
 Av. Iquique,-70.392627,-23.624294,JAM,13,6,f,29,9,2024,58
+Av. Séptimo de Línea,-70.396629,-23.641396,JAM,14,6,f,29,9,2024,8
 Av. Edmundo Pérez Zujovic,-70.393498,-23.586005,JAM,14,6,f,29,9,2024,10
 Av. Edmundo Pérez Zujovic,-70.395841,-23.635296,JAM,14,6,f,29,9,2024,17
 Av. Edmundo Pérez Zujovic,-70.395854,-23.634325,JAM,14,6,f,29,9,2024,16
 Av. Edmundo Pérez Zujovic,-70.395797,-23.633108,JAM,14,6,f,29,9,2024,32
+Av. Séptimo de Línea,-70.395866,-23.639034,JAM,14,6,f,29,9,2024,36
 Av. Pedro Aguirre Cerda,-70.390334,-23.584466,JAM,15,6,f,29,9,2024,43
 Av. Edmundo Pérez Zujovic,-70.392253,-23.617167,JAM,15,6,f,29,9,2024,53
 Av. Iquique,-70.393919,-23.630971,JAM,16,6,f,29,9,2024,57
@@ -3204,7 +3205,6 @@ Av. Argentina,-70.403906,-23.675929,JAM,8,0,s,30,9,2024,0
 Av. Grecia,-70.403909,-23.664777,JAM,8,0,s,30,9,2024,0
 Av. Grecia,-70.403628,-23.662274,JAM,8,0,s,30,9,2024,3
 Av. Iquique,-70.393374,-23.63943,JAM,8,0,s,30,9,2024,7
-Av. Salvador Allende,-70.395603,-23.628537,JAM,8,0,s,30,9,2024,5
 Av. Pedro Aguirre Cerda,-70.390908,-23.577901,JAM,8,0,s,30,9,2024,7
 Av. Edmundo Pérez Zujovic,-70.393702,-23.599156,JAM,8,0,s,30,9,2024,7
 Av. Edmundo Pérez Zujovic,-70.394916,-23.597399,JAM,8,0,s,30,9,2024,10
@@ -3236,7 +3236,6 @@ Av. Iquique,-70.394015,-23.629094,JAM,9,0,s,30,9,2024,13
 Av. Pedro Aguirre Cerda,-70.390154,-23.586537,JAM,9,0,s,30,9,2024,21
 Av. Edmundo Pérez Zujovic,-70.39297,-23.620414,JAM,9,0,s,30,9,2024,29
 Av. Edmundo Pérez Zujovic,-70.396277,-23.625718,JAM,9,0,s,30,9,2024,29
-Av. Salvador Allende,-70.394593,-23.628606,JAM,9,0,s,30,9,2024,34
 Av. Edmundo Pérez Zujovic,-70.396415,-23.6279,JAM,9,0,s,30,9,2024,32
 Av. Iquique,-70.394114,-23.628745,JAM,9,0,s,30,9,2024,35
 Av. Pedro Aguirre Cerda,-70.390134,-23.585533,JAM,9,0,s,30,9,2024,37
@@ -3341,7 +3340,6 @@ Av. Argentina,-70.40273,-23.674661,JAM,7,1,s,1,10,2024,35
 Av. Argentina,-70.402452,-23.674341,JAM,7,1,s,1,10,2024,34
 Av. Edmundo Pérez Zujovic,-70.39449,-23.623041,JAM,7,1,s,1,10,2024,37
 Av. Edmundo Pérez Zujovic,-70.396324,-23.627507,JAM,7,1,s,1,10,2024,40
-Av. Salvador Allende,-70.386558,-23.628395,JAM,7,1,s,1,10,2024,41
 Av. Edmundo Pérez Zujovic,-70.394595,-23.623201,JAM,7,1,s,1,10,2024,43
 Av. Edmundo Pérez Zujovic,-70.396294,-23.626094,JAM,7,1,s,1,10,2024,40
 Av. Edmundo Pérez Zujovic,-70.396316,-23.627864,JAM,7,1,s,1,10,2024,42
@@ -3392,8 +3390,6 @@ Av. Iquique,-70.393651,-23.635809,ACCIDENT,10,1,s,1,10,2024,1
 Av. Edmundo Pérez Zujovic,-70.395852,-23.63427,JAM,10,1,s,1,10,2024,6
 Av. Edmundo Pérez Zujovic,-70.393435,-23.621222,JAM,10,1,s,1,10,2024,4
 Av. Edmundo Pérez Zujovic,-70.39586,-23.63455,JAM,10,1,s,1,10,2024,7
-Av. Salvador Allende,-70.392693,-23.628534,JAM,10,1,s,1,10,2024,31
-Av. Salvador Allende,-70.393278,-23.62856,JAM,10,1,s,1,10,2024,30
 Av. Grecia,-70.402593,-23.654007,JAM,11,1,s,1,10,2024,22
 Av. Pedro Aguirre Cerda,-70.38957,-23.597462,ACCIDENT,11,1,s,1,10,2024,29
 Av. Pedro Aguirre Cerda,-70.389498,-23.596949,ACCIDENT,11,1,s,1,10,2024,47
@@ -3480,7 +3476,6 @@ Av. Argentina,-70.4038,-23.675817,JAM,7,2,s,2,10,2024,30
 Av. Grecia,-70.406816,-23.66911,JAM,7,2,s,2,10,2024,31
 Av. Antonio Rendic,-70.385876,-23.62104,JAM,7,2,s,2,10,2024,34
 Av. Antonio Rendic,-70.387279,-23.623298,JAM,7,2,s,2,10,2024,38
-Av. Salvador Allende,-70.395433,-23.62853,JAM,7,2,s,2,10,2024,39
 Av. Pedro Aguirre Cerda,-70.388669,-23.615432,JAM,7,2,s,2,10,2024,35
 Av. Pedro Aguirre Cerda,-70.390837,-23.570744,JAM,7,2,s,2,10,2024,35
 Av. Pedro Aguirre Cerda,-70.388392,-23.612621,JAM,7,2,s,2,10,2024,35
@@ -3489,12 +3484,9 @@ Av. Antonio Rendic,-70.388665,-23.625619,JAM,7,2,s,2,10,2024,41
 Av. Pedro Aguirre Cerda,-70.391198,-23.574658,JAM,7,2,s,2,10,2024,39
 Av. Antonio Rendic,-70.389071,-23.6353,JAM,7,2,s,2,10,2024,45
 Nicolás Tirado,-70.388287,-23.591889,JAM,7,2,s,2,10,2024,47
-Av. Salvador Allende,-70.388325,-23.628302,JAM,7,2,s,2,10,2024,47
 Av. Edmundo Pérez Zujovic,-70.397362,-23.570883,JAM,7,2,s,2,10,2024,52
 Av. Pedro Aguirre Cerda,-70.389712,-23.593878,JAM,7,2,s,2,10,2024,51
-Av. Salvador Allende,-70.39425,-23.628498,JAM,7,2,s,2,10,2024,54
 Av. Pedro Aguirre Cerda,-70.389727,-23.593418,JAM,7,2,s,2,10,2024,57
-Av. Salvador Allende,-70.392062,-23.628504,JAM,7,2,s,2,10,2024,56
 Av. Edmundo Pérez Zujovic,-70.394211,-23.598321,JAM,8,2,s,2,10,2024,1
 Av. Argentina,-70.396054,-23.657067,JAM,8,2,s,2,10,2024,2
 Av. Grecia,-70.402799,-23.65021,JAM,8,2,s,2,10,2024,0
@@ -3587,7 +3579,9 @@ Av. Edmundo Pérez Zujovic,-70.39618,-23.625503,JAM,19,2,s,2,10,2024,9
 Av. Edmundo Pérez Zujovic,-70.39589,-23.632076,JAM,19,2,s,2,10,2024,10
 Av. Edmundo Pérez Zujovic,-70.395857,-23.634399,JAM,19,2,s,2,10,2024,7
 Av. Iquique,-70.394147,-23.628152,JAM,19,2,s,2,10,2024,13
+Av. Séptimo de Línea,-70.396287,-23.640406,JAM,19,2,s,2,10,2024,19
 Av. Edmundo Pérez Zujovic,-70.396371,-23.572997,ACCIDENT,19,2,s,2,10,2024,18
+Av. Séptimo de Línea,-70.395987,-23.639438,JAM,19,2,s,2,10,2024,19
 Av. Iquique,-70.39423,-23.627216,JAM,19,2,s,2,10,2024,24
 Av. Grecia,-70.402706,-23.654901,JAM,19,2,s,2,10,2024,48
 Av. Antonio Rendic,-70.384481,-23.618959,JAM,20,2,s,2,10,2024,19
@@ -3673,6 +3667,7 @@ Av. Grecia,-70.402516,-23.655732,JAM,18,3,s,3,10,2024,16
 Av. Grecia,-70.40253,-23.652632,JAM,18,3,s,3,10,2024,17
 Av. Grecia,-70.405655,-23.666799,JAM,18,3,s,3,10,2024,13
 Av. Edmundo Pérez Zujovic,-70.395072,-23.588616,JAM,18,3,s,3,10,2024,18
+Av. Séptimo de Línea,-70.396022,-23.639996,JAM,18,3,s,3,10,2024,22
 Av. Edmundo Pérez Zujovic,-70.395395,-23.624438,JAM,18,3,s,3,10,2024,21
 Av. Edmundo Pérez Zujovic,-70.392387,-23.618579,JAM,18,3,s,3,10,2024,19
 Av. Edmundo Pérez Zujovic,-70.396962,-23.594342,JAM,18,3,s,3,10,2024,20
@@ -3689,6 +3684,7 @@ Av. Grecia,-70.406498,-23.668334,JAM,18,3,s,3,10,2024,38
 Av. Edmundo Pérez Zujovic,-70.396329,-23.627054,JAM,18,3,s,3,10,2024,43
 Av. Óscar Bonilla,-70.379653,-23.576977,JAM,18,3,s,3,10,2024,40
 Av. Antonio Rendic,-70.388513,-23.643341,JAM,18,3,s,3,10,2024,42
+Av. Séptimo de Línea,-70.395863,-23.639026,JAM,18,3,s,3,10,2024,44
 Av. Iquique,-70.393965,-23.630223,JAM,18,3,s,3,10,2024,50
 Av. Pedro Aguirre Cerda,-70.390726,-23.56988,JAM,18,3,s,3,10,2024,57
 Av. Pedro Aguirre Cerda,-70.390695,-23.578932,JAM,18,3,s,3,10,2024,54
@@ -3696,6 +3692,7 @@ Av. Grecia,-70.402628,-23.655025,JAM,19,3,s,3,10,2024,2
 Av. Balmaceda,-70.399685,-23.645336,JAM,19,3,s,3,10,2024,0
 Av. Edmundo Pérez Zujovic,-70.396288,-23.630683,JAM,19,3,s,3,10,2024,8
 Av. Edmundo Pérez Zujovic,-70.392326,-23.617931,JAM,19,3,s,3,10,2024,5
+Av. Séptimo de Línea,-70.396319,-23.64051,JAM,19,3,s,3,10,2024,8
 Av. Edmundo Pérez Zujovic,-70.395226,-23.597049,JAM,19,3,s,3,10,2024,15
 Nicolás Tirado,-70.39214,-23.59226,JAM,19,3,s,3,10,2024,11
 Av. Pedro Aguirre Cerda,-70.390803,-23.577831,JAM,19,3,s,3,10,2024,13
@@ -3714,4 +3711,393 @@ Av. Pedro Aguirre Cerda,-70.388947,-23.616659,JAM,19,3,s,3,10,2024,51
 Av. Grecia,-70.402335,-23.647936,JAM,19,3,s,3,10,2024,52
 Av. Pedro Aguirre Cerda,-70.391009,-23.576996,JAM,19,3,s,3,10,2024,56
 Av. Edmundo Pérez Zujovic,-70.395761,-23.637618,JAM,20,3,s,3,10,2024,8
+Av. Séptimo de Línea,-70.396396,-23.640753,ACCIDENT,20,3,s,3,10,2024,11
 Av. Grecia,-70.402643,-23.648007,JAM,20,3,s,3,10,2024,51
+Av. Séptimo de Línea,-70.396514,-23.641126,ACCIDENT,21,3,s,3,10,2024,18
+Nicolás Tirado,-70.389456,-23.591908,ACCIDENT,7,4,s,4,10,2024,10
+Av. Pedro Aguirre Cerda,-70.390157,-23.586503,JAM,7,4,s,4,10,2024,19
+Av. Pedro Aguirre Cerda,-70.388994,-23.616861,JAM,7,4,s,4,10,2024,19
+Av. Edmundo Pérez Zujovic,-70.392731,-23.619841,JAM,7,4,s,4,10,2024,17
+Av. Edmundo Pérez Zujovic,-70.392208,-23.607575,JAM,7,4,s,4,10,2024,23
+Av. Edmundo Pérez Zujovic,-70.393382,-23.584356,JAM,7,4,s,4,10,2024,26
+Av. Edmundo Pérez Zujovic,-70.394565,-23.622914,JAM,7,4,s,4,10,2024,31
+Av. Pedro Aguirre Cerda,-70.388908,-23.60609,JAM,7,4,s,4,10,2024,26
+Av. Edmundo Pérez Zujovic,-70.392002,-23.6152,JAM,7,4,s,4,10,2024,33
+Av. Argentina,-70.398922,-23.66667,JAM,7,4,s,4,10,2024,42
+Av. Pedro Aguirre Cerda,-70.390956,-23.571884,JAM,7,4,s,4,10,2024,40
+Av. Argentina,-70.397307,-23.663305,JAM,7,4,s,4,10,2024,43
+Av. Grecia,-70.402668,-23.658212,JAM,7,4,s,4,10,2024,49
+Av. Antonio Rendic,-70.383319,-23.617119,JAM,7,4,s,4,10,2024,55
+Av. Grecia,-70.402788,-23.649821,JAM,7,4,s,4,10,2024,54
+Av. Grecia,-70.402583,-23.655341,JAM,7,4,s,4,10,2024,57
+Av. Edmundo Pérez Zujovic,-70.392943,-23.578184,JAM,7,4,s,4,10,2024,57
+Av. Séptimo de Línea,-70.396108,-23.639837,JAM,7,4,s,4,10,2024,55
+Av. Iquique,-70.39413,-23.628403,ACCIDENT,7,4,s,4,10,2024,56
+Av. Antonio Rendic,-70.383727,-23.617763,JAM,7,4,s,4,10,2024,55
+Av. Edmundo Pérez Zujovic,-70.39626,-23.57344,JAM,7,4,s,4,10,2024,55
+Av. Pedro Aguirre Cerda,-70.38949,-23.597117,JAM,8,4,s,4,10,2024,2
+Av. Edmundo Pérez Zujovic,-70.392237,-23.608797,JAM,8,4,s,4,10,2024,0
+Av. Edmundo Pérez Zujovic,-70.393105,-23.620692,JAM,8,4,s,4,10,2024,1
+Av. Edmundo Pérez Zujovic,-70.39228,-23.609709,JAM,8,4,s,4,10,2024,1
+Av. Edmundo Pérez Zujovic,-70.394267,-23.587511,JAM,8,4,s,4,10,2024,5
+Av. Óscar Bonilla,-70.378636,-23.592052,JAM,8,4,s,4,10,2024,5
+Av. Pedro Aguirre Cerda,-70.388542,-23.6094,ACCIDENT,8,4,s,4,10,2024,13
+Av. Pedro Aguirre Cerda,-70.388597,-23.608728,ACCIDENT,8,4,s,4,10,2024,13
+Av. Iquique,-70.393906,-23.631175,JAM,8,4,s,4,10,2024,17
+Av. Edmundo Pérez Zujovic,-70.396434,-23.62685,JAM,8,4,s,4,10,2024,23
+Av. Edmundo Pérez Zujovic,-70.395342,-23.589256,JAM,8,4,s,4,10,2024,21
+Av. Grecia,-70.403431,-23.660161,JAM,8,4,s,4,10,2024,19
+Av. Iquique,-70.394064,-23.629842,ACCIDENT,8,4,s,4,10,2024,21
+Av. Balmaceda,-70.398715,-23.644486,JAM,8,4,s,4,10,2024,20
+Av. Iquique,-70.39414,-23.628425,ACCIDENT,8,4,s,4,10,2024,21
+Av. Pedro Aguirre Cerda,-70.389732,-23.620083,JAM,8,4,s,4,10,2024,19
+Av. Edmundo Pérez Zujovic,-70.393227,-23.584812,JAM,8,4,s,4,10,2024,19
+Av. Edmundo Pérez Zujovic,-70.396185,-23.630289,JAM,8,4,s,4,10,2024,29
+Av. Edmundo Pérez Zujovic,-70.395937,-23.59009,JAM,8,4,s,4,10,2024,36
+Av. Iquique,-70.393979,-23.629975,JAM,8,4,s,4,10,2024,44
+Av. Edmundo Pérez Zujovic,-70.392393,-23.617172,JAM,8,4,s,4,10,2024,55
+Av. Grecia,-70.403531,-23.660471,JAM,8,4,s,4,10,2024,55
+Av. Grecia,-70.402457,-23.656403,JAM,9,4,s,4,10,2024,9
+Av. Grecia,-70.402583,-23.656431,ACCIDENT,9,4,s,4,10,2024,17
+Av. Balmaceda,-70.397085,-23.642655,JAM,9,4,s,4,10,2024,35
+Av. Edmundo Pérez Zujovic,-70.396429,-23.627098,JAM,9,4,s,4,10,2024,37
+Av. Séptimo de Línea,-70.396111,-23.639847,JAM,9,4,s,4,10,2024,57
+Av. Séptimo de Línea,-70.396637,-23.641516,JAM,9,4,s,4,10,2024,59
+Av. Séptimo de Línea,-70.396432,-23.640867,JAM,10,4,s,4,10,2024,1
+Av. Edmundo Pérez Zujovic,-70.395808,-23.633271,JAM,10,4,s,4,10,2024,16
+Av. Edmundo Pérez Zujovic,-70.396428,-23.627196,JAM,10,4,s,4,10,2024,18
+Av. Séptimo de Línea,-70.39583,-23.638915,JAM,10,4,s,4,10,2024,42
+Av. Balmaceda,-70.400867,-23.646131,ACCIDENT,12,4,s,4,10,2024,1
+Av. Balmaceda,-70.400363,-23.645781,JAM,12,4,s,4,10,2024,10
+Av. Grecia,-70.402618,-23.654539,JAM,12,4,s,4,10,2024,19
+Av. Pedro Aguirre Cerda,-70.389894,-23.588464,JAM,12,4,s,4,10,2024,23
+Av. Grecia,-70.402669,-23.653314,JAM,12,4,s,4,10,2024,24
+Av. Grecia,-70.404656,-23.66539,JAM,12,4,s,4,10,2024,41
+Av. Edmundo Pérez Zujovic,-70.396428,-23.627162,JAM,12,4,s,4,10,2024,43
+Av. Balmaceda,-70.401405,-23.64654,ACCIDENT,12,4,s,4,10,2024,48
+Av. Edmundo Pérez Zujovic,-70.395518,-23.624421,JAM,12,4,s,4,10,2024,48
+Av. Balmaceda,-70.397699,-23.643415,ACCIDENT,12,4,s,4,10,2024,57
+Av. Grecia,-70.403347,-23.659957,JAM,12,4,s,4,10,2024,55
+Av. Edmundo Pérez Zujovic,-70.395853,-23.634875,JAM,13,4,s,4,10,2024,4
+Nicolás Tirado,-70.392045,-23.592258,JAM,12,4,s,4,10,2024,59
+Av. Balmaceda,-70.401024,-23.646249,JAM,13,4,s,4,10,2024,2
+Nicolás Tirado,-70.39364,-23.592298,JAM,13,4,s,4,10,2024,12
+Av. Argentina,-70.39303,-23.650455,JAM,13,4,s,4,10,2024,15
+Av. Antonio Rendic,-70.388643,-23.640859,JAM,13,4,s,4,10,2024,23
+Av. Argentina,-70.393027,-23.649575,JAM,13,4,s,4,10,2024,22
+Av. Antonio Rendic,-70.388856,-23.637341,JAM,13,4,s,4,10,2024,27
+Av. Grecia,-70.406941,-23.669415,JAM,13,4,s,4,10,2024,34
+Av. Grecia,-70.40736,-23.670491,JAM,13,4,s,4,10,2024,35
+Av. Iquique,-70.392896,-23.625112,JAM,13,4,s,4,10,2024,40
+Av. Grecia,-70.407267,-23.670543,JAM,13,4,s,4,10,2024,44
+Av. Grecia,-70.403563,-23.660827,JAM,13,4,s,4,10,2024,47
+Av. Grecia,-70.402463,-23.650829,ACCIDENT,14,4,s,4,10,2024,5
+Av. Grecia,-70.40239,-23.648873,ACCIDENT,14,4,s,4,10,2024,9
+Av. Séptimo de Línea,-70.396049,-23.639642,JAM,14,4,s,4,10,2024,7
+Av. Edmundo Pérez Zujovic,-70.396203,-23.630013,JAM,14,4,s,4,10,2024,10
+Av. Grecia,-70.402439,-23.650176,ACCIDENT,14,4,s,4,10,2024,17
+Av. Antonio Rendic,-70.388842,-23.63758,JAM,14,4,s,4,10,2024,13
+Av. Edmundo Pérez Zujovic,-70.395656,-23.636912,JAM,14,4,s,4,10,2024,18
+Av. Séptimo de Línea,-70.396678,-23.641645,JAM,14,4,s,4,10,2024,18
+Av. Argentina,-70.398937,-23.666448,JAM,14,4,s,4,10,2024,21
+Av. Edmundo Pérez Zujovic,-70.394959,-23.623537,JAM,14,4,s,4,10,2024,24
+Av. Grecia,-70.405505,-23.666563,ACCIDENT,14,4,s,4,10,2024,25
+Av. Balmaceda,-70.397584,-23.643294,JAM,14,4,s,4,10,2024,26
+Av. Balmaceda,-70.399352,-23.645079,JAM,14,4,s,4,10,2024,29
+Av. Edmundo Pérez Zujovic,-70.395765,-23.632111,JAM,14,4,s,4,10,2024,37
+Av. Edmundo Pérez Zujovic,-70.396246,-23.629363,JAM,14,4,s,4,10,2024,34
+Av. Séptimo de Línea,-70.396271,-23.640358,JAM,14,4,s,4,10,2024,33
+Av. Grecia,-70.402425,-23.649891,ACCIDENT,14,4,s,4,10,2024,38
+Av. Edmundo Pérez Zujovic,-70.395675,-23.632523,JAM,14,4,s,4,10,2024,37
+Av. Grecia,-70.402442,-23.650282,JAM,14,4,s,4,10,2024,37
+Av. Iquique,-70.393939,-23.626222,JAM,14,4,s,4,10,2024,43
+Av. Séptimo de Línea,-70.396159,-23.640004,JAM,14,4,s,4,10,2024,42
+Av. Grecia,-70.402439,-23.650209,ACCIDENT,14,4,s,4,10,2024,55
+Av. Edmundo Pérez Zujovic,-70.395717,-23.634146,JAM,15,4,s,4,10,2024,2
+Av. Séptimo de Línea,-70.396382,-23.640707,JAM,15,4,s,4,10,2024,7
+Av. Grecia,-70.402425,-23.649898,ACCIDENT,15,4,s,4,10,2024,21
+Av. Iquique,-70.392708,-23.624662,JAM,15,4,s,4,10,2024,21
+Av. Grecia,-70.402605,-23.654252,JAM,15,4,s,4,10,2024,27
+Av. Grecia,-70.402423,-23.649814,ACCIDENT,15,4,s,4,10,2024,30
+Av. Edmundo Pérez Zujovic,-70.396442,-23.626353,JAM,15,4,s,4,10,2024,36
+Av. Iquique,-70.394102,-23.629003,JAM,15,4,s,4,10,2024,39
+Av. Edmundo Pérez Zujovic,-70.395963,-23.631529,JAM,16,4,s,4,10,2024,7
+Av. Edmundo Pérez Zujovic,-70.396417,-23.626052,JAM,16,4,s,4,10,2024,15
+Av. Grecia,-70.402624,-23.655068,JAM,16,4,s,4,10,2024,18
+Av. Edmundo Pérez Zujovic,-70.392295,-23.603497,JAM,16,4,s,4,10,2024,36
+Av. Antonio Rendic,-70.386543,-23.622108,JAM,16,4,s,4,10,2024,42
+Av. Balmaceda,-70.398733,-23.644505,JAM,16,4,s,4,10,2024,48
+Av. Edmundo Pérez Zujovic,-70.396138,-23.6314,JAM,16,4,s,4,10,2024,54
+Av. Grecia,-70.402497,-23.655844,JAM,17,4,s,4,10,2024,5
+Av. Edmundo Pérez Zujovic,-70.3961,-23.63101,JAM,17,4,s,4,10,2024,12
+Av. Edmundo Pérez Zujovic,-70.395846,-23.635121,JAM,17,4,s,4,10,2024,13
+Av. Edmundo Pérez Zujovic,-70.396216,-23.631128,JAM,17,4,s,4,10,2024,10
+Av. Pedro Aguirre Cerda,-70.390763,-23.568719,ACCIDENT,17,4,s,4,10,2024,16
+Av. Balmaceda,-70.398779,-23.644554,JAM,17,4,s,4,10,2024,22
+Av. Pedro Aguirre Cerda,-70.389913,-23.58825,JAM,17,4,s,4,10,2024,23
+Av. Iquique,-70.393883,-23.633479,JAM,17,4,s,4,10,2024,20
+Av. Edmundo Pérez Zujovic,-70.39245,-23.617766,JAM,17,4,s,4,10,2024,27
+Av. Edmundo Pérez Zujovic,-70.395822,-23.633539,JAM,17,4,s,4,10,2024,27
+Av. Edmundo Pérez Zujovic,-70.395963,-23.631874,JAM,17,4,s,4,10,2024,30
+Av. Balmaceda,-70.396994,-23.642439,JAM,17,4,s,4,10,2024,32
+Av. Edmundo Pérez Zujovic,-70.393143,-23.600408,JAM,17,4,s,4,10,2024,40
+Av. Edmundo Pérez Zujovic,-70.391889,-23.614562,JAM,17,4,s,4,10,2024,37
+Av. Grecia,-70.403901,-23.664767,JAM,17,4,s,4,10,2024,45
+Av. Séptimo de Línea,-70.395768,-23.638666,JAM,17,4,s,4,10,2024,43
+Av. Edmundo Pérez Zujovic,-70.394785,-23.623261,JAM,17,4,s,4,10,2024,42
+Av. Edmundo Pérez Zujovic,-70.393544,-23.599707,JAM,17,4,s,4,10,2024,41
+Av. Grecia,-70.403632,-23.662434,JAM,17,4,s,4,10,2024,47
+Av. Pedro Aguirre Cerda,-70.390705,-23.578832,JAM,17,4,s,4,10,2024,46
+Av. Grecia,-70.402477,-23.656728,JAM,17,4,s,4,10,2024,50
+Av. Pedro Aguirre Cerda,-70.390861,-23.577307,JAM,17,4,s,4,10,2024,47
+Av. Edmundo Pérez Zujovic,-70.395133,-23.623812,ACCIDENT,18,4,s,4,10,2024,5
+Av. Edmundo Pérez Zujovic,-70.394523,-23.62285,JAM,18,4,s,4,10,2024,4
+Av. Balmaceda,-70.398101,-23.643838,JAM,18,4,s,4,10,2024,7
+Av. Edmundo Pérez Zujovic,-70.395982,-23.590181,JAM,18,4,s,4,10,2024,16
+Nicolás Tirado,-70.389455,-23.591908,JAM,18,4,s,4,10,2024,15
+Av. Edmundo Pérez Zujovic,-70.396736,-23.592052,JAM,18,4,s,4,10,2024,21
+Av. Antonio Rendic,-70.388785,-23.625866,JAM,18,4,s,4,10,2024,26
+Av. Edmundo Pérez Zujovic,-70.396158,-23.631341,JAM,18,4,s,4,10,2024,22
+Av. Edmundo Pérez Zujovic,-70.396238,-23.62563,JAM,18,4,s,4,10,2024,25
+Av. Grecia,-70.403589,-23.661166,JAM,18,4,s,4,10,2024,22
+Av. Edmundo Pérez Zujovic,-70.396432,-23.626941,JAM,18,4,s,4,10,2024,26
+Av. Edmundo Pérez Zujovic,-70.395796,-23.6331,JAM,18,4,s,4,10,2024,25
+Av. Óscar Bonilla,-70.379582,-23.577876,JAM,18,4,s,4,10,2024,28
+Av. Edmundo Pérez Zujovic,-70.397037,-23.593684,JAM,18,4,s,4,10,2024,30
+Av. Balmaceda,-70.399619,-23.645285,JAM,18,4,s,4,10,2024,34
+Av. Iquique,-70.394159,-23.627977,JAM,18,4,s,4,10,2024,43
+Av. Edmundo Pérez Zujovic,-70.392148,-23.604916,JAM,19,4,s,4,10,2024,26
+Av. Edmundo Pérez Zujovic,-70.392502,-23.578632,JAM,19,4,s,4,10,2024,31
+Nicolás Tirado,-70.392077,-23.592258,JAM,20,4,s,4,10,2024,22
+Av. Edmundo Pérez Zujovic,-70.392098,-23.606686,JAM,20,4,s,4,10,2024,37
+Av. Antonio Rendic,-70.382632,-23.616048,JAM,20,4,s,4,10,2024,38
+Av. Edmundo Pérez Zujovic,-70.39327,-23.584094,ACCIDENT,7,5,f,5,10,2024,37
+Av. Edmundo Pérez Zujovic,-70.393263,-23.583972,ACCIDENT,7,5,f,5,10,2024,37
+Av. Edmundo Pérez Zujovic,-70.3932,-23.58528,JAM,7,5,f,5,10,2024,38
+Av. Edmundo Pérez Zujovic,-70.393262,-23.585675,ACCIDENT,8,5,f,5,10,2024,6
+Av. Edmundo Pérez Zujovic,-70.394168,-23.587607,JAM,8,5,f,5,10,2024,10
+Av. Edmundo Pérez Zujovic,-70.393235,-23.584691,ACCIDENT,8,5,f,5,10,2024,21
+Av. Edmundo Pérez Zujovic,-70.394027,-23.587417,JAM,9,5,f,5,10,2024,0
+Av. Edmundo Pérez Zujovic,-70.393883,-23.587142,JAM,9,5,f,5,10,2024,8
+Av. Edmundo Pérez Zujovic,-70.393224,-23.584863,ACCIDENT,9,5,f,5,10,2024,14
+Av. Óscar Bonilla,-70.378816,-23.587237,ACCIDENT,9,5,f,5,10,2024,17
+Av. Óscar Bonilla,-70.378824,-23.586684,ACCIDENT,9,5,f,5,10,2024,22
+Av. Edmundo Pérez Zujovic,-70.39327,-23.584088,ACCIDENT,9,5,f,5,10,2024,29
+Av. Iquique,-70.392624,-23.624157,JAM,9,5,f,5,10,2024,46
+Av. Óscar Bonilla,-70.378825,-23.586658,ACCIDENT,10,5,f,5,10,2024,6
+Av. Edmundo Pérez Zujovic,-70.396438,-23.626597,JAM,11,5,f,5,10,2024,27
+Av. Edmundo Pérez Zujovic,-70.396085,-23.625325,JAM,11,5,f,5,10,2024,26
+Av. Iquique,-70.394016,-23.629049,JAM,11,5,f,5,10,2024,42
+Av. Grecia,-70.403214,-23.659664,JAM,11,5,f,5,10,2024,59
+Av. Séptimo de Línea,-70.395767,-23.638657,JAM,12,5,f,5,10,2024,7
+Av. Pedro Aguirre Cerda,-70.389843,-23.590367,JAM,12,5,f,5,10,2024,6
+Av. Séptimo de Línea,-70.396346,-23.640593,JAM,12,5,f,5,10,2024,32
+Av. Edmundo Pérez Zujovic,-70.395802,-23.636749,JAM,12,5,f,5,10,2024,29
+Av. Edmundo Pérez Zujovic,-70.396159,-23.630644,JAM,12,5,f,5,10,2024,28
+Av. Edmundo Pérez Zujovic,-70.395816,-23.633411,JAM,12,5,f,5,10,2024,46
+Av. Edmundo Pérez Zujovic,-70.396321,-23.630118,JAM,13,5,f,5,10,2024,11
+Av. Antonio Rendic,-70.385359,-23.620358,JAM,13,5,f,5,10,2024,11
+Av. Edmundo Pérez Zujovic,-70.395942,-23.631932,JAM,13,5,f,5,10,2024,29
+Av. Edmundo Pérez Zujovic,-70.395745,-23.624781,JAM,13,5,f,5,10,2024,26
+Av. Edmundo Pérez Zujovic,-70.39586,-23.634598,JAM,13,5,f,5,10,2024,35
+Av. Edmundo Pérez Zujovic,-70.395674,-23.63282,JAM,13,5,f,5,10,2024,36
+Av. Edmundo Pérez Zujovic,-70.395685,-23.632426,JAM,13,5,f,5,10,2024,41
+Av. Edmundo Pérez Zujovic,-70.395819,-23.633472,JAM,13,5,f,5,10,2024,46
+Av. Séptimo de Línea,-70.396121,-23.640319,JAM,13,5,f,5,10,2024,56
+Av. Edmundo Pérez Zujovic,-70.396319,-23.630144,JAM,13,5,f,5,10,2024,51
+Av. Séptimo de Línea,-70.396155,-23.639993,JAM,13,5,f,5,10,2024,59
+Av. Edmundo Pérez Zujovic,-70.395813,-23.633346,JAM,14,5,f,5,10,2024,1
+Av. Edmundo Pérez Zujovic,-70.394344,-23.622814,JAM,14,5,f,5,10,2024,7
+Av. Edmundo Pérez Zujovic,-70.392098,-23.606679,JAM,14,5,f,5,10,2024,9
+Av. Edmundo Pérez Zujovic,-70.395673,-23.632575,JAM,14,5,f,5,10,2024,14
+Av. Edmundo Pérez Zujovic,-70.392139,-23.605221,JAM,14,5,f,5,10,2024,24
+Av. Pedro Aguirre Cerda,-70.390178,-23.584976,JAM,15,5,f,5,10,2024,47
+Av. Argentina,-70.407108,-23.680287,ACCIDENT,15,5,f,5,10,2024,54
+Av. Edmundo Pérez Zujovic,-70.392176,-23.603927,ACCIDENT,16,5,f,5,10,2024,12
+Av. Edmundo Pérez Zujovic,-70.392247,-23.605669,ACCIDENT,16,5,f,5,10,2024,10
+Av. Edmundo Pérez Zujovic,-70.391957,-23.609949,JAM,16,5,f,5,10,2024,28
+Av. Edmundo Pérez Zujovic,-70.392109,-23.6063,JAM,16,5,f,5,10,2024,33
+Av. Edmundo Pérez Zujovic,-70.391954,-23.61,JAM,16,5,f,5,10,2024,38
+Av. Edmundo Pérez Zujovic,-70.392299,-23.603393,ACCIDENT,16,5,f,5,10,2024,45
+Av. Edmundo Pérez Zujovic,-70.396152,-23.630723,JAM,16,5,f,5,10,2024,57
+Av. Edmundo Pérez Zujovic,-70.392247,-23.605629,ACCIDENT,17,5,f,5,10,2024,3
+Av. Pedro Aguirre Cerda,-70.388513,-23.611098,JAM,17,5,f,5,10,2024,9
+Av. Balmaceda,-70.399514,-23.645508,JAM,17,5,f,5,10,2024,25
+Av. Iquique,-70.394107,-23.627336,JAM,17,5,f,5,10,2024,48
+Av. Balmaceda,-70.399028,-23.645132,JAM,18,5,f,5,10,2024,1
+Av. Edmundo Pérez Zujovic,-70.393747,-23.586854,ACCIDENT,18,5,f,5,10,2024,24
+Av. Edmundo Pérez Zujovic,-70.39585,-23.634996,JAM,18,5,f,5,10,2024,47
+Av. Edmundo Pérez Zujovic,-70.396086,-23.631074,JAM,19,5,f,5,10,2024,3
+Av. Edmundo Pérez Zujovic,-70.392712,-23.582251,ACCIDENT,19,5,f,5,10,2024,39
+Av. Edmundo Pérez Zujovic,-70.393188,-23.583412,JAM,19,5,f,5,10,2024,42
+Av. Edmundo Pérez Zujovic,-70.395861,-23.589944,JAM,19,5,f,5,10,2024,49
+Av. Edmundo Pérez Zujovic,-70.39545,-23.589448,JAM,20,5,f,5,10,2024,5
+Av. Iquique,-70.393713,-23.634867,JAM,20,5,f,5,10,2024,10
+Av. Balmaceda,-70.401537,-23.647093,JAM,20,5,f,5,10,2024,35
+Av. Argentina,-70.392432,-23.645838,ACCIDENT,20,5,f,5,10,2024,57
+Av. Iquique,-70.393475,-23.64147,ACCIDENT,20,5,f,5,10,2024,59
+Av. Argentina,-70.392556,-23.646666,JAM,20,5,f,5,10,2024,57
+Av. Séptimo de Línea,-70.395767,-23.639164,JAM,21,5,f,5,10,2024,9
+Av. Argentina,-70.392667,-23.647365,ACCIDENT,21,5,f,5,10,2024,14
+Av. Óscar Bonilla,-70.378751,-23.590732,ACCIDENT,22,5,f,5,10,2024,18
+Av. Edmundo Pérez Zujovic,-70.393527,-23.58638,ACCIDENT,3,6,f,6,10,2024,57
+Av. Séptimo de Línea,-70.396506,-23.6411,JAM,12,6,f,6,10,2024,0
+Av. Pedro Aguirre Cerda,-70.389924,-23.589389,JAM,12,6,f,6,10,2024,3
+Av. Pedro Aguirre Cerda,-70.38986,-23.590166,JAM,12,6,f,6,10,2024,3
+Av. Edmundo Pérez Zujovic,-70.393378,-23.583808,JAM,12,6,f,6,10,2024,12
+Av. Antonio Rendic,-70.38912,-23.626513,JAM,12,6,f,6,10,2024,23
+Av. Pedro Aguirre Cerda,-70.390063,-23.587654,JAM,12,6,f,6,10,2024,26
+Av. Pedro Aguirre Cerda,-70.390192,-23.586096,JAM,12,6,f,6,10,2024,43
+Av. Edmundo Pérez Zujovic,-70.393341,-23.585091,JAM,13,6,f,6,10,2024,2
+Av. Edmundo Pérez Zujovic,-70.394094,-23.598733,JAM,13,6,f,6,10,2024,5
+Av. Séptimo de Línea,-70.396172,-23.640045,JAM,13,6,f,6,10,2024,20
+Av. Grecia,-70.407352,-23.670471,JAM,13,6,f,6,10,2024,35
+Av. Edmundo Pérez Zujovic,-70.395835,-23.635537,JAM,13,6,f,6,10,2024,55
+Av. Edmundo Pérez Zujovic,-70.395829,-23.636106,JAM,13,6,f,6,10,2024,56
+Av. Edmundo Pérez Zujovic,-70.395808,-23.636629,JAM,13,6,f,6,10,2024,58
+Av. Séptimo de Línea,-70.395752,-23.638323,JAM,13,6,f,6,10,2024,59
+Av. Séptimo de Línea,-70.396284,-23.6404,JAM,14,6,f,6,10,2024,2
+Av. Balmaceda,-70.39738,-23.643078,JAM,14,6,f,6,10,2024,6
+Av. Iquique,-70.394063,-23.627986,JAM,14,6,f,6,10,2024,20
+Av. Séptimo de Línea,-70.396297,-23.640439,JAM,14,6,f,6,10,2024,43
+Av. Séptimo de Línea,-70.39612,-23.639878,JAM,14,6,f,6,10,2024,55
+Av. Séptimo de Línea,-70.396722,-23.641782,JAM,15,6,f,6,10,2024,1
+Av. Balmaceda,-70.396739,-23.642537,JAM,17,6,f,6,10,2024,14
+Av. Edmundo Pérez Zujovic,-70.396094,-23.63104,JAM,20,6,f,6,10,2024,33
+Av. Edmundo Pérez Zujovic,-70.395677,-23.633129,JAM,20,6,f,6,10,2024,32
+Av. Edmundo Pérez Zujovic,-70.396262,-23.629107,JAM,20,6,f,6,10,2024,34
+Av. Edmundo Pérez Zujovic,-70.394331,-23.587824,JAM,20,6,f,6,10,2024,40
+Av. Pedro Aguirre Cerda,-70.390152,-23.586571,JAM,21,6,f,6,10,2024,13
+Av. Antonio Rendic,-70.385563,-23.62069,ACCIDENT,21,6,f,6,10,2024,35
+Av. Antonio Rendic,-70.386612,-23.622364,ACCIDENT,21,6,f,6,10,2024,35
+Av. Edmundo Pérez Zujovic,-70.396253,-23.629247,JAM,22,6,f,6,10,2024,24
+Av. Edmundo Pérez Zujovic,-70.396267,-23.629011,JAM,6,0,s,7,10,2024,43
+Av. Edmundo Pérez Zujovic,-70.393731,-23.586533,JAM,7,0,s,7,10,2024,12
+Av. Edmundo Pérez Zujovic,-70.394949,-23.588447,JAM,7,0,s,7,10,2024,13
+Av. Pedro Aguirre Cerda,-70.388928,-23.605691,JAM,7,0,s,7,10,2024,17
+Av. Antonio Rendic,-70.382693,-23.615991,JAM,7,0,s,7,10,2024,16
+Av. Edmundo Pérez Zujovic,-70.392067,-23.610814,JAM,7,0,s,7,10,2024,19
+Av. Pedro Aguirre Cerda,-70.388794,-23.615999,JAM,7,0,s,7,10,2024,23
+Av. Antonio Rendic,-70.389416,-23.629664,JAM,7,0,s,7,10,2024,22
+Av. Pedro Aguirre Cerda,-70.390871,-23.578207,ACCIDENT,7,0,s,7,10,2024,21
+Av. Grecia,-70.403461,-23.660241,JAM,7,0,s,7,10,2024,27
+Av. Edmundo Pérez Zujovic,-70.396428,-23.62719,JAM,7,0,s,7,10,2024,27
+Av. Grecia,-70.402575,-23.6536,JAM,7,0,s,7,10,2024,30
+Av. Grecia,-70.402622,-23.654623,JAM,7,0,s,7,10,2024,29
+Av. Grecia,-70.402548,-23.653012,JAM,7,0,s,7,10,2024,30
+Av. Pedro Aguirre Cerda,-70.389865,-23.590161,ACCIDENT,7,0,s,7,10,2024,27
+Av. Grecia,-70.402631,-23.654948,JAM,7,0,s,7,10,2024,29
+Av. Pedro Aguirre Cerda,-70.389748,-23.591953,ACCIDENT,7,0,s,7,10,2024,30
+Av. Pedro Aguirre Cerda,-70.389982,-23.588691,ACCIDENT,7,0,s,7,10,2024,26
+Av. Pedro Aguirre Cerda,-70.390845,-23.570966,JAM,7,0,s,7,10,2024,28
+Av. Pedro Aguirre Cerda,-70.389761,-23.591616,ACCIDENT,7,0,s,7,10,2024,29
+Av. Pedro Aguirre Cerda,-70.389846,-23.590432,ACCIDENT,7,0,s,7,10,2024,27
+Av. Grecia,-70.402462,-23.656049,JAM,7,0,s,7,10,2024,27
+Av. Pedro Aguirre Cerda,-70.388369,-23.613581,JAM,7,0,s,7,10,2024,34
+Av. Pedro Aguirre Cerda,-70.389985,-23.588651,JAM,7,0,s,7,10,2024,34
+Av. Grecia,-70.402552,-23.657566,JAM,7,0,s,7,10,2024,31
+Av. Grecia,-70.403748,-23.662217,JAM,7,0,s,7,10,2024,35
+Av. Grecia,-70.402638,-23.652441,JAM,7,0,s,7,10,2024,37
+Av. Grecia,-70.402485,-23.656854,JAM,7,0,s,7,10,2024,44
+Av. Antonio Rendic,-70.389133,-23.634287,JAM,7,0,s,7,10,2024,46
+Av. Iquique,-70.39387,-23.63376,JAM,7,0,s,7,10,2024,46
+Av. Grecia,-70.403782,-23.664558,JAM,7,0,s,7,10,2024,51
+Av. Iquique,-70.39405,-23.628169,JAM,7,0,s,7,10,2024,47
+Av. Edmundo Pérez Zujovic,-70.39518,-23.574815,JAM,7,0,s,7,10,2024,53
+Av. Edmundo Pérez Zujovic,-70.397303,-23.571151,JAM,7,0,s,7,10,2024,56
+Av. Pedro Aguirre Cerda,-70.391217,-23.574581,JAM,7,0,s,7,10,2024,52
+Av. Antonio Rendic,-70.389525,-23.628059,JAM,7,0,s,7,10,2024,52
+Av. Argentina,-70.396153,-23.658332,JAM,7,0,s,7,10,2024,54
+Av. Edmundo Pérez Zujovic,-70.392273,-23.604415,JAM,7,0,s,7,10,2024,54
+Av. Pedro Aguirre Cerda,-70.391136,-23.57552,JAM,7,0,s,7,10,2024,54
+Av. Iquique,-70.394016,-23.629037,JAM,8,0,s,7,10,2024,1
+Av. Iquique,-70.393921,-23.630936,JAM,7,0,s,7,10,2024,59
+Av. Argentina,-70.399722,-23.670591,JAM,8,0,s,7,10,2024,5
+Av. Óscar Bonilla,-70.37877,-23.589532,JAM,8,0,s,7,10,2024,3
+Av. Edmundo Pérez Zujovic,-70.392224,-23.610114,JAM,8,0,s,7,10,2024,7
+Av. Grecia,-70.403047,-23.65928,JAM,8,0,s,7,10,2024,5
+Av. Argentina,-70.404752,-23.677076,JAM,8,0,s,7,10,2024,6
+Av. Pedro Aguirre Cerda,-70.389552,-23.595575,JAM,8,0,s,7,10,2024,9
+Av. Edmundo Pérez Zujovic,-70.395627,-23.637651,JAM,8,0,s,7,10,2024,12
+Av. Séptimo de Línea,-70.395617,-23.638254,JAM,8,0,s,7,10,2024,10
+Av. Argentina,-70.396967,-23.662593,JAM,8,0,s,7,10,2024,16
+Av. Edmundo Pérez Zujovic,-70.395728,-23.634956,JAM,8,0,s,7,10,2024,15
+Av. Antonio Rendic,-70.388632,-23.641045,JAM,8,0,s,7,10,2024,17
+Av. Antonio Rendic,-70.388575,-23.642085,JAM,8,0,s,7,10,2024,16
+Av. Pedro Aguirre Cerda,-70.389628,-23.592911,JAM,8,0,s,7,10,2024,22
+Av. Edmundo Pérez Zujovic,-70.392045,-23.579609,JAM,8,0,s,7,10,2024,23
+Av. Antonio Rendic,-70.388685,-23.640122,JAM,8,0,s,7,10,2024,26
+Av. Edmundo Pérez Zujovic,-70.392216,-23.616777,JAM,8,0,s,7,10,2024,24
+Av. Antonio Rendic,-70.388837,-23.637677,JAM,8,0,s,7,10,2024,29
+Av. Óscar Bonilla,-70.380038,-23.572247,ACCIDENT,8,0,s,7,10,2024,37
+Av. Edmundo Pérez Zujovic,-70.396063,-23.631173,JAM,8,0,s,7,10,2024,38
+Av. Edmundo Pérez Zujovic,-70.395645,-23.624623,JAM,8,0,s,7,10,2024,34
+Av. Pedro Aguirre Cerda,-70.390063,-23.587662,ACCIDENT,8,0,s,7,10,2024,44
+Av. Pedro Aguirre Cerda,-70.390078,-23.587449,JAM,8,0,s,7,10,2024,43
+Av. Iquique,-70.393375,-23.639428,JAM,8,0,s,7,10,2024,47
+Av. Iquique,-70.393707,-23.634949,JAM,8,0,s,7,10,2024,49
+Av. Pedro Aguirre Cerda,-70.389954,-23.589032,JAM,8,0,s,7,10,2024,45
+Av. Edmundo Pérez Zujovic,-70.395695,-23.633658,JAM,8,0,s,7,10,2024,54
+Av. Edmundo Pérez Zujovic,-70.391995,-23.611385,JAM,8,0,s,7,10,2024,51
+Av. Edmundo Pérez Zujovic,-70.393365,-23.58366,JAM,9,0,s,7,10,2024,6
+Av. Pedro Aguirre Cerda,-70.389795,-23.591128,JAM,9,0,s,7,10,2024,8
+Av. Pedro Aguirre Cerda,-70.389607,-23.593877,JAM,9,0,s,7,10,2024,37
+Av. Edmundo Pérez Zujovic,-70.393059,-23.6206,JAM,9,0,s,7,10,2024,40
+Av. Edmundo Pérez Zujovic,-70.39589,-23.625012,JAM,9,0,s,7,10,2024,41
+Av. Grecia,-70.402488,-23.651606,JAM,9,0,s,7,10,2024,51
+Av. Edmundo Pérez Zujovic,-70.396571,-23.595696,JAM,9,0,s,7,10,2024,54
+Av. Iquique,-70.392617,-23.623726,JAM,10,0,s,7,10,2024,14
+Av. Edmundo Pérez Zujovic,-70.392298,-23.603414,JAM,10,0,s,7,10,2024,17
+Av. Pedro Aguirre Cerda,-70.389749,-23.620152,JAM,10,0,s,7,10,2024,36
+Av. Argentina,-70.394837,-23.654497,JAM,11,0,s,7,10,2024,6
+Av. Iquique,-70.393769,-23.626069,JAM,11,0,s,7,10,2024,16
+Av. Grecia,-70.402485,-23.651499,JAM,11,0,s,7,10,2024,23
+Av. Grecia,-70.406395,-23.668378,JAM,11,0,s,7,10,2024,44
+Av. Edmundo Pérez Zujovic,-70.396006,-23.625197,JAM,11,0,s,7,10,2024,48
+Av. Edmundo Pérez Zujovic,-70.394084,-23.62221,JAM,12,0,s,7,10,2024,11
+Nicolás Tirado,-70.388613,-23.591893,JAM,12,0,s,7,10,2024,59
+Av. Edmundo Pérez Zujovic,-70.394143,-23.598648,JAM,13,0,s,7,10,2024,10
+Av. Edmundo Pérez Zujovic,-70.396079,-23.631105,JAM,13,0,s,7,10,2024,19
+Av. Edmundo Pérez Zujovic,-70.396432,-23.626921,JAM,13,0,s,7,10,2024,54
+Av. Grecia,-70.402751,-23.648978,JAM,13,0,s,7,10,2024,54
+Av. Grecia,-70.405171,-23.665903,JAM,14,0,s,7,10,2024,11
+Av. Argentina,-70.393297,-23.65182,JAM,14,0,s,7,10,2024,14
+Av. Argentina,-70.39354,-23.652244,JAM,14,0,s,7,10,2024,14
+Av. Edmundo Pérez Zujovic,-70.391771,-23.613052,JAM,15,0,s,7,10,2024,23
+Av. Edmundo Pérez Zujovic,-70.396224,-23.629701,JAM,15,0,s,7,10,2024,27
+Av. Antonio Rendic,-70.387834,-23.624297,JAM,15,0,s,7,10,2024,30
+Av. Grecia,-70.406903,-23.669322,JAM,15,0,s,7,10,2024,48
+Av. Séptimo de Línea,-70.395775,-23.639194,ACCIDENT,16,0,s,7,10,2024,10
+Av. Edmundo Pérez Zujovic,-70.39232,-23.61787,JAM,16,0,s,7,10,2024,16
+Av. Edmundo Pérez Zujovic,-70.395853,-23.63429,JAM,16,0,s,7,10,2024,23
+Av. Edmundo Pérez Zujovic,-70.395751,-23.637834,JAM,16,0,s,7,10,2024,27
+Av. Grecia,-70.40624,-23.668036,JAM,16,0,s,7,10,2024,35
+Av. Grecia,-70.40263,-23.654985,JAM,16,0,s,7,10,2024,49
+Av. Edmundo Pérez Zujovic,-70.395714,-23.632291,JAM,16,0,s,7,10,2024,58
+Av. Iquique,-70.394045,-23.630145,JAM,17,0,s,7,10,2024,20
+Av. Edmundo Pérez Zujovic,-70.395669,-23.636568,JAM,17,0,s,7,10,2024,29
+Av. Edmundo Pérez Zujovic,-70.395674,-23.632706,JAM,17,0,s,7,10,2024,34
+Av. Antonio Rendic,-70.388918,-23.626142,JAM,17,0,s,7,10,2024,34
+Av. Edmundo Pérez Zujovic,-70.395713,-23.635409,ACCIDENT,17,0,s,7,10,2024,41
+Av. Séptimo de Línea,-70.395639,-23.638598,JAM,17,0,s,7,10,2024,37
+Nicolás Tirado,-70.389112,-23.591902,JAM,17,0,s,7,10,2024,48
+Av. Iquique,-70.393398,-23.639048,JAM,17,0,s,7,10,2024,51
+Av. Pedro Aguirre Cerda,-70.389766,-23.591524,JAM,17,0,s,7,10,2024,56
+Av. Séptimo de Línea,-70.396133,-23.640358,JAM,18,0,s,7,10,2024,2
+Av. Edmundo Pérez Zujovic,-70.395723,-23.635107,JAM,18,0,s,7,10,2024,6
+Av. Argentina,-70.393018,-23.643693,JAM,18,0,s,7,10,2024,12
+Av. Iquique,-70.393912,-23.631074,JAM,18,0,s,7,10,2024,11
+Av. Séptimo de Línea,-70.395617,-23.638282,JAM,18,0,s,7,10,2024,10
+Av. Antonio Rendic,-70.382475,-23.615809,JAM,18,0,s,7,10,2024,17
+Av. Edmundo Pérez Zujovic,-70.395894,-23.631705,JAM,18,0,s,7,10,2024,15
+Av. Grecia,-70.402553,-23.65757,JAM,18,0,s,7,10,2024,16
+Av. Edmundo Pérez Zujovic,-70.395721,-23.634227,JAM,18,0,s,7,10,2024,18
+Av. Edmundo Pérez Zujovic,-70.396116,-23.590767,JAM,18,0,s,7,10,2024,17
+Av. Grecia,-70.403615,-23.66162,JAM,18,0,s,7,10,2024,22
+Av. Antonio Rendic,-70.387911,-23.624421,JAM,18,0,s,7,10,2024,23
+Av. Edmundo Pérez Zujovic,-70.393526,-23.586068,JAM,18,0,s,7,10,2024,23
+Av. Séptimo de Línea,-70.396644,-23.642072,JAM,18,0,s,7,10,2024,24
+Av. Balmaceda,-70.396737,-23.642529,JAM,18,0,s,7,10,2024,28
+Av. Balmaceda,-70.401189,-23.646375,JAM,18,0,s,7,10,2024,34
+Av. Argentina,-70.398228,-23.664808,JAM,18,0,s,7,10,2024,33
+Av. Balmaceda,-70.397206,-23.642885,JAM,18,0,s,7,10,2024,32
