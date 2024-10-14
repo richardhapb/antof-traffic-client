@@ -7,6 +7,34 @@ import contextily as cx
 import matplotlib.pyplot as plt
 from scipy.spatial import cKDTree
 import requests
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.model_selection import train_test_split, cross_val_score
+from xgboost import XGBClassifier
+
+
+# ['Solarize_Light2', '_classic_test_patch', '_mpl-gallery', '_mpl-gallery-nogrid', 'bmh', 'classic', 'dark_background', 'fast', 'fivethirtyeight', 'ggplot', 'grayscale', 'seaborn-v0_8', 'seaborn-v0_8-bright', 'seaborn-v0_8-colorblind', 'seaborn-v0_8-dark', 'seaborn-v0_8-dark-palette', 'seaborn-v0_8-darkgrid', 'seaborn-v0_8-deep', 'seaborn-v0_8-muted', 'seaborn-v0_8-notebook', 'seaborn-v0_8-paper', 'seaborn-v0_8-pastel', 'seaborn-v0_8-poster', 'seaborn-v0_8-talk', 'seaborn-v0_8-ticks', 'seaborn-v0_8-white', 'seaborn-v0_8-whitegrid', 'tableau-colorblind10']
+
+plt.style.use("_mpl-gallery")
+plt.rcParams.update(
+    {
+        "axes.facecolor": "white",
+        "axes.labelcolor": "black",
+        "figure.facecolor": "white",
+        "figure.figsize": (7, 3),
+        "grid.color": "black",
+        "patch.edgecolor": "black",
+        "patch.force_edgecolor": True,
+        "text.color": "black",
+        "xtick.color": "dimgray",
+        "ytick.color": "dimgray",
+        "savefig.facecolor": "white",
+        "savefig.edgecolor": "white",
+        "savefig.format": "png",
+        "grid.linestyle": "-",
+        "grid.alpha": 0.1,
+        "font.size": 14,
+    }
+)
 
 
 PERIM_X = [-70.42034224747098, -70.36743722434367]
@@ -166,6 +194,8 @@ def extract_event(data: gpd.GeoDataFrame, concept: list, extra_col: list = []):
 
     dat = dat.rename(columns={"pubMillis": "inicio", "endreport": "fin"})
     dat["hour"] = dat["inicio"].dt.hour
+    dat["minute"] = dat["inicio"].dt.minute
+    dat["day"] = dat["inicio"].dt.day
     dat["week_day"] = dat["inicio"].dt.dayofweek
     dat["day_type"] = dat["inicio"].apply(
         lambda x: "f"
@@ -304,3 +334,179 @@ def get_holidays():
     feriados = [f["date"] for f in feriados]
 
     return feriados
+
+def grid(geometry:gpd.GeoDataFrame, n_x_div: int, n_y_div: int):
+    bounds_x = np.array(
+            np.linspace(geometry.to_crs(epsg=3857).geometry.x.min(), geometry.to_crs(epsg=3857).geometry.x.max(), n_x_div)
+    )
+    bounds_y = np.array(
+        np.linspace(
+            geometry.to_crs(epsg=3857).geometry.y.min(),
+            geometry.to_crs(epsg=3857).geometry.y.max(),
+            n_y_div,
+        )
+    )
+
+    return np.meshgrid(bounds_x, bounds_y)
+
+def calc_quadrant(x_pos:int, y_pos:int, x_len:int):
+    return x_len * y_pos + x_pos + 1
+
+def get_quadrant(x_grid:np.array, y_grid:np.array, point:tuple):
+    x_pos, y_pos = -1, -1
+
+    for xi in range(len(x_grid[0])):
+        if xi < len(x_grid[0]) - 1 and point[0] >= x_grid[0][xi] and point[0] <= x_grid[0][xi + 1]:
+            x_pos = xi
+
+    for yi in range(len(y_grid)):
+        if yi < len(y_grid) - 1 and point[1] >= y_grid[yi][0] and point[1] <= y_grid[yi + 1][0]:
+            y_pos = yi
+
+    if x_pos < 0 or y_pos < 0:
+        raise ValueError(f"El punto {point} no se encuentra en ningún cuadrante")
+
+    quadrant = calc_quadrant(x_pos, y_pos, x_grid.shape[1] - 1)
+
+    return quadrant
+
+def plot_antof():
+    PERIM_AFTA = gpd.GeoDataFrame(geometry=gpd.points_from_xy(PERIM_X, PERIM_Y))
+    PERIM_AFTA.crs = "EPSG:4326"
+    PERIM_AFTA = PERIM_AFTA.to_crs(epsg=3857)
+
+    fig, ax = plt.subplots()
+
+
+    fig.set_size_inches(10, 10)
+    PERIM_AFTA.plot(ax=ax, color="red")
+    cx.add_basemap(ax, source=cx.providers.OpenStreetMap.Mapnik)
+    ax.set_xlim(PERIM_AFTA.total_bounds[0], PERIM_AFTA.total_bounds[2])
+    ax.set_ylim(PERIM_AFTA.total_bounds[1], PERIM_AFTA.total_bounds[3])
+    return ax
+
+def get_center_points(grid:tuple):
+    # X
+    center_points_x = np.zeros((grid[0].shape[0] - 1, grid[0].shape[1] - 1))
+
+    x_half = (grid[0][0][1] - grid[0][0][0]) / 2
+
+    for x in range(len(grid[0][0]) - 1):
+        center_points_x[0][x] = grid[0][0][x] + x_half
+
+    center_points_x[:][:] = center_points_x[0][:]
+
+    # Y
+    center_points_y = np.zeros((grid[0].shape[0] - 1, grid[0].shape[1] - 1))
+
+    y_half = (grid[1][1][0] - grid[1][0][0]) / 2
+
+    for y in range(len(grid[1]) - 1):
+        center_points_y[y][0] = grid[1][y][0] + y_half
+
+    for c in range(len(center_points_y)):
+        center_points_y[c][:] = center_points_y[c][0]
+
+    return center_points_x, center_points_y
+
+
+def xgb_classifier(df:gpd.GeoDataFrame, Y_label:str, cats:list = [], ohe:bool=True, happen:bool=True):
+    events = df.copy()
+
+    if happen:
+        events["happen"] = 1
+
+    q_events = len(events)
+    if "street" in df.columns:
+        street = events["street"]
+    if "day_type" in df.columns:
+        day_type = np.random.choice(["s", "f"], q_events)
+    if "type" in df.columns:
+        type = np.random.choice(["ACCIDENT", "JAM"], q_events)
+    if "group" in df.columns:
+        group = np.random.randint(df["group"].min(), df["group"].max(), q_events)
+    if "day" in df.columns:
+        day = np.random.randint(events.day.min(), events.day.max() + 1, q_events)
+    if "week_day" in df.columns:
+        week_day = np.random.randint(events.week_day.min(), events.week_day.max(), q_events)
+    if "hour" in df.columns:
+        hour = np.random.randint(events.hour.min(), events.hour.max(), q_events)
+    if "minute" in df.columns:
+        minute = np.random.randint(events.minute.min(), events.minute.max(), q_events)
+
+    no_events = pd.DataFrame(columns=events.columns)
+
+    if "street" in df.columns:
+        no_events["street"] = street
+    if "day_type" in df.columns:
+        no_events["day_type"] = day_type
+    if "type" in df.columns:
+        no_events["type"] = type
+    if "group" in df.columns:
+        no_events["group"] = group
+    if "day" in df.columns:
+        no_events["day"] = day
+    if "week_day" in df.columns:
+        no_events["week_day"] = week_day
+    if "hour" in df.columns:
+        no_events["hour"] = hour
+    if "minute" in df.columns:
+        no_events["minute"] = minute
+
+    if happen:
+        no_events["happen"] = 0
+
+    total_events = pd.concat([events, no_events], axis=0)
+    
+    if "day_type" in total_events.columns:
+        total_events["day_type"] = total_events["day_type"].map({"f": 0, "s": 1})
+
+    if ohe:
+        labeled = []
+        for c in cats:
+            onehot = OneHotEncoder(handle_unknown="ignore")
+            oht = onehot.fit_transform(total_events[[c]])
+
+            labeled.append(pd.DataFrame(oht.toarray(), columns=onehot.get_feature_names_out()).reset_index(drop=True))
+
+
+        X_labeled = pd.concat([total_events.drop(cats, axis=1).reset_index(drop=True), *labeled], axis=1)
+    else:
+        X_labeled = total_events.copy()
+
+    if happen:
+        Y = X_labeled["happen"]
+        X_labeled = X_labeled.drop("happen", axis=1)
+    else:
+        Y = X_labeled[Y_label]
+        X_labeled = X_labeled.drop(Y_label, axis=1)
+
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X_labeled, Y, test_size=0.2, random_state=42
+    )
+
+
+    xgb = XGBClassifier(
+        learning_rate=0.03,
+        random_state=42,
+        n_estimators=50,
+        max_depth=5,
+        gamma=0.2,
+        colsample_bytree=0.7,
+    )
+    xgb.fit(X_train, y_train)
+
+
+    cvs = cross_val_score(xgb, X_labeled, Y, cv=10)
+    print(cvs)
+    print(cvs.mean())
+
+    return {
+        "model": xgb,
+        "X_labeled": X_labeled,
+        "X_train": X_train,
+        "X_test": X_test,
+        "y_train": y_train,
+        "y_test": y_test
+    }

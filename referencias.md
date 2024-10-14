@@ -1,0 +1,3 @@
+Goodall N. Lee E. (Tina) 2019. Comparison of Waze crash and disabled vehicle records with video evidence. Transportation Research Interdisciplinary Perspectives. https://doi.org/10.1016/j.trip.2019.100019.
+
+Berhanu Y. Schröder D. Teklu Wodajoc B. Alemayehua E. Machine learning for predictions of road traffic accidents and spatial network analysis for safe routing on accident and congestion-prone road networks. Results in Engineering. https://doi.org/10.1016/j.rineng.2024.102737.
