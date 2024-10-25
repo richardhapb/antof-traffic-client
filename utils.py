@@ -366,7 +366,7 @@ def get_quadrant(x_grid:np.array, y_grid:np.array, point:tuple):
     if x_pos < 0 or y_pos < 0:
         raise ValueError(f"El punto {point} no se encuentra en ningún cuadrante")
 
-    quadrant = calc_quadrant(x_pos, y_pos, x_grid.shape[1] - 1)
+    quadrant = x_pos, y_pos
 
     return quadrant
 
