@@ -6,4 +6,5 @@ if __name__ == "__main__":
     while True:
         print("Actualizando...")
         data.main()
+        print("Actualizado.")
         time.sleep(60 * 5)
