@@ -29,6 +29,8 @@ def read_json(filename="data/waze.json"):
     except json.decoder.JSONDecodeError:
         shutil.copyfile(filename + ".bak", filename)
 
+    return read_json(filename)
+
 
 def write_json(dat, filename="data/waze.json"):
     """
