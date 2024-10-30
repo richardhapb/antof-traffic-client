@@ -1,6 +1,8 @@
 import json
 from datetime import datetime
 import pytz
+import shutil
+import os
 
 
 class Events:
@@ -47,6 +49,9 @@ class Events:
         if filename is None and self.filename is None:
             raise ValueError("Se requiere una ruta para leer el archivo")
 
+        if not os.path.exists(filename):
+            raise FileNotFoundError(f"Archivo {filename} no existe")
+
         if filename is not None:
             self.filename = filename
 
@@ -57,6 +62,12 @@ class Events:
     def write_file(self, filename=None):
         if filename is None and self.filename is None:
             raise ValueError("Se requiere una ruta para crear el archivo")
+
+        if not os.path.exists(os.path.dirname(filename)):
+            os.makedirs(os.path.dirname(filename))
+
+        if os.path.exists(filename):
+            shutil.copyfile(filename, filename + ".bak")
 
         if filename is not None:
             self.filename = filename
