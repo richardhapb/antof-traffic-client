@@ -11,7 +11,7 @@ class Events:
         self.filename = filename
         self.pending_endreports = {}
 
-        if filename is not None:
+        if self.filename is not None:
             self.read_file()
 
         self.update_pending_endreports()
@@ -49,11 +49,11 @@ class Events:
         if filename is None and self.filename is None:
             raise ValueError("Se requiere una ruta para leer el archivo")
 
-        if not os.path.exists(filename):
-            raise FileNotFoundError(f"Archivo {filename} no existe")
-
         if filename is not None:
             self.filename = filename
+
+        if not os.path.exists(self.filename):
+            raise FileNotFoundError(f"Archivo {self.filename} no existe")
 
         with open(self.filename, "r") as f:
             self.data = json.load(f)
@@ -63,14 +63,14 @@ class Events:
         if filename is None and self.filename is None:
             raise ValueError("Se requiere una ruta para crear el archivo")
 
-        if not os.path.exists(os.path.dirname(filename)):
-            os.makedirs(os.path.dirname(filename))
-
-        if os.path.exists(filename):
-            shutil.copyfile(filename, filename + ".bak")
-
         if filename is not None:
             self.filename = filename
+
+        if not os.path.exists(os.path.dirname(self.filename)):
+            os.makedirs(os.path.dirname(self.filename))
+
+        if os.path.exists(self.filename):
+            shutil.copyfile(self.filename, self.filename + ".bak")
 
         with open(self.filename, "w") as f:
             json.dump(self.data, f)
