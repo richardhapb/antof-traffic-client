@@ -86,3 +86,33 @@ class Events:
         if idx is not None:
             self.data[idx]["endreport"] = now
             self.pending_endreports.discard(uuid)
+
+    def clean_data(self):
+        # 1. Eliminar columnas innecesarias provenientes de Waze
+        #   ALERTS
+        #       country
+        #       city
+        #       reportRating
+        #       reportByMunicipalityUser
+        #       confidence
+        #   JAMS
+        #       country
+        #       city
+        #       turnType
+        #       speed
+        #       id
+
+        deletions = {
+            "country",
+            "city",
+            "reportRating",
+            "reportByMunicipalityUser",
+            "confidence",
+            "turnType",
+            "speed",
+            "id",
+        }
+
+        for item in self.data:
+            for key in deletions:
+                item.pop(key, None)

@@ -14,11 +14,13 @@ def main():
 
         if "alerts" in data:
             alerts_api = Events(data["alerts"])
+            alerts_api.clean_data()
         else:
             alerts_api = Events()
 
         if "jams" in data:
             jams_api = Events(data["jams"])
+            jams_api.clean_data()
         else:
             jams_api = Events()
 
