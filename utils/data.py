@@ -8,8 +8,9 @@ import datetime
 import pytz
 import requests
 import shutil
+from aws import dynamodb
 
-timezone = pytz.timezone("America/Santiago")
+timezone = pytz.utc
 # 15000 = 2.5 minutos, el promedio entre periodos
 now = int(datetime.datetime.now(timezone).timestamp()) * 1000 - 150000
 
@@ -42,8 +43,14 @@ def write_json(dat, filename="data/waze.json"):
 
 
 def verify_endings(datf, datr):
+    """
+    Verifica si hay eventos que no se agregaron a Waze, y se modifican los atributos "endreport" con la hora actual, menos 2.5 minutos.
+
+    Parámetros:
+    - datf: Diccionario con los eventos provenientes de la base de datos
+    - datr: Diccionario con los eventos provenientes de api Waze
+    """
     try:
-        irregularities = datf["irregularities"]
         del datf["irregularities"]
     except KeyError:
         irregularities = []
@@ -119,6 +126,10 @@ def main():
 
     f["irregularities"] = irregularities
     f = verify_endings(f, data)
+
+    ## Insertar en DynamoDB, se agregan los eventos activo que ya no están agregados, también en caso de que alguno haya desaparecido, se modifica el atributo "endreport" con la hora actual, menos 2.5 minutos.
+    # Paso 1: Filtrar los eventos activos que no están en DynamoDB
+
     write_json(f)
 
 

@@ -9,3 +9,5 @@ graph
 *.csv
 *.png
 *.xlsx
+t.py
+exceptions.txt
