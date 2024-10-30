@@ -9,7 +9,6 @@ def main():
     jams_data = Events(filename="data/jams.json")
 
     while True:
-        init_time = time.perf_counter()
         print("Actualizando...")
         data = waze_api.get_data()
 
@@ -33,7 +32,6 @@ def main():
         jams_data.write_file()
 
         print("Actualizado.")
-        print(f"Tiempo: {time.perf_counter() - init_time:.2f} segundos")
         time.sleep(60 * 5)
 
 

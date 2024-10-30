@@ -14,12 +14,20 @@ class Events:
 
         self.update_pending_endreports()
 
+        if self.data:
+            self.index_map = {d["uuid"]: i for i, d in enumerate(self.data)}
+            last_24h = int((datetime.now().timestamp() - (24 * 60 * 60)) * 1000)
+            self.existing_uuids_last_24h = {
+                d["uuid"] for d in self.data if d["pubMillis"] > last_24h
+            }
+        else:
+            self.index_map = {}
+
     def __add__(self, other):
         if isinstance(other, Events):
-            last_24h = int((datetime.now().timestamp() - (24 * 60 * 60)) * 1000)
-            existing_uuids = {d["uuid"] for d in self.data if d["pubMillis"] > last_24h}
-
-            new_data = [d for d in other.data if d["uuid"] not in existing_uuids]
+            new_data = [
+                d for d in other.data if d["uuid"] not in self.existing_uuids_last_24h
+            ]
 
             events = Events(new_data, self.filename)
             events.pending_endreports = (
@@ -27,7 +35,7 @@ class Events:
             )
 
             # Update pending endreports if an uuid is not found in the new data
-            for uuid in existing_uuids:
+            for uuid in self.existing_uuids_last_24h:
                 if uuid not in other.pending_endreports:
                     events.end_report(uuid)
 
@@ -60,14 +68,10 @@ class Events:
         self.pending_endreports = {d["uuid"] for d in self.data if "endreport" not in d}
 
     def end_report(self, uuid):
-        tz = pytz.utc
-        now = int((datetime.now(tz).timestamp() - (5 * 60 / 2)) * 1000)
+        now = int((datetime.now(tz=pytz.utc).timestamp() - (5 * 60 / 2)) * 1000)
 
-        idx = next((i for i, d in enumerate(self.data) if d["uuid"] == uuid), None)
+        idx = self.index_map.get(uuid, None)
 
         if idx is not None:
             self.data[idx]["endreport"] = now
             self.pending_endreports.discard(uuid)
-            return True
-        else:
-            return False
