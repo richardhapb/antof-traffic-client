@@ -3,11 +3,17 @@ import json
 import pytz
 from datetime import datetime
 
-with open("data/waze.json", "r") as f:
-    data = json.load(f)
+# with open("data/waze.json", "r") as f:
+#     data = json.load(f)
 
-alerts = data["alerts"]
-jams = data["jams"]
+# alerts = data["alerts"]
+# jams = data["jams"]
+
+with open("data/alerts.json", "r") as f:
+    alerts = json.load(f)
+
+with open("data/jams.json", "r") as f:
+    jams = json.load(f)
 
 # dynamodb.put_batch("waze_alert_antof", alerts)
 
