@@ -49,8 +49,17 @@ alerts_deletions = [
     "reportRating",
     "reportByMunicipalityUser",
     "confidence",
+    "reportDescription",
 ]
-jams_deletions = ["country", "city", "turnType", "speed", "id"]
+jams_deletions = [
+    "country",
+    "city",
+    "turnType",
+    "speed",
+    "id",
+    "blockingAlertUuid",
+    "startNode",
+]
 
 for i in range(len(alerts)):
     for d in alerts_deletions:
@@ -72,5 +81,4 @@ with open("data/jams.json", "w") as f:
 # 3. Generar workflows para actualizar la base de datos a intervalos regulares, evitando duplicados
 # 4. Generar un pipeline que realice los pasos anteriores
 
-print(data["alerts"][0].keys())
-print(data["jams"][0].keys())
+print(f"Hay {len(alerts)} alertas y {len(jams)} jams")

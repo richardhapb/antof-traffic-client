@@ -11,3 +11,4 @@ graph
 *.xlsx
 t.py
 exceptions.txt
+config.py

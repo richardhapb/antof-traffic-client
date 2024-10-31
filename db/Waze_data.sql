@@ -1,3 +1,10 @@
+
+DROP TABLE IF EXISTS "alerts";
+DROP TABLE IF EXISTS "alerts_location";
+DROP TABLE IF EXISTS "jams_line";
+DROP TABLE IF EXISTS "jams_segments";
+DROP TABLE IF EXISTS "jams";
+
 CREATE TABLE "alerts" (
   "uuid" UUID PRIMARY KEY,
   "reliability" smallint,
@@ -5,16 +12,16 @@ CREATE TABLE "alerts" (
   "road_type" smallint,
   "magvar" real,
   "subtype" varchar(40),
-  "location_id" int,
+  "location_id" SERIAL,
+  "street" varchar(50),
   "pub_millis" bigint,
   "end_pub_millis" bigint
 );
 
 CREATE TABLE "alerts_location" (
-  "id" int PRIMARY KEY,
-  "x" decimal(3,6),
-  "y" decimal(3,6),
-  "street" varchar(50),
+  "id" SERIAL PRIMARY KEY,
+  "x" decimal(6),
+  "y" decimal(6),
   "segment" int
 );
 
@@ -31,17 +38,17 @@ CREATE TABLE "jams" (
   "end_pub_millis" bigint
 );
 
-CREATE TABLE "jams_lines" (
-  "id" int PRIMARY KEY,
-  "jam_uuid" bigint,
+CREATE TABLE "jams_line" (
+  "id" SERIAL PRIMARY KEY,
+  "jams_uuid" bigint,
   "position" smallint,
   "x" real,
   "y" real
 );
 
 CREATE TABLE "jams_segments" (
-  "id" int PRIMARY KEY,
-  "jam_uuid" bigint,
+  "id" SERIAL PRIMARY KEY,
+  "jams_uuid" bigint,
   "position" smallint,
   "segment_id" bigint,
   "from_node" bigint,
@@ -51,6 +58,6 @@ CREATE TABLE "jams_segments" (
 
 ALTER TABLE "alerts" ADD FOREIGN KEY ("location_id") REFERENCES "alerts_location" ("id") ON DELETE CASCADE;
 
-ALTER TABLE "jams_lines" ADD FOREIGN KEY ("jam_uuid") REFERENCES "jams" ("uuid") ON DELETE CASCADE;
+ALTER TABLE "jams_line" ADD FOREIGN KEY ("jams_uuid") REFERENCES "jams" ("uuid") ON DELETE CASCADE;
 
-ALTER TABLE "jams_segments" ADD FOREIGN KEY ("jam_uuid") REFERENCES "jams" ("uuid") ON DELETE CASCADE;
+ALTER TABLE "jams_segments" ADD FOREIGN KEY ("jams_uuid") REFERENCES "jams" ("uuid") ON DELETE CASCADE;
