@@ -11,7 +11,7 @@ from functools import wraps
 def db_connection(func):
     @wraps(func)
     def wrapper(self, *args, **kwargs):
-        if self.table_name == "":
+        if self.table_name is None or self.table_name == "":
             raise ValueError("No se ha especificado la tabla de la base de datos")
         if self.db is None or self.db.closed:
             self.db = psycopg2.connect(**DATABASE_CONFIG)
@@ -32,7 +32,7 @@ def db_connection(func):
 
 
 class Events:
-    def __init__(self, data=[], filename=None, table_name=""):
+    def __init__(self, data=[], filename=None, table_name=None):
         self.data = data
         self.filename = filename
         self.table_name = table_name
@@ -86,8 +86,9 @@ class Events:
         if self.filename is not None and len(self.data) == 0:
             self.read_file()
 
-        if len(self.data) > 0:
+        if self.data is not None:
             self.update_index_map()
+            self.update_pending_endreports()
 
     def __del__(self):
         if self.db is not None and not self.db.closed:
@@ -95,14 +96,16 @@ class Events:
 
     def __add__(self, other):
         if isinstance(other, Events):
-            if len(other.data) > 0:
+            if other.data is not None and len(other.data) > 0:
                 new_data = [
                     d for d in other.data if d["uuid"] not in self.pending_endreports
                 ]
-            elif len(self.data) > 0:
+            elif self.data is not None and len(self.data) > 0:
                 new_data = [
                     d for d in self.data if d["uuid"] not in other.pending_endreports
                 ]
+            else:
+                return Events([])
 
             events = Events(
                 new_data + self.data,
@@ -123,10 +126,32 @@ class Events:
         else:
             raise TypeError("Operador + no soportado")
 
+    def __sub__(self, other):
+        if isinstance(other, Events):
+            if other.data is not None and len(other.data) > 0:
+                new_data = [
+                    d for d in self.data if d["uuid"] not in other.pending_endreports
+                ]
+            else:
+                new_data = self.data
+
+            events = Events(
+                new_data,
+                self.filename if self.filename else other.filename,
+                self.table_name if self.table_name else other.table_name,
+            )
+
+            events.pending_endreports = (
+                self.pending_endreports - other.pending_endreports
+            )
+
+            return events
+        else:
+            raise TypeError("Operador - no soportado")
+
     def update_index_map(self):
-        if len(self.data) > 0:
+        if self.data is not None:
             self.index_map = {d["uuid"]: i for i, d in enumerate(self.data)}
-            self.update_pending_endreports()
         else:
             self.index_map = {}
 
@@ -154,6 +179,7 @@ class Events:
                 raise e
 
         self.update_index_map()
+        self.update_pending_endreports()
         return self.data
 
     def write_file(self, filename=None):
@@ -173,6 +199,8 @@ class Events:
             json.dump(self.data, f)
 
     def update_pending_endreports(self):
+        if self.data is None:
+            return
         self.pending_endreports = {
             d["uuid"]
             for d in self.data
@@ -186,7 +214,10 @@ class Events:
 
         if idx is not None:
             self.data[idx]["endreport"] = now
-            self.update_endreport_to_db(now, uuid)
+
+            if self.table_name != "" and self.table_name is not None:
+                self.update_endreport_to_db(now, uuid)
+
             self.pending_endreports.discard(uuid)
 
     def clean_data(self):
@@ -199,9 +230,11 @@ class Events:
                     item.pop(key, None)
 
     def format_data(self):
-        if not isinstance(self.data, list):
+        if self.data is None:
             return
-        if len(self.data) > 0:
+        if not isinstance(self.data[0], tuple):
+            return
+        if self.data is not None:
             cols = [
                 k
                 for k in self.db_columns_map[self.table_name].keys()
@@ -209,23 +242,12 @@ class Events:
             ]
             self.data = [{k: v for k, v in zip(cols, d)} for d in self.data]
 
-    @db_connection
     def fetch_from_db(self, not_ended=False):
-        if self.db is None:
-            raise ValueError("No se ha conectado a la base de datos")
-
-        cur = self.db.cursor()
-        if not_ended:
-            cur.execute(
-                "SELECT * FROM " + self.table_name + " WHERE end_pub_millis IS NULL"
-            )
-        else:
-            cur.execute("SELECT * FROM " + self.table_name)
-
-        self.data = cur.fetchall()
+        self.data = self.get_all_from_db(not_ended)
 
         self.format_data()
         self.update_index_map()
+        self.update_pending_endreports()
 
     @db_connection
     def get_all_from_db(self, not_ended=True):
@@ -348,9 +370,6 @@ class Events:
                     sql_nested = f"INSERT INTO {nested_table} ({nested_columns}) VALUES ({nested_placeholders})"
                     cur.executemany(sql_nested, batch_data)
 
-            # Confirmar la transacción después de cada `record`
-            self.db.commit()
-
         # Cerrar el cursor
         cur.close()
         return True
@@ -368,7 +387,6 @@ class Events:
                 + " SET end_pub_millis = %s WHERE uuid = %s",
                 (endreport, uuid),
             )
-            self.db.commit()
 
         except psycopg2.Error as e:
             raise ValueError(f"Error updating data to database: {e}")
@@ -378,34 +396,40 @@ class Events:
         return True
 
     @db_connection
-    def update_endreports_to_db(self):
+    def update_endreports_to_db(self, from_new_data=False):
         if self.db is None:
             raise ValueError("No se ha conectado a la base de datos")
 
         try:
             cur = self.db.cursor()
 
+            now = int((datetime.now(tz=pytz.utc).timestamp() - (5 * 60 / 2)) * 1000)
+
             cur.execute(
                 "SELECT uuid FROM " + self.table_name + " WHERE end_pub_millis IS NULL"
             )
             not_ended = {d[0] for d in cur.fetchall()}
 
+            elements = [
+                (d["endreport"] if from_new_data else now, d["uuid"])
+                for d in self.data
+                if d["uuid"] in not_ended
+                and (from_new_data or ("endreport" in d and d["endreport"] is not None))
+            ]
+
             cur.executemany(
                 "UPDATE "
                 + self.table_name
                 + " SET end_pub_millis = %s WHERE uuid = %s",
-                [
-                    (d["endreport"] if "endreport" in d else None, d["uuid"])
-                    for d in self.data
-                    if d["uuid"] in not_ended
-                ],
+                elements,
             )
-            self.db.commit()
 
         except psycopg2.Error as e:
             raise ValueError(f"Error updating data to database: {e}")
         finally:
             cur.close()
+
+        return len(elements)
 
     @db_connection
     def update_endreports_to_db_from_file(self, filename=None):
@@ -416,33 +440,12 @@ class Events:
             raise ValueError("Se requiere una ruta para leer el archivo")
 
         try:
-            cur = self.db.cursor()
-
-            cur.execute(
-                "SELECT uuid FROM " + self.table_name + " WHERE end_pub_millis IS NULL"
-            )
-            not_ended = {d[0] for d in cur.fetchall()}
-
             events = Events(filename=filename, table_name=self.table_name)
-            to_db = Events(table_name=self.table_name)
-
-            changes = 0
-
-            for d in events.data:
-                if d["uuid"] in not_ended:
-                    to_db.data.append(d)
-
-                    changes += 1
+            changes = events.update_endreports_to_db()
 
             print(
                 f"Se actualizaron {changes} elementos en {self.table_name} en end report"
             )
-            self.db.commit()
 
         except psycopg2.Error as e:
             raise ValueError(f"Error updating data to database: {e}")
-        finally:
-            cur.close()
-
-        if changes > 0:
-            to_db.update_endreports_to_db()

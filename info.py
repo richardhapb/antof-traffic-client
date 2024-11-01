@@ -5,57 +5,43 @@ from waze.api import WazeAPI
 
 def main():
     waze_api = WazeAPI()
-    alerts_data = Events(filename="data/alerts.json")
-    jams_data = Events(filename="data/jams.json")
 
     while True:
         print("Actualizando...")
         data = waze_api.get_data()
-
-        if "alerts" in data:
-            alerts_api = Events(data["alerts"], table_name="alerts")
-            alerts_api.clean_data()
-        else:
-            alerts_api = Events()
-
-        if "jams" in data:
-            jams_api = Events(data["jams"], table_name="jams")
-            jams_api.clean_data()
-        else:
-            jams_api = Events()
-
-        print(f"Nuevas alertas: {len(alerts_api.pending_endreports)}")
-        print(f"Nuevos eventos de congestión: {len(jams_api.pending_endreports)}")
-
-        alerts_data = Events(filename="data/alerts.json", table_name="alerts")
-        jams_data = Events(filename="data/jams.json", table_name="jams")
-
-        alerts_data += alerts_api
-        jams_data += jams_api
-
-        alerts_data.write_file()
-        jams_data.write_file()
-
-        print(f"Alertas: {len(alerts_data.data)}")
-        print(f"Jams: {len(jams_data.data)}")
-
         try:
-            alerts_not_ended = Events(table_name="alerts")
-            jams_not_ended = Events(table_name="jams")
+            if "alerts" in data:
+                # 1. Capturar nuevas alertas
+                alerts_api = Events(data["alerts"], table_name="alerts")
+                # 2. Limpiar datos
+                alerts_api.clean_data()
+                # 3. Leer alertas no terminadas de la db
+                alerts_not_ended_db = Events(table_name="alerts")
+                alerts_not_ended_db.fetch_from_db(not_ended=True)
+                # 4. Obtener nuevas alertas
+                new_alerts = alerts_api - alerts_not_ended_db
+                # 5. Actualizar en db las alertas terminadas
+                new_alerts.update_endreports_to_db(from_new_data=True)
+                # 6. Insertar nuevas alertas en db
+                new_alerts.insert_to_db()
+                print(f"Nuevas alertas: {len(new_alerts.data)}")
 
-            # alerts_not_ended.update_endreports_to_db_from_file(
-            #     filename="data/alerts.json"
-            # )
-            # jams_not_ended.update_endreports_to_db_from_file(filename="data/jams.json")
+            if "jams" in data:
+                # 1. Capturar nuevos eventos de congestión
+                jams_api = Events(data["jams"], table_name="jams")
+                # 2. Limpiar datos
+                jams_api.clean_data()
+                # 3. Leer eventos de congestión no terminados de la db
+                jams_not_ended_db = Events(table_name="jams")
+                jams_not_ended_db.fetch_from_db(not_ended=True)
+                # 4. Obtener nuevos eventos de congestión
+                new_jams = jams_api - jams_not_ended_db
+                # 5. Actualizar en db los eventos de congestión terminados
+                new_jams.update_endreports_to_db(from_new_data=True)
+                # 6. Insertar nuevos eventos de congestión en db
+                new_jams.insert_to_db()
+                print(f"Nuevos eventos de congestión: {len(new_jams.data)}")
 
-            alerts_not_ended.fetch_from_db(not_ended=True)
-            jams_not_ended.fetch_from_db(not_ended=True)
-
-            alerts_put = alerts_not_ended + alerts_api
-            jams_put = jams_not_ended + jams_api
-
-            alerts_put.insert_to_db()
-            jams_put.insert_to_db()
         except Exception as e:
             print(f"Error actualizando: {e}")
 
@@ -64,4 +50,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("Saliendo...")
+        exit(0)
+    except Exception as e:
+        print(f"Error: {e}")
+        exit(1)
