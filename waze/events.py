@@ -89,7 +89,7 @@ class Events:
         if len(self.data) > 0:
             self.update_index_map()
 
-    def __end__(self):
+    def __del__(self):
         if self.db is not None and not self.db.closed:
             self.db.close()
 
