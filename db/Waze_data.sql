@@ -20,9 +20,8 @@ CREATE TABLE "alerts" (
 
 CREATE TABLE "alerts_location" (
   "id" SERIAL PRIMARY KEY,
-  "x" decimal(6),
-  "y" decimal(6),
-  "segment" int
+  "x" real,
+  "y" real
 );
 
 CREATE TABLE "jams" (

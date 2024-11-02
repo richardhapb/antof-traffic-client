@@ -10,9 +10,9 @@ graph TD
     G -->|Yes| LOOP[Wait 5 minutes]
     H --> M[Clean events data]
     M --> Q[Fetch last 24 hours events from database]
-    Q --> T[Merge events that not are in the database - uuid as key]
-    T --> U[Update end reports timestamp for events that not are in the API data but are in the database]
-    U --> V[Insert new events to database]
+    Q --> U[Merge events that not are in the database - uuid as key]
+    U --> T[Insert new events to database]
+    T --> V[Update end reports timestamp for events that not are in the API data but are in the database without end timestamp]
     V --> LOOP
     LOOP --> F
 :::

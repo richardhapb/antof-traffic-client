@@ -6,6 +6,7 @@ import os
 from config import DATABASE_CONFIG
 import psycopg2
 from functools import wraps
+import numpy as np
 
 
 def db_connection(func):
@@ -268,7 +269,7 @@ class Events:
         return events
 
     @db_connection
-    def insert_to_db(self):
+    def insert_to_db(self, only_review_not_ended=True):
         if self.db is None:
             raise ValueError("No se ha conectado a la base de datos")
 
@@ -277,6 +278,8 @@ class Events:
         try:
             cur.execute(
                 "SELECT uuid FROM " + self.table_name + " WHERE end_pub_millis IS NULL"
+                if only_review_not_ended
+                else "SELECT uuid FROM " + self.table_name
             )
             not_ended = {d[0] for d in cur.fetchall()}
         except psycopg2.Error as e:
@@ -294,15 +297,12 @@ class Events:
                 )  # Extraer el diccionario de `location`
                 if location_data:
                     # Insertar datos en `alerts_location` y obtener el `location_id`
-                    sql_location = "INSERT INTO alerts_location (x, y, segment) VALUES (%s, %s, %s) RETURNING id"
+                    sql_location = "INSERT INTO alerts_location (x, y) VALUES (%s, %s) RETURNING id"
                     cur.execute(
                         sql_location,
                         (
                             location_data["x"],
                             location_data["y"],
-                            location_data["segment"]
-                            if "segment" in location_data
-                            else 0,
                         ),
                     )
                     location_id = cur.fetchone()[0]  # Obtener el `location_id` generado
@@ -350,8 +350,13 @@ class Events:
 
                     # Convertir cada diccionario de la lista en tupla, agregando `jam_uuid`
                     batch_data = [
-                        (jam_uuid, *tuple(nested_item.values()))
+                        (
+                            jam_uuid,
+                            *tuple(nested_item.values()),
+                            *tuple((p,)),
+                        )
                         for nested_item in nested_list
+                        for p in range(1, len(nested_list) + 1)
                     ]
 
                     # Extraer columnas de la primera entrada de la lista
@@ -363,6 +368,7 @@ class Events:
                                 for k in nested_list[0].keys()
                             ]
                         )
+                        + ["position"]
                     )
                     nested_placeholders = ", ".join(["%s"] * len(batch_data[0]))
 
@@ -411,7 +417,7 @@ class Events:
             not_ended = {d[0] for d in cur.fetchall()}
 
             elements = [
-                (d["endreport"] if from_new_data else now, d["uuid"])
+                (d["endreport"] if not from_new_data else now, d["uuid"])
                 for d in self.data
                 if d["uuid"] in not_ended
                 and (from_new_data or ("endreport" in d and d["endreport"] is not None))
