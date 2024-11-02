@@ -45,7 +45,7 @@ def main():
         except Exception as e:
             print(f"Error actualizando: {e}")
 
-        print("Actualizado.")
+        print("Actualizado.\n")
         time.sleep(60 * 5)
 
 
