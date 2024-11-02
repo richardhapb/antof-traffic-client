@@ -22,14 +22,21 @@ API_FERIADOS = "https://api.boostr.cl/holidays/2024.json"
 
 
 def load_data(
-    table_name, file: str = None, with_nested_items: bool = True, mode: str = "all"
+    table_name: str,
+    file: str = None,
+    with_nested_items: bool = True,
+    mode: str = "all",
+    epoch: int = None,
+    between: tuple = None,
 ):
     """
     Carga los datos de eventos de Waze desde un archivo JSON o desde la BD SQL
     """
 
     data = Events(table_name=table_name, filename=file)
-    data.fetch_from_db(with_nested_items=with_nested_items, mode=mode)
+    data.fetch_from_db(
+        with_nested_items=with_nested_items, mode=mode, epoch=epoch, between=between
+    )
 
     return data
 
@@ -225,6 +232,53 @@ def hourly_group(data: pd.DataFrame):
     hourly_reports = hourly_reports.reindex(all_hours, fill_value=0)
 
     return hourly_reports
+
+
+def daily_group(data: pd.DataFrame):
+    """
+    Transforma un DataFrame de eventos en un reporte por día
+    """
+
+    df = data[["day_type", "day", "inicio", "fin"]].copy()
+
+    df.reset_index(inplace=True, drop=True)
+
+    def calculate_days(df):
+        for i in range(df.shape[0]):
+            days = (df.loc[i, "fin"] - df.loc[i, "inicio"]).days
+            if np.isnan(days):
+                continue
+            for d in range(1, int(days) + 1):
+                df = pd.concat(
+                    [
+                        df,
+                        pd.DataFrame(
+                            {
+                                "day_type": [df.loc[i, "day_type"]],
+                                "day": [df.loc[i, "day"] + d],
+                                "inicio": [df.loc[i, "inicio"]],
+                                "fin": [df.loc[i, "fin"]],
+                            },
+                        ),
+                    ],
+                    ignore_index=True,
+                )
+        return df
+
+    df = calculate_days(df)
+
+    # Agrupar por día y tipo de día
+    daily_reports = (
+        df[["day_type", "day"]].groupby(["day_type", "day"]).size().unstack(level=0)
+    )
+
+    # Crear un índice que incluya todos los días del mes
+    all_days = pd.Index(range(1, 32), name="day")
+
+    # Reindexar el DataFrame para incluir todos los días del mes
+    daily_reports = daily_reports.reindex(all_days, fill_value=0)
+
+    return daily_reports
 
 
 def filter_nearby(gdf, threshold=300):
