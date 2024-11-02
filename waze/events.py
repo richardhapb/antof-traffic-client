@@ -33,6 +33,50 @@ def db_connection(func):
 
 
 class Events:
+    # Mapeo de columnas de Waze a columnas de la base de datos
+    # Se usa para insertar datos en la base de datos
+    # Cada tabla tiene diccionarios dentro, para esos casos se considera [nombre_atributo]_id
+    # Además existe una tabla para cada diccionario dentro de los datos, con nombre [nombre_tabla]_[nombre_atributo]
+
+    db_columns_map = {
+        "alerts": {
+            "uuid": "uuid",
+            "reliability": "reliability",
+            "type": "type",
+            "roadType": "road_type",
+            "magvar": "magvar",
+            "subtype": "subtype",
+            "location": "location_id",
+            "street": "street",
+            "pubMillis": "pub_millis",
+            "endreport": "end_pub_millis",
+        },
+        "jams": {
+            "uuid": "uuid",
+            "level": "level",
+            "speedKMH": "speed_kmh",
+            "length": "length",
+            "endNode": "end_node",
+            "roadType": "road_type",
+            "delay": "delay",
+            "street": "street",
+            "line": {
+                "position": "position",
+                "x": "x",
+                "y": "y",
+            },
+            "segments": {
+                "position": "position",
+                "ID": "segment_id",
+                "fromNode": "from_node",
+                "toNode": "to_node",
+                "isForward": "is_forward",
+            },
+            "pubMillis": "pub_millis",
+            "endreport": "end_pub_millis",
+        },
+    }
+
     def __init__(self, data=[], filename=None, table_name=None):
         self.data = data
         self.filename = filename
@@ -40,49 +84,6 @@ class Events:
         self.pending_endreports = set()
         self.db = None
         self.index_map = {}
-        # Mapeo de columnas de Waze a columnas de la base de datos
-        # Se usa para insertar datos en la base de datos
-        # Cada tabla tiene diccionarios dentro, para esos casos se considera [nombre_atributo]_id
-        # Además existe una tabla para cada diccionario dentro de los datos, con nombre [nombre_tabla]_[nombre_atributo]
-        self.db_columns_map = {
-            "alerts": {
-                "uuid": "uuid",
-                "reliability": "reliability",
-                "type": "type",
-                "roadType": "road_type",
-                "magvar": "magvar",
-                "subtype": "subtype",
-                "location": "location_id",
-                "street": "street",
-                "pubMillis": "pub_millis",
-                "endreport": "end_pub_millis",
-            },
-            "jams": {
-                "uuid": "uuid",
-                "level": "level",
-                "speedKMH": "speed_kmh",
-                "length": "length",
-                "endNode": "end_node",
-                "roadType": "road_type",
-                "delay": "delay",
-                "street": "street",
-                "line": {
-                    "position": "position",
-                    "x": "x",
-                    "y": "y",
-                },
-                "segments": {
-                    "segment": "segment",
-                    "ID": "segment_id",
-                    "position": "position",
-                    "fromNode": "from_node",
-                    "toNode": "to_node",
-                    "isForward": "is_forward",
-                },
-                "pubMillis": "pub_millis",
-                "endreport": "end_pub_millis",
-            },
-        }
 
         if self.data is not None:
             self.update_index_map()
@@ -228,7 +229,7 @@ class Events:
                     item.pop(key, None)
 
     def format_data(self):
-        if self.data is None:
+        if self.data is None or len(self.data) == 0:
             return
         if not isinstance(self.data[0], tuple):
             return
@@ -251,48 +252,63 @@ class Events:
 
     @db_connection
     def fetch_nested_items(self):
-        for record in self.data:
-            if self.table_name == "alerts":
-                # Obtener datos de `alerts_location` y agregarlos a `record`
-                location_id = record["location"]
-                sql_location = (
-                    f"SELECT x, y FROM {self.table_name}_location WHERE id = %s"
-                )
-                cur = self.db.cursor()
-                cur.execute(sql_location, (location_id,))
-                location_data = cur.fetchone()
-                record["location"] = {"x": location_data[0], "y": location_data[1]}
-                cur.close()
+        sqls = []
+        if self.table_name == "alerts":
+            sql = (
+                f"SELECT a.*, l.x, l.y FROM {self.table_name} a "
+                f"JOIN {self.table_name}_location l ON a.location_id = l.id"
+            )
+            sqls.append(sql)
+        elif self.table_name == "jams":
+            sql = (
+                f"SELECT s.* FROM {self.table_name} j "
+                f"JOIN {self.table_name}_segments s ON j.uuid = s.{self.table_name}_uuid "
+                f"ORDER BY s.position"
+            )
+            sqls.append(sql)
+            sql = (
+                f"SELECT l.* FROM {self.table_name} j "
+                f"JOIN {self.table_name}_line l ON j.uuid = l.{self.table_name}_uuid"
+            )
+            sqls.append(sql)
+        else:
+            return
 
-            elif self.table_name == "jams":
-                # Obtener datos de `jams_segments` y `jams_lines` y agregarlos a `record`
-                jam_uuid = record["uuid"]
+        records = []
+        cur = self.db.cursor()
+        for sql in sqls:
+            cur.execute(sql)
+            records.append(cur.fetchall())
+        cur.close()
 
-                # Obtener datos de `jams_segments` y agregarlos a `record`
-                sql_segments = f"SELECT * FROM {self.table_name}_segments WHERE {self.table_name}_uuid = %s ORDER BY position"
-                cur = self.db.cursor()
-                cur.execute(sql_segments, (jam_uuid,))
-                segments_data = cur.fetchall()
-                record["segments"] = [
+        if self.table_name == "alerts":
+            for i, record in enumerate(records[0]):
+                self.data[i]["location"] = {"x": record[-2], "y": record[-1]}
+        elif self.table_name == "jams":
+            for i, record in enumerate(records[0]):
+                if "segments" not in self.data[self.index_map[record[1]]]:
+                    self.data[self.index_map[record[1]]]["segments"] = []
+                self.data[self.index_map[record[1]]]["segments"] += [
                     {
-                        "segment": d[1],
-                        "ID": d[2],
-                        "position": d[3],
-                        "fromNode": d[4],
-                        "toNode": d[5],
-                        "isForward": d[6],
+                        k: v
+                        for k, v in zip(
+                            self.db_columns_map[self.table_name]["segments"].keys(),
+                            record[2:],
+                        )
                     }
-                    for d in segments_data
                 ]
-                cur.close()
-
-                # Obtener datos de `jams_lines` y agregarlos a `record`
-                sql_lines = f"SELECT * FROM {self.table_name}_line WHERE {self.table_name}_uuid = %s ORDER BY position"
-                cur = self.db.cursor()
-                cur.execute(sql_lines, (jam_uuid,))
-                lines_data = cur.fetchall()
-                record["line"] = [{"x": d[2], "y": d[3]} for d in lines_data]
-                cur.close()
+            for i, record in enumerate(records[1]):
+                if "line" not in self.data[self.index_map[record[1]]]:
+                    self.data[self.index_map[record[1]]]["line"] = []
+                self.data[self.index_map[record[1]]]["line"] += [
+                    {
+                        k: v
+                        for k, v in zip(
+                            self.db_columns_map[self.table_name]["line"].keys(),
+                            record[2:],
+                        )
+                    }
+                ]
 
     @db_connection
     def get_all_from_db(self, mode="last_24h"):

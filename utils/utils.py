@@ -29,7 +29,7 @@ def load_data(
     """
 
     data = Events(table_name=table_name, filename=file)
-    data.fetch_from_db(not_ended=False, with_nested_items=with_nested_items, mode=mode)
+    data.fetch_from_db(with_nested_items=with_nested_items, mode=mode)
 
     return data
 
