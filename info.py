@@ -17,7 +17,7 @@ def main():
                 alerts_api.clean_data()
                 # 3. Leer alertas no terminadas de la db
                 alerts_not_ended_db = Events(table_name="alerts")
-                alerts_not_ended_db.fetch_from_db(not_ended=True)
+                alerts_not_ended_db.fetch_from_db(mode="not_ended")
                 # 4. Obtener nuevas alertas
                 new_alerts = alerts_api - alerts_not_ended_db
                 # 5. Insertar nuevas alertas en db
@@ -33,7 +33,7 @@ def main():
                 jams_api.clean_data()
                 # 3. Leer eventos de congestión no terminados de la db
                 jams_not_ended_db = Events(table_name="jams")
-                jams_not_ended_db.fetch_from_db(not_ended=True)
+                jams_not_ended_db.fetch_from_db(mode="not_ended")
                 # 4. Obtener nuevos eventos de congestión
                 new_jams = jams_api - jams_not_ended_db
                 # 5. Insertar nuevos eventos de congestión en db

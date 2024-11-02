@@ -1,9 +1,8 @@
-
+from waze.events import Events
 import pandas as pd
 import numpy as np
 import geopandas as gpd
 from shapely.geometry import Point
-import json
 import contextily as cx
 import matplotlib.pyplot as plt
 from scipy.spatial import cKDTree
@@ -11,32 +10,6 @@ import requests
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.model_selection import train_test_split, cross_val_score
 from xgboost import XGBClassifier
-
-
-# ['Solarize_Light2', '_classic_test_patch', '_mpl-gallery', '_mpl-gallery-nogrid', 'bmh', 'classic', 'dark_background', 'fast', 'fivethirtyeight', 'ggplot', 'grayscale', 'seaborn-v0_8', 'seaborn-v0_8-bright', 'seaborn-v0_8-colorblind', 'seaborn-v0_8-dark', 'seaborn-v0_8-dark-palette', 'seaborn-v0_8-darkgrid', 'seaborn-v0_8-deep', 'seaborn-v0_8-muted', 'seaborn-v0_8-notebook', 'seaborn-v0_8-paper', 'seaborn-v0_8-pastel', 'seaborn-v0_8-poster', 'seaborn-v0_8-talk', 'seaborn-v0_8-ticks', 'seaborn-v0_8-white', 'seaborn-v0_8-whitegrid', 'tableau-colorblind10']
-
-plt.style.use("_mpl-gallery")
-plt.rcParams.update(
-    {
-        "axes.facecolor": "white",
-        "axes.labelcolor": "black",
-        "figure.facecolor": "white",
-        "figure.figsize": (7, 3),
-        "grid.color": "black",
-        "patch.edgecolor": "black",
-        "patch.force_edgecolor": True,
-        "text.color": "black",
-        "xtick.color": "dimgray",
-        "ytick.color": "dimgray",
-        "savefig.facecolor": "white",
-        "savefig.edgecolor": "white",
-        "savefig.format": "png",
-        "grid.linestyle": "-",
-        "grid.alpha": 0.1,
-        "font.size": 14,
-    }
-)
-
 
 PERIM_X = [-70.42034224747098, -70.36743722434367]
 PERIM_Y = [-23.721724880116387, -23.511242421131792]
@@ -48,18 +21,17 @@ PERIM_AFTA = PERIM_AFTA.to_crs("EPSG:3857")
 API_FERIADOS = "https://api.boostr.cl/holidays/2024.json"
 
 
-def load_data(file: str = "data/waze.json"):
+def load_data(
+    table_name, file: str = None, with_nested_items: bool = True, mode: str = "all"
+):
     """
-    Carga un archivo JSON en un DataFrame
+    Carga los datos de eventos de Waze desde un archivo JSON o desde la BD SQL
     """
-    with open(file, "r", encoding="UTF8") as f:
-        data = json.load(f)
-        f.close()
 
-    alerts = pd.DataFrame(data["alerts"])
-    jams = pd.DataFrame(data["jams"])
+    data = Events(table_name=table_name, filename=file)
+    data.fetch_from_db(not_ended=False, with_nested_items=with_nested_items, mode=mode)
 
-    return alerts, jams
+    return data
 
 
 def filter_location(dat: pd.DataFrame, x: list, y: list):
@@ -336,9 +308,14 @@ def get_holidays():
 
     return feriados
 
-def grid(geometry:gpd.GeoDataFrame, n_x_div: int, n_y_div: int):
+
+def grid(geometry: gpd.GeoDataFrame, n_x_div: int, n_y_div: int):
     bounds_x = np.array(
-            np.linspace(geometry.to_crs(epsg=3857).geometry.x.min(), geometry.to_crs(epsg=3857).geometry.x.max(), n_x_div)
+        np.linspace(
+            geometry.to_crs(epsg=3857).geometry.x.min(),
+            geometry.to_crs(epsg=3857).geometry.x.max(),
+            n_x_div,
+        )
     )
     bounds_y = np.array(
         np.linspace(
@@ -350,18 +327,28 @@ def grid(geometry:gpd.GeoDataFrame, n_x_div: int, n_y_div: int):
 
     return np.meshgrid(bounds_x, bounds_y)
 
-def calc_quadrant(x_pos:int, y_pos:int, x_len:int):
+
+def calc_quadrant(x_pos: int, y_pos: int, x_len: int):
     return x_len * y_pos + x_pos + 1
 
-def get_quadrant(x_grid:np.array, y_grid:np.array, point:tuple):
+
+def get_quadrant(x_grid: np.array, y_grid: np.array, point: tuple):
     x_pos, y_pos = -1, -1
 
     for xi in range(len(x_grid[0])):
-        if xi < len(x_grid[0]) - 1 and point[0] >= x_grid[0][xi] and point[0] <= x_grid[0][xi + 1]:
+        if (
+            xi < len(x_grid[0]) - 1
+            and point[0] >= x_grid[0][xi]
+            and point[0] <= x_grid[0][xi + 1]
+        ):
             x_pos = xi
 
     for yi in range(len(y_grid)):
-        if yi < len(y_grid) - 1 and point[1] >= y_grid[yi][0] and point[1] <= y_grid[yi + 1][0]:
+        if (
+            yi < len(y_grid) - 1
+            and point[1] >= y_grid[yi][0]
+            and point[1] <= y_grid[yi + 1][0]
+        ):
             y_pos = yi
 
     if x_pos < 0 or y_pos < 0:
@@ -371,13 +358,13 @@ def get_quadrant(x_grid:np.array, y_grid:np.array, point:tuple):
 
     return quadrant
 
+
 def plot_antof():
     PERIM_AFTA = gpd.GeoDataFrame(geometry=gpd.points_from_xy(PERIM_X, PERIM_Y))
     PERIM_AFTA.crs = "EPSG:4326"
     PERIM_AFTA = PERIM_AFTA.to_crs(epsg=3857)
 
     fig, ax = plt.subplots()
-
 
     fig.set_size_inches(10, 10)
     PERIM_AFTA.plot(ax=ax, color="red")
@@ -386,7 +373,8 @@ def plot_antof():
     ax.set_ylim(PERIM_AFTA.total_bounds[1], PERIM_AFTA.total_bounds[3])
     return ax
 
-def get_center_points(grid:tuple):
+
+def get_center_points(grid: tuple):
     # X
     center_points_x = np.zeros((grid[0].shape[0] - 1, grid[0].shape[1] - 1))
 
@@ -411,7 +399,13 @@ def get_center_points(grid:tuple):
     return center_points_x, center_points_y
 
 
-def xgb_classifier(df:gpd.GeoDataFrame, Y_label:str, cats:list = [], ohe:bool=True, happen:bool=True):
+def xgb_classifier(
+    df: gpd.GeoDataFrame,
+    Y_label: str,
+    cats: list = [],
+    ohe: bool = True,
+    happen: bool = True,
+):
     events = df.copy()
 
     if happen:
@@ -429,7 +423,9 @@ def xgb_classifier(df:gpd.GeoDataFrame, Y_label:str, cats:list = [], ohe:bool=Tr
     if "day" in df.columns:
         day = np.random.randint(events.day.min(), events.day.max() + 1, q_events)
     if "week_day" in df.columns:
-        week_day = np.random.randint(events.week_day.min(), events.week_day.max(), q_events)
+        week_day = np.random.randint(
+            events.week_day.min(), events.week_day.max(), q_events
+        )
     if "hour" in df.columns:
         hour = np.random.randint(events.hour.min(), events.hour.max(), q_events)
     if "minute" in df.columns:
@@ -458,7 +454,7 @@ def xgb_classifier(df:gpd.GeoDataFrame, Y_label:str, cats:list = [], ohe:bool=Tr
         no_events["happen"] = 0
 
     total_events = pd.concat([events, no_events], axis=0)
-    
+
     if "day_type" in total_events.columns:
         total_events["day_type"] = total_events["day_type"].map({"f": 0, "s": 1})
 
@@ -468,10 +464,15 @@ def xgb_classifier(df:gpd.GeoDataFrame, Y_label:str, cats:list = [], ohe:bool=Tr
             onehot = OneHotEncoder(handle_unknown="ignore")
             oht = onehot.fit_transform(total_events[[c]])
 
-            labeled.append(pd.DataFrame(oht.toarray(), columns=onehot.get_feature_names_out()).reset_index(drop=True))
+            labeled.append(
+                pd.DataFrame(
+                    oht.toarray(), columns=onehot.get_feature_names_out()
+                ).reset_index(drop=True)
+            )
 
-
-        X_labeled = pd.concat([total_events.drop(cats, axis=1).reset_index(drop=True), *labeled], axis=1)
+        X_labeled = pd.concat(
+            [total_events.drop(cats, axis=1).reset_index(drop=True), *labeled], axis=1
+        )
     else:
         X_labeled = total_events.copy()
 
@@ -482,11 +483,9 @@ def xgb_classifier(df:gpd.GeoDataFrame, Y_label:str, cats:list = [], ohe:bool=Tr
         Y = X_labeled[Y_label]
         X_labeled = X_labeled.drop(Y_label, axis=1)
 
-
     X_train, X_test, y_train, y_test = train_test_split(
         X_labeled, Y, test_size=0.2, random_state=42
     )
-
 
     xgb = XGBClassifier(
         learning_rate=0.03,
@@ -498,7 +497,6 @@ def xgb_classifier(df:gpd.GeoDataFrame, Y_label:str, cats:list = [], ohe:bool=Tr
     )
     xgb.fit(X_train, y_train)
 
-
     cvs = cross_val_score(xgb, X_labeled, Y, cv=10)
     print(cvs)
     print(cvs.mean())
@@ -509,5 +507,5 @@ def xgb_classifier(df:gpd.GeoDataFrame, Y_label:str, cats:list = [], ohe:bool=Tr
         "X_train": X_train,
         "X_test": X_test,
         "y_train": y_train,
-        "y_test": y_test
+        "y_test": y_test,
     }

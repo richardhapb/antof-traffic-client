@@ -6,7 +6,6 @@ import os
 from config import DATABASE_CONFIG
 import psycopg2
 from functools import wraps
-import numpy as np
 
 
 def db_connection(func):
@@ -19,12 +18,13 @@ def db_connection(func):
             self.db.set_client_encoding("UTF8")
 
         try:
-            func(self, *args, **kwargs)
+            result = func(self, *args, **kwargs)
         except psycopg2.Error as e:
             self.db.rollback()
             raise ValueError(f"Error executing database query: {e}")
         else:
             self.db.commit()
+            return result
         finally:
             self.db.close()
             self.db = None
@@ -83,9 +83,6 @@ class Events:
                 "endreport": "end_pub_millis",
             },
         }
-
-        if self.filename is not None and len(self.data) == 0:
-            self.read_file()
 
         if self.data is not None:
             self.update_index_map()
@@ -243,17 +240,65 @@ class Events:
             ]
             self.data = [{k: v for k, v in zip(cols, d)} for d in self.data]
 
-    def fetch_from_db(self, not_ended=False):
-        self.data = self.get_all_from_db(not_ended)
+    def fetch_from_db(self, mode="last_24h", with_nested_items=False):
+        self.data = self.get_all_from_db(mode=mode)
 
         self.format_data()
         self.update_index_map()
         self.update_pending_endreports()
+        if with_nested_items:
+            self.fetch_nested_items()
 
     @db_connection
-    def get_all_from_db(self, not_ended=True):
-        if self.db is None:
-            raise ValueError("No se ha conectado a la base de datos")
+    def fetch_nested_items(self):
+        for record in self.data:
+            if self.table_name == "alerts":
+                # Obtener datos de `alerts_location` y agregarlos a `record`
+                location_id = record["location"]
+                sql_location = (
+                    f"SELECT x, y FROM {self.table_name}_location WHERE id = %s"
+                )
+                cur = self.db.cursor()
+                cur.execute(sql_location, (location_id,))
+                location_data = cur.fetchone()
+                record["location"] = {"x": location_data[0], "y": location_data[1]}
+                cur.close()
+
+            elif self.table_name == "jams":
+                # Obtener datos de `jams_segments` y `jams_lines` y agregarlos a `record`
+                jam_uuid = record["uuid"]
+
+                # Obtener datos de `jams_segments` y agregarlos a `record`
+                sql_segments = f"SELECT * FROM {self.table_name}_segments WHERE {self.table_name}_uuid = %s ORDER BY position"
+                cur = self.db.cursor()
+                cur.execute(sql_segments, (jam_uuid,))
+                segments_data = cur.fetchall()
+                record["segments"] = [
+                    {
+                        "segment": d[1],
+                        "ID": d[2],
+                        "position": d[3],
+                        "fromNode": d[4],
+                        "toNode": d[5],
+                        "isForward": d[6],
+                    }
+                    for d in segments_data
+                ]
+                cur.close()
+
+                # Obtener datos de `jams_lines` y agregarlos a `record`
+                sql_lines = f"SELECT * FROM {self.table_name}_line WHERE {self.table_name}_uuid = %s ORDER BY position"
+                cur = self.db.cursor()
+                cur.execute(sql_lines, (jam_uuid,))
+                lines_data = cur.fetchall()
+                record["line"] = [{"x": d[2], "y": d[3]} for d in lines_data]
+                cur.close()
+
+    @db_connection
+    def get_all_from_db(self, mode="last_24h"):
+        not_ended = "not_ended" in mode
+        last_24h = "last_24h" in mode
+        all = "all" in mode
 
         if not_ended:
             cur = self.db.cursor()
@@ -261,29 +306,47 @@ class Events:
                 "SELECT * FROM " + self.table_name + " WHERE end_pub_millis IS NULL"
             )
             events = cur.fetchall()
-            return events
 
-        cur = self.db.cursor()
-        cur.execute("SELECT * FROM " + self.table_name)
-        events = cur.fetchall()
+        if last_24h:
+            cur = self.db.cursor()
+            cur.execute(
+                "SELECT * FROM " + self.table_name + " WHERE pub_millis > %s",
+                (int((datetime.now(tz=pytz.utc).timestamp() - (24 * 60 * 60)) * 1000),),
+            )
+            events = cur.fetchall()
+
+        if all:
+            cur = self.db.cursor()
+            cur.execute("SELECT * FROM " + self.table_name)
+            events = cur.fetchall()
+
+        cur.close()
         return events
 
     @db_connection
-    def insert_to_db(self, only_review_not_ended=True):
-        if self.db is None:
-            raise ValueError("No se ha conectado a la base de datos")
+    def insert_to_db(self, review_mode="last_24h"):
+        only_review_not_ended = "not_ended" in review_mode
+        only_review_last_24h = "last_24h" in review_mode
+        review_all = "all" in review_mode
 
         cur = self.db.cursor()
 
-        try:
+        if only_review_not_ended:
             cur.execute(
                 "SELECT uuid FROM " + self.table_name + " WHERE end_pub_millis IS NULL"
-                if only_review_not_ended
-                else "SELECT uuid FROM " + self.table_name
             )
             not_ended = {d[0] for d in cur.fetchall()}
-        except psycopg2.Error as e:
-            raise ValueError(f"Error checking existing data: {e}")
+        elif only_review_last_24h:
+            cur.execute(
+                "SELECT uuid FROM " + self.table_name + " WHERE pub_millis > %s",
+                (int((datetime.now(tz=pytz.utc).timestamp() - (24 * 60 * 60)) * 1000),),
+            )
+            not_ended = {d[0] for d in cur.fetchall()}
+        elif review_all:
+            cur.execute("SELECT uuid FROM " + self.table_name)
+            not_ended = {d[0] for d in cur.fetchall()}
+        else:
+            not_ended = set()
 
         # Lista de uuids que no se encuentran en la base de datos
         data = [self.data[i] for d, i in self.index_map.items() if d not in not_ended]
@@ -353,10 +416,9 @@ class Events:
                         (
                             jam_uuid,
                             *tuple(nested_item.values()),
-                            *tuple((p,)),
+                            *tuple((p + 1,)),
                         )
-                        for nested_item in nested_list
-                        for p in range(1, len(nested_list) + 1)
+                        for p, nested_item in enumerate(nested_list)
                     ]
 
                     # Extraer columnas de la primera entrada de la lista
@@ -382,9 +444,6 @@ class Events:
 
     @db_connection
     def update_endreport_to_db(self, endreport, uuid):
-        if self.db is None:
-            raise ValueError("No se ha conectado a la base de datos")
-
         try:
             cur = self.db.cursor()
             cur.execute(
@@ -403,9 +462,6 @@ class Events:
 
     @db_connection
     def update_endreports_to_db(self, from_new_data=False):
-        if self.db is None:
-            raise ValueError("No se ha conectado a la base de datos")
-
         try:
             cur = self.db.cursor()
 
@@ -416,12 +472,18 @@ class Events:
             )
             not_ended = {d[0] for d in cur.fetchall()}
 
-            elements = [
-                (d["endreport"] if not from_new_data else now, d["uuid"])
-                for d in self.data
-                if d["uuid"] in not_ended
-                and (from_new_data or ("endreport" in d and d["endreport"] is not None))
-            ]
+            if from_new_data:
+                elements = [
+                    (now, uuid) for uuid in not_ended if uuid not in self.index_map
+                ]
+            else:
+                elements = [
+                    (d["endreport"], d["uuid"])
+                    for d in self.data
+                    if d["uuid"] in not_ended
+                    and "endreport" in d
+                    and d["endreport"] is not None
+                ]
 
             cur.executemany(
                 "UPDATE "
@@ -439,9 +501,6 @@ class Events:
 
     @db_connection
     def update_endreports_to_db_from_file(self, filename=None):
-        if self.db is None:
-            raise ValueError("No se ha conectado a la base de datos")
-
         if filename is None and self.filename is None:
             raise ValueError("Se requiere una ruta para leer el archivo")
 
