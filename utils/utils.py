@@ -166,9 +166,8 @@ def extract_event(data: gpd.GeoDataFrame, concept: list, extra_col: list = []):
     # Convertir la marca de tiempo a la zona horaria GMT-4 (CLT - Chile Standard Time)
     dat["pubMillis"] = dat["pubMillis"].dt.tz_convert("America/Santiago")
 
-    # Ya se encuentra en GMT-4
-    dat["endreport"] = pd.to_datetime(data["endreport"], unit="ms")
-    dat["endreport"] = dat["endreport"].dt.tz_localize("America/Santiago")
+    dat["endreport"] = pd.to_datetime(data["endreport"], unit="ms", utc=True)
+    dat["endreport"] = dat["endreport"].dt.tz_convert("America/Santiago")
 
     feriados = get_holidays()
 
