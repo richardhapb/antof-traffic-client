@@ -10,6 +10,8 @@ import requests
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.model_selection import train_test_split, cross_val_score
 from xgboost import XGBClassifier
+import pytz
+from datetime import datetime
 
 PERIM_X = [-70.42034224747098, -70.36743722434367]
 PERIM_Y = [-23.721724880116387, -23.511242421131792]
@@ -31,14 +33,37 @@ def load_data(
 ):
     """
     Carga los datos de eventos de Waze desde un archivo JSON o desde la BD SQL
+
+    Parámetros:
+    - table_name: Nombre de la tabla de la base de datos
+    - file: Archivo JSON con los datos de eventos
+    - with_nested_items: Si se deben cargar los eventos con sus subeventos
+    - mode: Modo de carga de datos, puede ser "all", "last_24h", "since" o "between"
+    - epoch: Hora de inicio de la búsqueda, en formato timestamp UTC en milisegundos
+    - between: Rango de tiempo de búsqueda, en formato timestamp UTC en milisegundos
     """
 
-    data = Events(table_name=table_name, filename=file)
-    data.fetch_from_db(
+    events = Events(table_name=table_name, filename=file)
+    events.fetch_from_db(
         with_nested_items=with_nested_items, mode=mode, epoch=epoch, between=between
     )
 
-    return data
+    return events
+
+
+def update_timezone(data: pd.DataFrame, tz: str = "America/Santiago"):
+    """
+    Actualiza el timezone de los datos de eventos
+    """
+
+    data_copy = data.copy()
+
+    data_copy["pubMillis"] = pd.to_datetime(data_copy["pubMillis"], unit="ms", utc=True)
+    data_copy["pubMillis"] = data_copy["pubMillis"].dt.tz_convert(tz)
+    data_copy["endreport"] = pd.to_datetime(data_copy["endreport"], unit="ms", utc=True)
+    data_copy["endreport"] = data_copy["endreport"].dt.tz_convert(tz)
+
+    return data_copy
 
 
 def filter_location(dat: pd.DataFrame, x: list, y: list):
@@ -160,14 +185,6 @@ def extract_event(data: gpd.GeoDataFrame, concept: list, extra_col: list = []):
     dat = dat[dat["type"].isin(concept)][
         ["uuid", "street", "pubMillis", "endreport", "x", "y", "geometry"] + extra_col
     ]
-
-    dat["pubMillis"] = pd.to_datetime(data["pubMillis"], unit="ms", utc=True)
-
-    # Convertir la marca de tiempo a la zona horaria GMT-4 (CLT - Chile Standard Time)
-    dat["pubMillis"] = dat["pubMillis"].dt.tz_convert("America/Santiago")
-
-    dat["endreport"] = pd.to_datetime(data["endreport"], unit="ms", utc=True)
-    dat["endreport"] = dat["endreport"].dt.tz_convert("America/Santiago")
 
     feriados = get_holidays()
 

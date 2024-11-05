@@ -6,6 +6,8 @@ import os
 from config import DATABASE_CONFIG
 import psycopg2
 from functools import wraps
+from utils import utils
+import pandas as pd
 
 
 def db_connection(func):
@@ -240,6 +242,14 @@ class Events:
                 if k not in ["line", "segments"]
             ]
             self.data = [{k: v for k, v in zip(cols, d)} for d in self.data]
+
+    def to_gdf(self, tz: str = "America/Santiago"):
+        if len(self.data) == 0:
+            return None
+        df = pd.DataFrame(self.data)
+        df = utils.update_timezone(df, tz)
+
+        return utils.separate_coords(df)
 
     def fetch_from_db(
         self, mode="last_24h", with_nested_items=False, epoch=None, between=None
