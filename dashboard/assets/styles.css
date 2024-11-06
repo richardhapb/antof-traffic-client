@@ -1,5 +1,185 @@
-html {
-    background-color: #333;
-    color: #fff;
+:root {
+    --bg-color: #111;
+    --bg-color-secondary: #333;
 }
 
+html {
+    background-color: var(--bg-color);
+    color: #fff;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+h1 {
+    font-size: 3rem;
+    margin: 2rem 0 0 0;
+    color: #ccc;
+    text-align: center;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    text-wrap: nowrap
+}
+
+.controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    width: 100%;
+}
+
+.slider {
+    width: 300px;
+    color: #000;
+    font-size: 1.2rem;
+    margin: 2rem 0 1rem 0;
+    background-color: var(--bg-color-secondary);
+    border-radius: 5px;
+}
+
+.first-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 4rem;
+}
+
+.plot {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.plot-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+}
+
+.plot-container > h2 {
+    margin: 2rem 0 2rem 0;
+    color:#bbb;
+    font-size: 1.3rem;
+    text-wrap: wrap;
+}
+
+input, .Select-value-label {
+    color: #fff !important;
+    font-size: 1.2rem;
+    background-color: var(--bg-color-secondary) !important;
+}
+
+.DateRangePickerInput_arrow_svg {
+    background-color: var(--bg-color-secondary) !important;
+    height: 46px !important;
+    fill: #fff !important;
+}
+
+
+.Select-menu-outer {
+    background-color: #333; /* Cambia el color de fondo del desplegable */
+    color: white;           /* Cambia el color del texto en el desplegable */
+}
+
+.CalendarMonth, .CalendarMonth_1, .CalendarMonthGrid_month__hidden, .CalendarDay, .DayPickerNavigation_button, .CalendarMonth_caption {
+    background-color: var(--bg-color-secondary) !important;
+    color: #fff !important;
+}
+
+#dd_type{
+    width: 300px;
+    font-size: 1.2rem;
+    margin: 2rem 0 1rem 0;
+}
+
+.Select-control {
+    background-color: var(--bg-color-secondary) !important;
+}
+
+#date_range {
+    width: 300px;
+    color: #fff;
+    font-size: 1.2rem;
+    margin: 2rem 0 1rem 0;
+}
+
+#map {
+    width: 500px;
+    height: 500px;
+}
+
+#hourly {
+    width: 600px;
+    height: 500px;
+}
+
+@media screen and (max-width: 1100px) {
+    .first-row {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+    }
+    
+    .plot-container {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+    }
+
+    .plot, .plot-container, #map, #hourly, #dd_type, #date_range, .header, .first-row {
+
+        width: 100%;
+        height: auto;
+    }
+
+    .controls {
+        width: 100%;
+        gap: 4rem;
+        justify-content: space-between;
+    }
+
+    #date_range {
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 2rem;
+        text-wrap: wrap;
+    }
+    
+}
+
+@media screen and (max-width: 600px) { 
+    .controls {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .container {
+        margin: 0 2rem;
+}
+
+}
