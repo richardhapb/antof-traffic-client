@@ -10,10 +10,18 @@ html {
 }
 
 h1 {
-    font-size: 3rem;
+    font-size: 2rem;
     margin: 2rem 0 0 0;
     color: #ccc;
     text-align: center;
+}
+
+.subtitle {
+    font-size: 1rem;
+    margin: 0 0 0 0;
+    color: #ccc;
+    text-align: center;
+    font-weight: lighter;
 }
 
 .container {
@@ -52,7 +60,7 @@ h1 {
     border-radius: 5px;
 }
 
-.first-row {
+.row {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -96,8 +104,8 @@ input, .Select-value-label {
 
 
 .Select-menu-outer {
-    background-color: #333; /* Cambia el color de fondo del desplegable */
-    color: white;           /* Cambia el color del texto en el desplegable */
+    background-color: #333 !important; /* Cambia el color de fondo del desplegable */
+    color: white !important;           /* Cambia el color del texto en el desplegable */
 }
 
 .CalendarMonth, .CalendarMonth_1, .CalendarMonthGrid_month__hidden, .CalendarDay, .DayPickerNavigation_button, .CalendarMonth_caption {
@@ -118,7 +126,7 @@ input, .Select-value-label {
 #date_range {
     width: 300px;
     color: #fff;
-    font-size: 1.2rem;
+    font-size: 1rem;
     margin: 2rem 0 1rem 0;
 }
 

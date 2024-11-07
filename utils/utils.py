@@ -227,9 +227,13 @@ def hourly_group(data: pd.DataFrame):
                     ],
                     ignore_index=True,
                 )
+
         return df
 
-    df = calculate_hours(df)
+    # df = calculate_hours(df)
+
+    f = df[df["day_type"] == "f"].shape[0]
+    s = df[df["day_type"] == "s"].shape[0]
 
     # Agrupar por hora y tipo de día
     hourly_reports = (
@@ -241,6 +245,22 @@ def hourly_group(data: pd.DataFrame):
 
     # Reindexar el DataFrame para incluir todas las horas del día
     hourly_reports = hourly_reports.reindex(all_hours, fill_value=0)
+    hourly_reports = hourly_reports.fillna(0)
+    hourly_reports = hourly_reports.reset_index()
+
+    if "s" not in hourly_reports.columns:
+        hourly_reports["s"] = 0.0
+    else:
+        hourly_reports["s"] = hourly_reports["s"].astype(float)
+
+    if "f" not in hourly_reports.columns:
+        hourly_reports["f"] = 0.0
+    else:
+        hourly_reports["f"] = hourly_reports["f"].astype(float)
+
+    # Calcular la tasa por tipo de día
+    hourly_reports["f"] = hourly_reports["f"] / f if f > 0 else 0
+    hourly_reports["s"] = hourly_reports["s"] / s if s > 0 else 0
 
     return hourly_reports
 

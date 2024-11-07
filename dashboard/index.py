@@ -1,9 +1,10 @@
-from dash import Dash, html, dcc, Input, Output
+from dash import Dash, html, dcc, Input, Output, dash_table
 import plotly.express as px
 from utils import utils
 import datetime
 import pytz
 import plotly.graph_objs as go
+import pandas as pd
 
 
 tz = "America/Santiago"
@@ -24,7 +25,13 @@ app.layout = html.Div(
     [
         html.Div(
             [
-                html.H1("Tráfico vehicular\nAntofagasta"),
+                html.H1(
+                    "Inteligencia de Tráfico para la Gestión Urbana en Antofagasta"
+                ),
+                html.H2(
+                    "Análisis de patrones y eventos reportados por usuarios para gestión de tráfico",
+                    className="subtitle",
+                ),
                 html.Div(
                     [
                         dcc.Dropdown(
@@ -68,10 +75,7 @@ app.layout = html.Div(
             [
                 html.Div(
                     [
-                        dcc.Graph(
-                            id="map",
-                            className="plot",
-                        ),
+                        dcc.Graph(id="map", className="plot"),
                     ],
                     className="plot-container",
                 ),
@@ -79,12 +83,76 @@ app.layout = html.Div(
                     [
                         dcc.Graph(
                             id="hourly",
+                            className="plot",
                         ),
                     ],
                     className="plot-container",
                 ),
             ],
-            className="first-row",
+            className="row",
+        ),
+        html.Div(
+            [
+                html.Div(
+                    [
+                        dash_table.DataTable(
+                            id="table",
+                            columns=[
+                                {"name": i, "id": i} for i in ["Calle", "Eventos"]
+                            ],
+                            data=[],
+                            filter_action="native",
+                            sort_action="native",
+                            page_action="native",
+                            page_current=0,
+                            page_size=10,
+                            style_table={"overflowX": "auto"},
+                            style_cell={"textAlign": "center"},
+                            style_data_conditional=[
+                                {
+                                    "if": {"column_id": "Eventos"},
+                                    "width": "100px",
+                                    "textAlign": "center",
+                                },
+                                {
+                                    "if": {"column_id": "Calle"},
+                                    "width": "350px",
+                                    "textAlign": "left",
+                                },
+                            ],
+                            style_header={
+                                "backgroundColor": "rgba(30,30,30,0.6)",
+                                "color": "#ccc",
+                                "fontWeight": "semibold",
+                                "fontFamily": "Verdana",
+                                "fontSize": "1rem",
+                                "textAlign": "center",
+                                "border": "1px solid #555",
+                            },
+                            style_data={
+                                "backgroundColor": "rgba(30,30,30,0.6)",
+                                "color": "#fff",
+                                "fontWeight": "lighter",
+                                "fontFamily": "Verdana",
+                                "fontSize": "1rem",
+                                "textAlign": "center",
+                                "border": "1px solid #555",
+                            },
+                            style_filter={
+                                "backgroundColor": "rgba(30,30,30,0.6)",
+                                "color": "#000",
+                                "fontWeight": "semibold",
+                                "fontFamily": "Verdana",
+                                "fontSize": "1rem",
+                                "textAlign": "center",
+                                "border": "1px solid #555",
+                            },
+                        )
+                    ],
+                    className="plot-container",
+                ),
+            ],
+            className="row",
         ),
     ],
     className="container",
@@ -92,14 +160,19 @@ app.layout = html.Div(
 
 
 @app.callback(
-    [Output("map", "figure"), Output("hourly", "figure")],
+    [
+        Output("map", "figure"),
+        Output("hourly", "figure"),
+        Output("table", "data"),
+    ],
     [
         Input("dd_type", "value"),
         Input("date_range", "start_date"),
         Input("date_range", "end_date"),
+        Input("table", "active_cell"),
     ],
 )
-def update_graphs(kind, start_date, end_date):
+def update_graphs(kind, start_date, end_date, active_cell):
     if start_date is None or end_date is None:
         return go.Figure(), go.Figure()
 
@@ -112,26 +185,50 @@ def update_graphs(kind, start_date, end_date):
     alerts["freq"] = alerts.apply(lambda x: x["freq"] if x["freq"] > 0 else 1, axis=1)
     alerts = utils.filter_nearby(alerts, threshold=200)
 
+    streets_data = alerts.groupby("street")["type"].count().reset_index()
+    streets_data["Calle"] = streets_data["street"]
+    streets_data["Eventos"] = streets_data["type"]
+    streets_data = streets_data.sort_values(by="Eventos", ascending=False)
+
+    table_data = streets_data.to_dict("records")
+
+    if active_cell is not None:
+        alerts = alerts[
+            alerts["street"] == streets_data.iloc[active_cell["row"]]["street"]
+        ]
+
     if kind == "all":
         events = utils.extract_event(
             alerts, ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"]
         )
     else:
         events = utils.extract_event(alerts, [kind])
-    hourly = utils.hourly_group(events).reset_index()
+    hourly = utils.hourly_group(events).reset_index().copy()
+    hourly = pd.melt(
+        hourly,
+        id_vars=["hour"],
+        value_vars=["s", "f"],
+        var_name="day_type",
+        value_name="events",
+    )
 
     names = {
-        "all": "Eventos",
-        "ACCIDENT": "Accidentes",
+        "all": "Evento",
+        "ACCIDENT": "Accidente",
         "JAM": "Congestión",
-        "HAZARD": "Peligros",
-        "ROAD_CLOSED": "Caminos cerrados",
+        "HAZARD": "Peligro",
+        "ROAD_CLOSED": "Camino cerrado",
     }
 
     if kind != "all":
         map_data = alerts[alerts["type"] == kind].copy()
     else:
         map_data = alerts
+
+    map_data["time"] = map_data["pubMillis"].apply(lambda x: x.strftime("%H:%M:%S"))
+    map_data["date"] = map_data["pubMillis"].apply(lambda x: x.strftime("%d-%m-%Y"))
+
+    map_data["type"] = map_data["type"].map(names)
 
     map_fig = go.Figure(
         px.scatter_map(
@@ -147,46 +244,63 @@ def update_graphs(kind, start_date, end_date):
                 "freq": "Frecuencia",
                 "x": "Longitud",
                 "y": "Latitud",
+                "street": "Calle",
+                "time": "Hora de reporte",
+                "date": "Fecha de reporte",
+            },
+            hover_data={
+                "street": True,
+                "time": True,
+                "date": True,
             },
             opacity=0.8,
         )
     )
-    hourly_fig = go.Figure(
-        go.Bar(
-            x=hourly["hour"],
-            y=hourly["s"],
-            marker_color="lightskyblue",
-            name="Accidentes",
-            opacity=0.8,
-        ),
-    )
+
+    hourly_fig = go.Figure()
+    for day_type in ["s", "f"]:
+        hourly_fig.add_trace(
+            go.Bar(
+                x=hourly["hour"].astype(str) + ":00",
+                y=hourly[hourly["day_type"] == day_type]["events"],
+                opacity=0.8,
+                name={"f": "Fin de semana / Feriado", "s": "Semana"}[day_type],
+                marker_color={"f": "salmon", "s": "skyblue"}[day_type],
+            ),
+        )
 
     hourly_fig.update_layout(
-        paper_bgcolor="#333",
-        plot_bgcolor="#333",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="#ccc"),
         title=dict(
-            text=f"{names[kind].capitalize()} por hora del día",
+            text=f"Promedio de {names[kind].lower()} por hora del día",
             font=dict(
                 color="#ccc",
                 weight=600,
                 family="Verdana",
                 size=20,
             ),
-            xanchor="left",
-            yanchor="top",
             pad=dict(b=30, l=50),
         ),
-        font=dict(color="#ccc"),
         grid_ygap=1,
+        # nogrid
+        yaxis=dict(
+            title=f"Promedio de {names[kind].lower()} reportados", showgrid=False
+        ),
+        xaxis=dict(title="Hora del día", showgrid=False),
+        barmode="group",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        margin=dict(t=120, b=20, l=100, r=30),
     )
 
     map_fig.update_layout(
-        paper_bgcolor="#333",
-        plot_bgcolor="#333",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
         hoverlabel_font=dict(color="#fff"),
         showlegend=False,
         title=dict(
-            text=f"{names[kind]} de tráfico",
+            text=f"Reportes de {names[kind].lower()}",
             font=dict(
                 color="#ccc",
                 weight=600,
@@ -207,4 +321,4 @@ def update_graphs(kind, start_date, end_date):
             legend_font=dict(color="#ccc"),
         )
 
-    return map_fig, hourly_fig
+    return map_fig, hourly_fig, table_data

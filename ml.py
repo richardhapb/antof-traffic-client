@@ -97,7 +97,6 @@ initial_params = {
     "hour": 7,
     "week_day": 3,
     "group": 76,
-    "street": "Av. Pedro Aguirre Cerda",
 }
 
 x_vars = ["group", "week_day", "hour", "day_type"]
