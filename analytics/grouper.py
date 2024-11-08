@@ -11,6 +11,8 @@ class Grouper:
         "ACCIDENT": "Accidentes",
         "JAM": "Congestión",
         "HAZARD": "Peligros",
+        "ROAD_CLOSED": "Cierres de vías",
+        "ALL": "Eventos",
     }
 
     def __init__(self):
@@ -19,7 +21,7 @@ class Grouper:
         self.type = None
         pass
 
-    def group(self, data: gpd.GeoDataFrame, grid_dim: tuple, concept):
+    def group(self, data: gpd.GeoDataFrame, grid_dim: tuple, concepts: list):
         grouped = data.copy()
         grid = utils.grid(data, *grid_dim)
         self.grid = grid
@@ -38,7 +40,11 @@ class Grouper:
         )
 
         self.data = grouped
-        self.type = concept
+
+        if len(concepts) == 1:
+            self.type = concepts[0]
+        else:
+            self.type = "ALL"
 
         return self
 

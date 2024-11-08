@@ -5,7 +5,7 @@ import pandas as pd
 from xgboost import XGBClassifier
 
 
-def predict_route(ml, initial_params, routes):
+def predict_route(ml, initial_params, routes, **kwargs):
     print("\nHASHED DATA\n" if ml.hash else "\nONE HOT ENCODED DATA\n")
 
     print("Cross validation\n")
@@ -15,14 +15,30 @@ def predict_route(ml, initial_params, routes):
     print(ml.metrics())
     print("\n—————————————————————————————————————————————————————————————————\n")
 
+    obj = pd.DataFrame(columns=ml.x_train.columns)
+    obj.loc[0] = 0
+
+    if ml.hash:
+        for k, v in kwargs.items():
+            result = ml.encode([str(v)], k)
+            for r in range(len(result[0])):
+                obj[k + "_" + str(r)] = 0
+
+            obj[k + "_" + str(int(result[0][result[0].argmax()]))] = 1
+    elif ml.ohe:
+        for k, v in kwargs.items():
+            for c in [e for e in ml.x_train.columns if k in e]:
+                obj[c] = 0
+
+            result = ml.encode([str(v)], k)
+            obj[k + "_" + str(v)] = 1
+
+    probs = []
     for route in routes:
-        probs = []
         print(" -> ".join(route) + "\n")
-        obj = pd.DataFrame(columns=ml.x_train.columns)
-        obj.loc[0] = 0
 
         for column in ml.x_train.columns:
-            if "street" not in column:
+            if column.split("_")[0] not in " ".join(ml.categories):
                 obj[column] = initial_params[column]
 
         if ml.hash:
@@ -31,7 +47,7 @@ def predict_route(ml, initial_params, routes):
                 obj["street_" + str(int(result[0][result[0].argmax()]))] = 1
                 probs.append(ml.predict_proba(obj)[0])
                 obj["street_" + str(int(result[0][result[0].argmax()]))] = 0
-        else:
+        elif ml.ohe:
             streets = ml.onehot["street"].get_feature_names_out()
 
             for street in route:
@@ -40,19 +56,31 @@ def predict_route(ml, initial_params, routes):
                 probs.append(ml.predict_proba(obj)[0])
                 obj[streets[int(result[0][result[0].argmax()])]] = 0
 
+        probs.append(ml.predict_proba(obj)[0])
+
         print("\nProbabilities\n")
         print(" -> ".join([str(round(p[1], 3)) for p in probs]))
         print("\nAverage probability: ", round((sum(probs) / len(probs))[1], 3))
         print("\n—————————————————————————————————————————————————————————————————\n")
 
+    if not routes:
+        print("\nProbabilities\n")
+        probs = ml.predict_proba(obj)
+        print(probs[0])
+
+    return probs
+
+
+CONCEPTS = ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"]
 
 alerts = pd.DataFrame(utils.load_data("alerts").data)
-alerts = utils.extract_event(alerts, ["ACCIDENT"]).drop("uuid", axis=1)
+alerts = utils.update_timezone(alerts, "America/Santiago")
+alerts = utils.extract_event(alerts, CONCEPTS, ["type"]).drop("uuid", axis=1)
 
 alerts = alerts.dropna(subset=["street"])
 
 g = Grouper()
-g.group(alerts, (10, 20), "ACCIDENT")
+g.group(alerts, (10, 20), CONCEPTS)
 
 xgb = XGBClassifier(
     learning_rate=0.03,
@@ -95,55 +123,28 @@ routes = [route1, route2, route1_return, route2_return]
 initial_params = {
     "day_type": 1,
     "hour": 7,
-    "week_day": 3,
-    "group": 76,
 }
 
-x_vars = ["group", "week_day", "hour", "day_type"]
-categories = []
+x_vars = ["group", "hour", "day_type", "type"]
+categories = ["type", "group"]
 
 ml_ohe = ML(g.data, xgb, column_y="happen", ohe=True, categories=categories)
 ml_ohe.clean(x_vars, "happen")
 ml_ohe.train()
 
-ml_hash = ML(g.data, xgb, column_y="happen", hash=True, categories=categories)
-ml_hash.clean(x_vars, "happen")
-ml_hash.train()
-
-# predict_route(ml_ohe, initial_params, routes)
-# predict_route(ml_hash, initial_params, routes)
+# ml_hash = ML(g.data, xgb, column_y="happen", hash=True, categories=categories)
+# ml_hash.clean(x_vars, "happen")
+# ml_hash.train()
 
 
-obj = pd.DataFrame(columns=ml_ohe.x_train.columns)
-obj.loc[0] = 0
+print("\nINITIAL PARAMS:\n")
+for i in initial_params.items():
+    print(i)
 
-# for column in ml_ohe.x_train.columns:
-#     if "street" not in column:
-#         obj[column] = initial_params[column]
+print("\n—————————————————————————————————————————————————————————————————\n")
 
-# streets = ml_ohe.onehot["street"].get_feature_names_out()
-# for column in streets:
-#     obj[column] = 0
+probs = predict_route(ml_ohe, initial_params, [], type="JAM", group=60)
 
-# for street in ml_ohe.data["street"].unique():
-#     result = ml_ohe.encode([street], "street")
-#     if "street_" + street in streets:
-#         obj[streets[int(result[0][result[0].argmax()])]] = 1
-
-fig = ml_ohe.plot_by_quad(g, obj)
-fig.savefig("graph/accidents_by_quad_ohe.png")
-
-
-obj = pd.DataFrame(columns=ml_hash.x_train.columns)
-obj.loc[0] = 0
-
-# for column in ml_hash.x_train.columns:
-#     if "street" not in column:
-#         obj[column] = initial_params[column]
-
-# result = ml_hash.encode([initial_params["street"]], "street")
-
-# obj["street_" + str(int(result[0][result[0].argmax()]))] = 1
-
-fig = ml_hash.plot_by_quad(g, obj)
-fig.savefig("graph/accidents_by_quad_hash.png")
+g.data.isna()
+# ml_ohe.log_model_params(**initial_params, probabilities=probs)
+# predict_route(ml_hash, initial_params, [], type="JAM", group=60)

@@ -9,6 +9,23 @@ from analytics.grouper import Grouper
 from utils import utils
 import matplotlib.pyplot as plt
 import contextily as cx
+import mlflow
+from mlflow.models import infer_signature
+from functools import wraps
+from sklearn import base
+
+mlflow.set_tracking_uri(uri="http://localhost:8080")
+mlflow.set_experiment("AntofTraffic")
+
+
+def mlflow_logger(func):
+    @wraps(func)
+    def mlflow_wrapper(self, *args, **kwargs):
+        with mlflow.start_run():
+            result = func(self, *args, **kwargs)
+            return result
+
+    return mlflow_wrapper
 
 
 class ML:
@@ -30,25 +47,58 @@ class ML:
         self.y_test = None
         self.onehot = None
 
+        probs_type = {
+            "ACCIDENT": 1 - data["type"].value_counts(normalize=True)["ACCIDENT"],
+            "JAM": 1 - data["type"].value_counts(normalize=True)["JAM"],
+            "HAZARD": 1 - data["type"].value_counts(normalize=True)["HAZARD"],
+            "ROAD_CLOSED": 1 - data["type"].value_counts(normalize=True)["ROAD_CLOSED"],
+        }
+
+        t = sum(probs_type.values())
+        for k, v in probs_type.items():
+            probs_type[k] = v / t
+
+        probs_day_type = {"s": 2 / 7, "f": 5 / 7}
+
         self.simulated_data = {
-            "street": self.data["street"],
-            "day_type": np.random.choice(["s", "f"], len(self.data)),
-            "type": np.random.choice(self.data.type.unique(), len(self.data)),
+            "street": self.data["street"] if "street" in self.data.columns else None,
+            "day_type": np.random.choice(
+                list(probs_day_type.keys()),
+                len(self.data),
+                p=list(probs_day_type.values()),
+            )
+            if "day_type" in self.data.columns
+            else None,
+            "type": np.random.choice(
+                list(probs_type.keys()), len(self.data), p=list(probs_type.values())
+            )
+            if "type" in self.data.columns
+            else None,
             "group": np.random.randint(
                 self.data["group"].min(), self.data["group"].max(), len(self.data)
-            ),
+            )
+            if "group" in data.columns
+            else None,
             "day": np.random.randint(
                 self.data["day"].min(), self.data["day"].max() + 1, len(self.data)
-            ),
+            )
+            if "day" in self.data.columns
+            else None,
             "week_day": np.random.randint(
                 self.data["week_day"].min(), self.data["week_day"].max(), len(self.data)
-            ),
+            )
+            if "week_day" in self.data.columns
+            else None,
             "hour": np.random.randint(
                 self.data["hour"].min(), self.data["hour"].max(), len(self.data)
-            ),
+            )
+            if "hour" in self.data.columns
+            else None,
             "minute": np.random.randint(
                 self.data["minute"].min(), self.data["minute"].max(), len(self.data)
-            ),
+            )
+            if "minute" in self.data.columns
+            else None,
             "happen": [0] * len(self.data),
         }
 
@@ -140,7 +190,9 @@ class ML:
         x = self.data_labeled.drop(self.column_y, axis=1)
         y = self.data_labeled[self.column_y]
 
-        return cross_val_score(self.model, x, y, cv=10)
+        scores = cross_val_score(self.model, x, y, cv=10)
+
+        return scores
 
     def predict(self, data):
         if self.data_labeled is None:
@@ -162,12 +214,15 @@ class ML:
 
     def metrics(self):
         y_pred = self.model.predict(self.x_test)
-        return {
+
+        metrics = {
             "accuracy": accuracy_score(self.y_test, y_pred),
             "f1": f1_score(self.y_test, y_pred),
             "precision": precision_score(self.y_test, y_pred),
             "recall": recall_score(self.y_test, y_pred),
         }
+
+        return metrics
 
     def encode(self, data, category):
         if self.data_labeled is None:
@@ -225,3 +280,30 @@ class ML:
         fig.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
 
         return fig
+
+    @mlflow_logger
+    def log_model_params(self, **params):
+        signature = infer_signature(self.x_train, self.model.predict(self.x_train))
+
+        if isinstance(self.model, base.BaseEstimator):
+            mlflow.sklearn.log_model(
+                sk_model=self.model,
+                artifact_path="waze_data",
+                signature=signature,
+                input_example=self.x_train,
+                registered_model_name=type(self.model).__name__,
+            )
+
+        model_params = self.model.get_params()
+        mlflow.log_params({k: v for k, v in model_params.items() if v is not None})
+
+        scores = self.cross_validation()
+
+        for idx, score in enumerate(scores):
+            mlflow.log_metric(f"cv_score_fold_{idx}", score)
+
+        metrics = self.metrics()
+
+        mlflow.log_metrics(metrics)
+
+        mlflow.log_params(params)

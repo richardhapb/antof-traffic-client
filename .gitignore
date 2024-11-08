@@ -13,3 +13,5 @@ t.py
 exceptions.txt
 config.py
 v.py
+mlartifacts
+mlruns
