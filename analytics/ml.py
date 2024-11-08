@@ -278,8 +278,8 @@ class ML:
 
         cats = ["positive", "negative"]
         for c in range(len(cm)):
-            metrics.update({"cm_true_" + cats[c]: cm[c][0]})
-            metrics.update({"cm_false_" + cats[c]: cm[c][1]})
+            metrics.update({"cm_true_" + cats[c]: cm[c][0 + c]})
+            metrics.update({"cm_false_" + cats[c]: cm[c][1 - c]})
 
         mlflow.log_metrics(metrics)
         mlflow.log_params(params)
