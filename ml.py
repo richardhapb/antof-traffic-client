@@ -8,13 +8,6 @@ from xgboost import XGBClassifier
 def predict_route(ml, initial_params, routes, **kwargs):
     print("\nHASHED DATA\n" if ml.hash else "\nONE HOT ENCODED DATA\n")
 
-    print("Cross validation\n")
-    print(ml.cross_validation())
-    print("\n—————————————————————————————————————————————————————————————————\n")
-    print("Metrics\n")
-    print(ml.metrics())
-    print("\n—————————————————————————————————————————————————————————————————\n")
-
     obj = pd.DataFrame(columns=ml.x_train.columns)
     obj.loc[0] = 0
 
@@ -76,7 +69,7 @@ CONCEPTS = ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"]
 alerts = pd.DataFrame(utils.load_data("alerts").data)
 alerts = utils.update_timezone(alerts, "America/Santiago")
 
-GEODATA = "street"
+GEODATA = "group"
 
 alerts = utils.extract_event(
     alerts, CONCEPTS, ["type", "geometry"] + (["street"] if GEODATA == "street" else [])
@@ -143,8 +136,6 @@ ml.generate_neg_simulated_data(extra_cols=["type", GEODATA], geodata=GEODATA)
 ml.clean(x_vars, "happen")
 ml.prepare_train()
 
-print(ml.oe["street"].get_feature_names_out())
-
 geodata_element = 60
 
 initial_params = {"day_type": 1, "hour": 7, GEODATA: geodata_element}
@@ -155,7 +146,7 @@ for i in initial_params.items():
 
 print("\n—————————————————————————————————————————————————————————————————\n")
 
-type_event = "ACCIDENT"
+type_event = "JAM"
 
 probs = predict_route(ml, initial_params, [], type=type_event)
 
@@ -175,7 +166,7 @@ ml.log_model_params(
     ordinal_encoder=ORDINAL_ENCODER,
     sample_no_events=ml.no_events.shape,
     confusion_matrix=cm,
-    each_x_min=60 * 12,
+    each_x_min=60 * 24,
     geodata=GEODATA,
     geodata_element=geodata_element,
 )
@@ -196,7 +187,7 @@ ml.log_model_params(
     ordinal_encoder=ORDINAL_ENCODER,
     sample_no_events=ml.no_events.shape,
     confusion_matrix=cm,
-    each_x_min=60 * 12,
+    each_x_min=60 * 24,
     geodata=GEODATA,
     geodata_element=geodata_element,
 )

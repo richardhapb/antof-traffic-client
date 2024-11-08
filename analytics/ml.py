@@ -270,14 +270,18 @@ class ML:
         mlflow.log_params({k: v for k, v in model_params.items() if v is not None})
 
         scores = self.cross_validation()
+        cm = self.confusion_matrix()
 
         for idx, score in enumerate(scores):
             mlflow.log_metric(f"cv_score_fold_{idx}", score)
-
         metrics = self.metrics()
 
-        mlflow.log_metrics(metrics)
+        cats = ["positive", "negative"]
+        for c in range(len(cm)):
+            metrics.update({"cm_true_" + cats[c]: cm[c][0]})
+            metrics.update({"cm_false_" + cats[c]: cm[c][1]})
 
+        mlflow.log_metrics(metrics)
         mlflow.log_params(params)
 
     def prepare_train(self):

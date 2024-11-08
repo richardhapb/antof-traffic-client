@@ -8,6 +8,10 @@ import matplotlib.pyplot as plt
 from scipy.spatial import cKDTree
 import requests
 import time
+import warnings
+
+# Deshabilitar SettingWithCopyWarning
+warnings.simplefilter(action="ignore", category=pd.errors.SettingWithCopyWarning)
 
 tz = "America/Santiago"
 
@@ -505,7 +509,7 @@ def generate_no_events(events: gpd.GeoDataFrame | pd.DataFrame, geodata: str = "
     if not isinstance(events2["inicio"].iloc[0], np.int64):
         events2["inicio"] = np.int64(pd.to_numeric(events2["inicio"]) / 1_000_000)
 
-    step = np.int64(60_000 * 60 * 12)
+    step = np.int64(60_000 * 60 * 24)
 
     min_tms = events2["inicio"].min()
     max_tms = events2["inicio"].max()
@@ -528,16 +532,16 @@ def generate_no_events(events: gpd.GeoDataFrame | pd.DataFrame, geodata: str = "
         combinations, event_combinations, on=["interval", geodata, "type"], how="left"
     )
 
-    merged.loc[:, "happen"] = merged["happen"].fillna(0).astype(int)
+    merged["happen"] = merged["happen"].fillna(0).astype(int)
 
-    merged.loc[:, "inicio"] = merged["interval"]
+    merged["inicio"] = merged["interval"]
 
     result = merged[["inicio", geodata, "type", "happen"]]
 
     if not isinstance(events["inicio"].iloc[0], np.int64):
-        result.loc[:, "inicio"] = pd.to_datetime(result["inicio"] * 1_000_000)
+        result["inicio"] = pd.to_datetime((result["inicio"] * 1_000_000), unit="ns")
     else:
-        result.loc[:, "inicio"] = result["inicio"]
+        result["inicio"] = result["inicio"]
 
     print(f"Tiempo de ejecución: {time.time() - init} segundos\n")
     return result
