@@ -1,7 +1,12 @@
-import numpy as np
 from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder
+from sklearn.metrics import (
+    accuracy_score,
+    f1_score,
+    precision_score,
+    recall_score,
+    confusion_matrix,
+)
 from sklearn.feature_extraction import FeatureHasher
 from sklearn.base import clone
 import pandas as pd
@@ -13,6 +18,9 @@ import mlflow
 from mlflow.models import infer_signature
 from functools import wraps
 from sklearn import base
+
+CONCEPTS = ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"]
+
 
 mlflow.set_tracking_uri(uri="http://localhost:8080")
 mlflow.set_experiment("AntofTraffic")
@@ -46,81 +54,37 @@ class ML:
         self.y_train = None
         self.y_test = None
         self.onehot = None
+        self.oe = None
+        self.no_events = None
 
-        probs_type = {
-            "ACCIDENT": 1 - data["type"].value_counts(normalize=True)["ACCIDENT"],
-            "JAM": 1 - data["type"].value_counts(normalize=True)["JAM"],
-            "HAZARD": 1 - data["type"].value_counts(normalize=True)["HAZARD"],
-            "ROAD_CLOSED": 1 - data["type"].value_counts(normalize=True)["ROAD_CLOSED"],
-        }
+        if self.data is not None:
+            self.data[column_y] = 1
 
-        t = sum(probs_type.values())
-        for k, v in probs_type.items():
-            probs_type[k] = v / t
-
-        probs_day_type = {"s": 2 / 7, "f": 5 / 7}
-
-        self.simulated_data = {
-            "street": self.data["street"] if "street" in self.data.columns else None,
-            "day_type": np.random.choice(
-                list(probs_day_type.keys()),
-                len(self.data),
-                p=list(probs_day_type.values()),
-            )
-            if "day_type" in self.data.columns
-            else None,
-            "type": np.random.choice(
-                list(probs_type.keys()), len(self.data), p=list(probs_type.values())
-            )
-            if "type" in self.data.columns
-            else None,
-            "group": np.random.randint(
-                self.data["group"].min(), self.data["group"].max(), len(self.data)
-            )
-            if "group" in data.columns
-            else None,
-            "day": np.random.randint(
-                self.data["day"].min(), self.data["day"].max() + 1, len(self.data)
-            )
-            if "day" in self.data.columns
-            else None,
-            "week_day": np.random.randint(
-                self.data["week_day"].min(), self.data["week_day"].max(), len(self.data)
-            )
-            if "week_day" in self.data.columns
-            else None,
-            "hour": np.random.randint(
-                self.data["hour"].min(), self.data["hour"].max(), len(self.data)
-            )
-            if "hour" in self.data.columns
-            else None,
-            "minute": np.random.randint(
-                self.data["minute"].min(), self.data["minute"].max(), len(self.data)
-            )
-            if "minute" in self.data.columns
-            else None,
-            "happen": [0] * len(self.data),
-        }
+    def generate_neg_simulated_data(self, extra_cols: list, geodata: str = "group"):
+        no_events = utils.generate_no_events(self.data, geodata=geodata)
+        self.no_events = pd.DataFrame(no_events)
+        self.no_events = utils.extract_event(
+            self.no_events, CONCEPTS, extra_cols + ["happen"]
+        )
 
     def clean(self, columns_x, column_y):
         self.columns_x = columns_x
         self.column_y = column_y
 
         # Clean the data
-        for column in self.data.columns:
-            if column not in self.columns_x and column != self.column_y:
-                self.data = self.data.drop(column, axis=1)
+        self.data = self.data[columns_x + [column_y]]
+        if self.no_events is not None:
+            self.no_events = self.no_events[columns_x + [column_y]]
 
-    def train(self, no_features=None):
-        no_events = pd.DataFrame()
-        for column in self.columns_x:
-            no_events[column] = self.simulated_data[column]
+    def prepare(self, no_features=None):
+        if self.data is None:
+            raise ValueError("Not have data for model generation")
 
-        if self.column_y == "happen":
-            self.data["happen"] = 1
-            no_events["happen"] = 0
-
-        total_events = pd.concat([self.data, no_events], axis=0)
+        total_events = (
+            pd.concat([self.data, self.no_events])
+            if self.no_events is not None
+            else self.data.copy()
+        )
 
         if "day_type" in total_events.columns:
             total_events["day_type"] = total_events["day_type"].map({"f": 0, "s": 1})
@@ -174,6 +138,7 @@ class ML:
         else:
             self.data_labeled = total_events.copy()
 
+    def train(self):
         x = self.data_labeled.drop(self.column_y, axis=1)
         y = self.data_labeled[self.column_y]
 
@@ -223,6 +188,13 @@ class ML:
         }
 
         return metrics
+
+    def confusion_matrix(self):
+        return confusion_matrix(
+            self.y_test,
+            self.model.predict(self.x_test),
+            labels=self.y_train.unique(),
+        )
 
     def encode(self, data, category):
         if self.data_labeled is None:
@@ -290,7 +262,7 @@ class ML:
                 sk_model=self.model,
                 artifact_path="waze_data",
                 signature=signature,
-                input_example=self.x_train,
+                input_example=self.x_train.head(),
                 registered_model_name=type(self.model).__name__,
             )
 
@@ -307,3 +279,17 @@ class ML:
         mlflow.log_metrics(metrics)
 
         mlflow.log_params(params)
+
+    def prepare_train(self):
+        self.prepare()
+        self.train()
+
+    def ordinal_encoder(self, categories: list):
+        if self.data is None:
+            raise ValueError("Data is not loaded")
+        self.oe = {}
+        for cat in categories:
+            if cat not in self.data.columns:
+                raise ValueError(cat + " is not in data")
+            self.oe[cat] = OrdinalEncoder()
+            self.data[cat] = self.oe[cat].fit_transform(self.data[[cat]])

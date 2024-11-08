@@ -21,7 +21,12 @@ class Grouper:
         self.type = None
         pass
 
-    def group(self, data: gpd.GeoDataFrame, grid_dim: tuple, concepts: list):
+    def group(
+        self,
+        data: gpd.GeoDataFrame | pd.DataFrame,
+        grid_dim: tuple,
+        concepts: list = ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"],
+    ):
         grouped = data.copy()
         grid = utils.grid(data, *grid_dim)
         self.grid = grid

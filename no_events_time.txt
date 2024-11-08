@@ -1,0 +1,18 @@
+Comienzo de ejecución generate_no_events
+Tiempo de ejecución: 30.785223245620728 segundos
+
+(17257332, 4)
+
+—————————————————————————————————————————————————————————————————
+
+Comienzo de ejecución generate_no_events
+Tiempo de ejecución: 18.69149088859558 segundos
+
+(23833640, 5)
+
+—————————————————————————————————————————————————————————————————
+
+Comienzo de ejecución generate_no_events
+Tiempo de ejecución: 3.4078261852264404 segundos
+
+(2736802, 4)

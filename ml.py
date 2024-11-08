@@ -75,12 +75,16 @@ CONCEPTS = ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"]
 
 alerts = pd.DataFrame(utils.load_data("alerts").data)
 alerts = utils.update_timezone(alerts, "America/Santiago")
-alerts = utils.extract_event(alerts, CONCEPTS, ["type"]).drop("uuid", axis=1)
 
-alerts = alerts.dropna(subset=["street"])
+GEODATA = "street"
+
+alerts = utils.extract_event(
+    alerts, CONCEPTS, ["type", "geometry"] + (["street"] if GEODATA == "street" else [])
+)
 
 g = Grouper()
-g.group(alerts, (10, 20), CONCEPTS)
+if GEODATA == "group":
+    g.group(alerts, (10, 20), CONCEPTS)
 
 xgb = XGBClassifier(
     learning_rate=0.03,
@@ -120,22 +124,30 @@ route2_return = [
 
 routes = [route1, route2, route1_return, route2_return]
 
-initial_params = {
-    "day_type": 1,
-    "hour": 7,
-}
 
-x_vars = ["group", "hour", "day_type", "type"]
-categories = ["type", "group"]
+x_vars = [GEODATA, "hour", "day_type", "type"]
+categories = ["type"]
 
-ml_ohe = ML(g.data, xgb, column_y="happen", ohe=True, categories=categories)
-ml_ohe.clean(x_vars, "happen")
-ml_ohe.train()
+ORDINAL_ENCODER = True
 
-# ml_hash = ML(g.data, xgb, column_y="happen", hash=True, categories=categories)
-# ml_hash.clean(x_vars, "happen")
-# ml_hash.train()
+ml = ML(
+    g.data if GEODATA == "group" else alerts,
+    xgb,
+    column_y="happen",
+    ohe=True,
+    categories=categories,
+)
+if ORDINAL_ENCODER:
+    ml.ordinal_encoder(categories=[GEODATA])
+ml.generate_neg_simulated_data(extra_cols=["type", GEODATA], geodata=GEODATA)
+ml.clean(x_vars, "happen")
+ml.prepare_train()
 
+print(ml.oe["street"].get_feature_names_out())
+
+geodata_element = 60
+
+initial_params = {"day_type": 1, "hour": 7, GEODATA: geodata_element}
 
 print("\nINITIAL PARAMS:\n")
 for i in initial_params.items():
@@ -143,8 +155,48 @@ for i in initial_params.items():
 
 print("\n—————————————————————————————————————————————————————————————————\n")
 
-probs = predict_route(ml_ohe, initial_params, [], type="JAM", group=60)
+type_event = "ACCIDENT"
 
-g.data.isna()
-# ml_ohe.log_model_params(**initial_params, probabilities=probs)
-# predict_route(ml_hash, initial_params, [], type="JAM", group=60)
+probs = predict_route(ml, initial_params, [], type=type_event)
+
+print("\n—————————————————————————————————————————————————————————————————\n")
+
+cm = ml.confusion_matrix()
+
+print(cm)
+
+ml.log_model_params(
+    **initial_params,
+    probabilities=probs,
+    type_event=type_event,
+    hash_encode=ml.hash,
+    ohe=ml.ohe,
+    sample=ml.data.shape,
+    ordinal_encoder=ORDINAL_ENCODER,
+    sample_no_events=ml.no_events.shape,
+    confusion_matrix=cm,
+    each_x_min=60 * 12,
+    geodata=GEODATA,
+    geodata_element=geodata_element,
+)
+
+ml.ohe = False
+ml.hash = True
+ml.prepare_train()
+
+probs = predict_route(ml, initial_params, [], type="JAM")
+
+ml.log_model_params(
+    **initial_params,
+    probabilities=probs,
+    type_event=type_event,
+    hash_encode=ml.hash,
+    ohe=ml.ohe,
+    sample=ml.data.shape,
+    ordinal_encoder=ORDINAL_ENCODER,
+    sample_no_events=ml.no_events.shape,
+    confusion_matrix=cm,
+    each_x_min=60 * 12,
+    geodata=GEODATA,
+    geodata_element=geodata_element,
+)

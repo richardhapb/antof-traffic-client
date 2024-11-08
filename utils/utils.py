@@ -7,6 +7,9 @@ import contextily as cx
 import matplotlib.pyplot as plt
 from scipy.spatial import cKDTree
 import requests
+import time
+
+tz = "America/Santiago"
 
 PERIM_X = [-70.42034224747098, -70.36743722434367]
 PERIM_Y = [-23.721724880116387, -23.511242421131792]
@@ -46,7 +49,7 @@ def load_data(
     return events
 
 
-def update_timezone(data: pd.DataFrame, tz: str = "America/Santiago"):
+def update_timezone(data: pd.DataFrame, tz: str = tz):
     """
     Actualiza el timezone de los datos de eventos
     """
@@ -174,16 +177,25 @@ def extract_event(data: gpd.GeoDataFrame, concept: list, extra_col: list = []):
 
     dat = data.copy()
 
-    if "geometry" not in dat.columns:
+    if "geometry" not in dat.columns and "geometry" in extra_col:
         dat = separate_coords(dat)
 
-    dat = dat[dat["type"].isin(concept)][
-        ["uuid", "street", "pubMillis", "endreport", "x", "y", "geometry"] + extra_col
-    ]
+    millis = (
+        ["inicio", "fin"]
+        if "inicio" in list(data.columns)
+        else ["pubMillis", "endreport"]
+    )
+    try:
+        dat = dat[dat["type"].isin(concept)][millis + extra_col]
+        if "pubMillis" in millis:
+            dat = dat.rename(columns={"pubMillis": "inicio", "endreport": "fin"})
+    except KeyError:
+        dat = dat[dat["type"].isin(concept)][[millis[0]] + extra_col]
+        if "pubMillis" in millis:
+            dat = dat.rename(columns={"pubMillis": "inicio"})
 
     feriados = get_holidays()
 
-    dat = dat.rename(columns={"pubMillis": "inicio", "endreport": "fin"})
     dat["hour"] = dat["inicio"].dt.hour
     dat["minute"] = dat["inicio"].dt.minute
     dat["day"] = dat["inicio"].dt.day
@@ -232,8 +244,7 @@ def hourly_group(data: pd.DataFrame):
 
     # df = calculate_hours(df)
 
-    f = df[df["day_type"] == "f"].shape[0]
-    s = df[df["day_type"] == "s"].shape[0]
+    days = (data["inicio"].max() - data["inicio"].min()).days
 
     # Agrupar por hora y tipo de día
     hourly_reports = (
@@ -259,8 +270,8 @@ def hourly_group(data: pd.DataFrame):
         hourly_reports["f"] = hourly_reports["f"].astype(float)
 
     # Calcular la tasa por tipo de día
-    hourly_reports["f"] = hourly_reports["f"] / f if f > 0 else 0
-    hourly_reports["s"] = hourly_reports["s"] / s if s > 0 else 0
+    hourly_reports["f"] = hourly_reports["f"] / days
+    hourly_reports["s"] = hourly_reports["s"] / days
 
     return hourly_reports
 
@@ -394,7 +405,7 @@ def get_holidays():
     return feriados
 
 
-def grid(geometry: gpd.GeoDataFrame, n_x_div: int, n_y_div: int):
+def grid(geometry: gpd.GeoDataFrame | pd.DataFrame, n_x_div: int, n_y_div: int):
     bounds_x = np.array(
         np.linspace(
             geometry.to_crs(epsg=3857).geometry.x.min(),
@@ -482,3 +493,51 @@ def get_center_points(grid: tuple):
         center_points_y[c][:] = center_points_y[c][0]
 
     return center_points_x, center_points_y
+
+
+def generate_no_events(events: gpd.GeoDataFrame | pd.DataFrame, geodata: str = "group"):
+    print("\n—————————————————————————————————————————————————————————————————\n")
+    print("Comienzo de ejecución generate_no_events")
+    init = time.time()
+    events2 = events.copy()
+    events2["happen"] = 1
+
+    if not isinstance(events2["inicio"].iloc[0], np.int64):
+        events2["inicio"] = np.int64(pd.to_numeric(events2["inicio"]) / 1_000_000)
+
+    step = np.int64(60_000 * 60 * 12)
+
+    min_tms = events2["inicio"].min()
+    max_tms = events2["inicio"].max()
+
+    intervals = np.arange(min_tms, max_tms + step, step)
+
+    events2["interval"] = ((events2["inicio"]) // step) * step
+
+    allgroups = events2[geodata].unique()
+    alltypes = events2["type"].unique()
+
+    combinations = pd.MultiIndex.from_product(
+        [intervals, allgroups, alltypes], names=["interval", geodata, "type"]
+    ).to_frame(index=False)
+
+    event_combinations = events2[["interval", geodata, "type"]]
+    event_combinations["happen"] = 1
+
+    merged = pd.merge(
+        combinations, event_combinations, on=["interval", geodata, "type"], how="left"
+    )
+
+    merged.loc[:, "happen"] = merged["happen"].fillna(0).astype(int)
+
+    merged.loc[:, "inicio"] = merged["interval"]
+
+    result = merged[["inicio", geodata, "type", "happen"]]
+
+    if not isinstance(events["inicio"].iloc[0], np.int64):
+        result.loc[:, "inicio"] = pd.to_datetime(result["inicio"] * 1_000_000)
+    else:
+        result.loc[:, "inicio"] = result["inicio"]
+
+    print(f"Tiempo de ejecución: {time.time() - init} segundos\n")
+    return result
