@@ -190,13 +190,13 @@ def extract_event(data: gpd.GeoDataFrame, concept: list, extra_col: list = []):
         else ["pubMillis", "endreport"]
     )
     try:
-        dat = dat[dat["type"].isin(concept)][millis + extra_col]
         if "pubMillis" in millis:
             dat = dat.rename(columns={"pubMillis": "inicio", "endreport": "fin"})
     except KeyError:
-        dat = dat[dat["type"].isin(concept)][[millis[0]] + extra_col]
         if "pubMillis" in millis:
             dat = dat.rename(columns={"pubMillis": "inicio"})
+
+    millis = ["inicio", "fin"]
 
     feriados = get_holidays()
 
@@ -209,6 +209,11 @@ def extract_event(data: gpd.GeoDataFrame, concept: list, extra_col: list = []):
         if (x.weekday() >= 5) | (x.strftime("%Y-%m-%d") in feriados)
         else "s"
     )
+    try:
+        dat = dat[dat["type"].isin(concept)][millis + extra_col]
+    except KeyError:
+        dat = dat[dat["type"].isin(concept)][[millis[0]] + extra_col]
+
     return dat
 
 
@@ -509,7 +514,7 @@ def generate_no_events(events: gpd.GeoDataFrame | pd.DataFrame, geodata: str = "
     if not isinstance(events2["inicio"].iloc[0], np.int64):
         events2["inicio"] = np.int64(pd.to_numeric(events2["inicio"]) / 1_000_000)
 
-    step = np.int64(60_000 * 60 * 24)
+    step = np.int64(60_000 * 5)
 
     min_tms = events2["inicio"].min()
     max_tms = events2["inicio"].max()
@@ -532,6 +537,7 @@ def generate_no_events(events: gpd.GeoDataFrame | pd.DataFrame, geodata: str = "
         combinations, event_combinations, on=["interval", geodata, "type"], how="left"
     )
 
+    merged = merged.sample(events2.shape[0], replace=False, random_state=42)
     merged["happen"] = merged["happen"].fillna(0).astype(int)
 
     merged["inicio"] = merged["interval"]

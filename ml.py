@@ -3,6 +3,8 @@ from utils import utils
 from analytics.grouper import Grouper
 import pandas as pd
 from xgboost import XGBClassifier
+from sklearn.ensemble import RandomForestClassifier
+import numpy as np
 
 
 def predict_route(ml, initial_params, routes, **kwargs):
@@ -11,23 +13,47 @@ def predict_route(ml, initial_params, routes, **kwargs):
     obj = pd.DataFrame(columns=ml.x_train.columns)
     obj.loc[0] = 0
 
+    for k, v in initial_params.items():
+        obj[k] = v
+
     if ml.hash:
         for k, v in kwargs.items():
             result = ml.encode([str(v)], k)
             for r in range(len(result[0])):
                 obj[k + "_" + str(r)] = 0
+                if k in obj:
+                    del obj[k]
 
             obj[k + "_" + str(int(result[0][result[0].argmax()]))] = 1
     elif ml.ohe:
         for k, v in kwargs.items():
             for c in [e for e in ml.x_train.columns if k in e]:
                 obj[c] = 0
+                if k in obj:
+                    del obj[k]
 
             result = ml.encode([str(v)], k)
             obj[k + "_" + str(v)] = 1
 
-    probs = []
-    for route in routes:
+    response = []
+    if GEODATA == "group":
+        for route in routes:
+            probs = []
+            obj2 = pd.concat([obj] * len(route), ignore_index=True)
+            obj2["group"] = route
+            probs.append(ml.predict_proba(obj2))
+            response.append(probs)
+            print(
+                "\n—————————————————————————————————————————————————————————————————\n"
+            )
+
+            print(f"Route: {route}")
+            print("\nProbabilities:\n")
+            print(probs)
+            print(f"\nAverage probability: {np.average(np.array(probs)[0][:, 1])}\n")
+
+    for route in routes if len(routes) > 0 and isinstance(routes[0][0], str) else []:
+        probs = []
         print(" -> ".join(route) + "\n")
 
         for column in ml.x_train.columns:
@@ -38,7 +64,6 @@ def predict_route(ml, initial_params, routes, **kwargs):
             for street in route:
                 result = ml.encode([street], "street")
                 obj["street_" + str(int(result[0][result[0].argmax()]))] = 1
-                probs.append(ml.predict_proba(obj)[0])
                 obj["street_" + str(int(result[0][result[0].argmax()]))] = 0
         elif ml.ohe:
             streets = ml.onehot["street"].get_feature_names_out()
@@ -46,10 +71,10 @@ def predict_route(ml, initial_params, routes, **kwargs):
             for street in route:
                 result = ml.encode([street], "street")
                 obj[streets[int(result[0][result[0].argmax()])]] = 1
-                probs.append(ml.predict_proba(obj)[0])
                 obj[streets[int(result[0][result[0].argmax()])]] = 0
 
         probs.append(ml.predict_proba(obj)[0])
+        response.append(probs)
 
         print("\nProbabilities\n")
         print(" -> ".join([str(round(p[1], 3)) for p in probs]))
@@ -58,10 +83,10 @@ def predict_route(ml, initial_params, routes, **kwargs):
 
     if not routes:
         print("\nProbabilities\n")
-        probs = ml.predict_proba(obj)
-        print(probs[0])
+        response = ml.predict_proba(obj)
+        print(response[0])
 
-    return probs
+    return response
 
 
 CONCEPTS = ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"]
@@ -72,14 +97,17 @@ alerts = utils.update_timezone(alerts, "America/Santiago")
 GEODATA = "group"
 
 alerts = utils.extract_event(
-    alerts, CONCEPTS, ["type", "geometry"] + (["street"] if GEODATA == "street" else [])
+    alerts,
+    CONCEPTS,
+    ["type", "geometry", "hour", "day_type", "week_day"]
+    + (["street"] if GEODATA == "street" else []),
 )
 
 g = Grouper()
 if GEODATA == "group":
     g.group(alerts, (10, 20), CONCEPTS)
 
-xgb = XGBClassifier(
+model = XGBClassifier(
     learning_rate=0.03,
     random_state=42,
     n_estimators=50,
@@ -87,6 +115,8 @@ xgb = XGBClassifier(
     gamma=0.2,
     colsample_bytree=0.7,
 )
+
+# model = RandomForestClassifier(random_state=42, n_estimators=100, max_depth=5)
 
 route1 = [
     "Av. República de Croacia",  # No lo encuentra
@@ -101,54 +131,92 @@ route2 = [
     "Nicolás Tirado",
     "Av. Pedro Aguirre Cerda",
 ]
-route1_return = [
-    "Av. Edmundo Pérez Zujovic",
-    "Av. Séptimo de Línea",
-    "Av. Balmaceda",
-    "Av. República de Croacia",  # No lo encuentra
+
+route1_group = [
+    11,
+    21,
+    31,
+    40,
+    50,
+    59,
+    68,
+    78,
+    87,
+    95,
+    104,
+    113,
+    114,
+    122,
+    130,
+    139,
+    149,
 ]
-route2_return = [
-    "Av. Pedro Aguirre Cerda",
-    "Nicolás Tirado",
-    "El Yodo",
-    "Av. Iquique",
-    "Av. Argentina",
+
+route2_group = [
+    13,
+    22,
+    23,
+    32,
+    42,
+    51,
+    60,
+    70,
+    80,
+    88,
+    96,
+    97,
+    105,
+    114,
+    123,
+    132,
+    141,
+    150,
 ]
 
-routes = [route1, route2, route1_return, route2_return]
+if GEODATA == "street":
+    routes = [route1, route2]
+elif GEODATA == "group":
+    routes = [route1_group, route2_group]
 
 
-x_vars = [GEODATA, "hour", "day_type", "type"]
+x_vars = [GEODATA, "hour", "day_type", "type", "week_day"]
 categories = ["type"]
 
-ORDINAL_ENCODER = True
+ORDINAL_ENCODER = False
 
 ml = ML(
     g.data if GEODATA == "group" else alerts,
-    xgb,
+    model,
     column_y="happen",
     ohe=True,
     categories=categories,
 )
 if ORDINAL_ENCODER:
     ml.ordinal_encoder(categories=[GEODATA])
-ml.generate_neg_simulated_data(extra_cols=["type", GEODATA], geodata=GEODATA)
+ml.generate_neg_simulated_data(
+    extra_cols=x_vars,
+    geodata=GEODATA,
+)
 ml.clean(x_vars, "happen")
 ml.prepare_train()
 
+
 geodata_element = 60
 
-initial_params = {"day_type": 1, "hour": 7, GEODATA: geodata_element}
-
+initial_params = {
+    "day_type": 1,
+    "hour": 8,
+    "week_day": 2,
+    GEODATA: geodata_element,
+}
 print("\nINITIAL PARAMS:\n")
 for i in initial_params.items():
     print(i)
 
 print("\n—————————————————————————————————————————————————————————————————\n")
 
-type_event = "JAM"
-
-probs = predict_route(ml, initial_params, [], type=type_event)
+type_event = "ACCIDENT"
+probs = predict_route(ml, initial_params, routes, type=type_event)
 
 print("\n—————————————————————————————————————————————————————————————————\n")
 
@@ -158,36 +226,34 @@ print(cm)
 
 ml.log_model_params(
     **initial_params,
-    probabilities=probs,
+    avg_pos_probs=np.average(np.array(probs[0]).ravel().reshape(-1, 2)[:, 1]),
     type_event=type_event,
     hash_encode=ml.hash,
     ohe=ml.ohe,
     sample=ml.data.shape,
     ordinal_encoder=ORDINAL_ENCODER,
     sample_no_events=ml.no_events.shape,
-    confusion_matrix=cm,
-    each_x_min=60 * 24,
     geodata=GEODATA,
     geodata_element=geodata_element,
+    categories=categories,
 )
 
-ml.ohe = False
-ml.hash = True
-ml.prepare_train()
+# ml.ohe = False
+# ml.hash = True
+# ml.prepare_train()
 
-probs = predict_route(ml, initial_params, [], type="JAM")
+# probs = predict_route(ml, initial_params, routes, type=type_event)
 
-ml.log_model_params(
-    **initial_params,
-    probabilities=probs,
-    type_event=type_event,
-    hash_encode=ml.hash,
-    ohe=ml.ohe,
-    sample=ml.data.shape,
-    ordinal_encoder=ORDINAL_ENCODER,
-    sample_no_events=ml.no_events.shape,
-    confusion_matrix=cm,
-    each_x_min=60 * 24,
-    geodata=GEODATA,
-    geodata_element=geodata_element,
-)
+# ml.log_model_params(
+#     **initial_params,
+#     avg_pos_probs=np.average(np.array(probs[0]).ravel().reshape(-1, 2)[:, 1]),
+#     type_event=type_event,
+#     hash_encode=ml.hash,
+#     ohe=ml.ohe,
+#     sample=ml.data.shape,
+#     ordinal_encoder=ORDINAL_ENCODER,
+#     sample_no_events=ml.no_events.shape,
+#     geodata=GEODATA,
+#     geodata_element=geodata_element,
+#     categories=categories,
+# )
