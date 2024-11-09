@@ -315,3 +315,50 @@ class Grouper:
         fig.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
 
         return fig
+
+    def plot_with_numbers(self):
+        fig, ax = plt.subplots()
+        fig.set_size_inches((4.5, 9.5))
+
+        xc, yc = utils.get_center_points(self.grid)
+        i, j = 0, 0
+        between_x = xc[0][1] - xc[0][0]
+        between_y = yc[1][0] - yc[0][0]
+        for xp in xc[0]:
+            for yp in yc.T[0]:
+                quad = utils.calc_quadrant(i, j, self.grid[0].shape[1] - 1)
+                ax.text(xp - 250, yp - 150, quad, fontsize=6, alpha=0.5)
+                xf = xp - between_x / 2
+                yf = yp - between_y / 2
+                alpha = (
+                    self.data["group"].value_counts()[
+                        quad
+                        if quad in self.data["group"].value_counts().index
+                        else self.data["group"].value_counts().idxmin()
+                    ]
+                    - self.data["group"].value_counts().min()
+                ) / (
+                    self.data["group"].value_counts().max()
+                    - self.data["group"].value_counts().min()
+                )
+
+                ax.fill_between(
+                    [xf, xf + between_x],
+                    yf,
+                    yf + between_y,
+                    alpha=alpha if alpha > 0.05 else 0.1,
+                    color="r",
+                )
+                j += 1
+            i += 1
+            j = 0
+
+        cx.add_basemap(
+            ax, crs=self.data.crs.to_string(), source=cx.providers.OpenStreetMap.Mapnik
+        )
+
+        ax.set_title("Accidentes por cuadrante")
+        ax.set_ylabel("Latitud")
+        ax.set_xlabel("Longitud")
+
+        return fig

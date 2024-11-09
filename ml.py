@@ -6,6 +6,8 @@ from xgboost import XGBClassifier
 from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 
+g = Grouper()
+
 
 def predict_route(ml, initial_params, routes, **kwargs):
     print("\nHASHED DATA\n" if ml.hash else "\nONE HOT ENCODED DATA\n")
@@ -21,16 +23,16 @@ def predict_route(ml, initial_params, routes, **kwargs):
             result = ml.encode([str(v)], k)
             for r in range(len(result[0])):
                 obj[k + "_" + str(r)] = 0
-                if k in obj:
-                    del obj[k]
+            if k in obj:
+                del obj[k]
 
             obj[k + "_" + str(int(result[0][result[0].argmax()]))] = 1
     elif ml.ohe:
         for k, v in kwargs.items():
-            for c in [e for e in ml.x_train.columns if k in e]:
+            for c in [e for e in ml.x_train.columns if k + "_" in e]:
                 obj[c] = 0
-                if k in obj:
-                    del obj[k]
+            if k in obj:
+                del obj[k]
 
             result = ml.encode([str(v)], k)
             obj[k + "_" + str(v)] = 1
@@ -83,6 +85,7 @@ def predict_route(ml, initial_params, routes, **kwargs):
 
     if not routes:
         print("\nProbabilities\n")
+        print(kwargs)
         response = ml.predict_proba(obj)
         print(response[0])
 
@@ -103,9 +106,10 @@ alerts = utils.extract_event(
     + (["street"] if GEODATA == "street" else []),
 )
 
-g = Grouper()
 if GEODATA == "group":
-    g.group(alerts, (10, 20), CONCEPTS)
+    g.group(alerts, (15, 30), CONCEPTS)
+    fig = g.plot_with_numbers()
+    fig.savefig("graph/groups_with_numbers.png")
 
 model = XGBClassifier(
     learning_rate=0.03,
@@ -133,44 +137,52 @@ route2 = [
 ]
 
 route1_group = [
-    11,
-    21,
-    31,
-    40,
-    50,
-    59,
-    68,
-    78,
-    87,
-    95,
-    104,
-    113,
-    114,
-    122,
-    130,
-    139,
-    149,
+    45,
+    60,
+    75,
+    89,
+    90,
+    105,
+    119,
+    133,
+    134,
+    148,
+    162,
+    177,
+    191,
+    205,
+    218,
+    219,
+    232,
+    247,
+    260,
+    274,
+    287,
+    302,
 ]
 
 route2_group = [
-    13,
-    22,
-    23,
-    32,
-    42,
-    51,
-    60,
-    70,
-    80,
-    88,
-    96,
-    97,
-    105,
-    114,
-    123,
-    132,
-    141,
+    46,
+    61,
+    76,
+    91,
+    106,
+    120,
+    121,
+    135,
     150,
+    163,
+    178,
+    193,
+    206,
+    220,
+    233,
+    234,
+    247,
+    261,
+    275,
+    289,
+    303,
 ]
 
 if GEODATA == "street":
@@ -200,23 +212,49 @@ ml.generate_neg_simulated_data(
 ml.clean(x_vars, "happen")
 ml.prepare_train()
 
-
-geodata_element = 60
+geodata_element = 72
 
 initial_params = {
     "day_type": 1,
-    "hour": 8,
+    "hour": 10,
     "week_day": 2,
     GEODATA: geodata_element,
 }
+
 print("\nINITIAL PARAMS:\n")
 for i in initial_params.items():
     print(i)
 
+
+obj = pd.DataFrame(columns=ml.x_train.columns)
+obj.loc[0] = 0
+
+for k, v in initial_params.items():
+    obj[k] = v
+
+if "group" in obj:
+    del obj["group"]
+
+fig = ml.plot_by_quad(g, obj)
+fig.savefig("graph/quad_with_probs_linear.png")
+
 print("\n—————————————————————————————————————————————————————————————————\n")
 
 type_event = "ACCIDENT"
-probs = predict_route(ml, initial_params, routes, type=type_event)
+
+probs = []
+if "group" in categories:
+    for route in routes:
+        pr = []
+        for r in route:
+            p = predict_route(ml, initial_params, [], type=type_event, group=r)
+            pr.append(p)
+        probs.append(pr)
+        print("\nAverage: \n")
+        print(np.average(np.array(pr[0]).ravel().reshape(-1, 2)[:, 1]))
+        print("\n—————————————————————————————————————————————————————————————————\n")
+else:
+    probs = predict_route(ml, initial_params, routes, type=type_event)
 
 print("\n—————————————————————————————————————————————————————————————————\n")
 

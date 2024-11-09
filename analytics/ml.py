@@ -163,11 +163,15 @@ class ML:
         if self.data_labeled is None:
             self.train()
 
+        data = data[[e for e in list(self.data_labeled.columns) if e != self.column_y]]
+
         return self.model.predict(data)
 
     def predict_proba(self, data):
         if self.data_labeled is None:
             self.train()
+
+        data = data[[e for e in list(self.data_labeled.columns) if e != self.column_y]]
 
         return self.model.predict_proba(data)
 
@@ -210,8 +214,7 @@ class ML:
             return self.hasher[category].transform([[s] for s in data]).toarray()
 
     def plot_by_quad(self, grouper: Grouper, obj: pd.DataFrame):
-        if "group" not in self.data.columns:
-            raise ValueError("The data must have a 'group' column")
+        obj = obj.copy()
         if self.data_labeled is None:
             self.train()
         fig, ax = plt.subplots()
@@ -221,14 +224,18 @@ class ML:
         i, j = 0, 0
         between_x = xc[0][1] - xc[0][0]
         between_y = yc[1][0] - yc[0][0]
+
         for xp in xc[0]:
             for yp in yc.T[0]:
                 quad = utils.calc_quadrant(i, j, grouper.grid[0].shape[1] - 1)
                 xf = xp - between_x / 2
                 yf = yp - between_y / 2
-                obj["group"] = quad
+                if self.ohe and "group" in self.categories:
+                    obj["group_" + str(quad)] = 1
+                else:
+                    obj["group"] = quad
                 pred = self.predict_proba(obj)[0][1]
-                ax.text(xp - 150, yp - 150, round(pred, 1), fontsize=7, alpha=0.8)
+                ax.text(xp - 250, yp - 150, round(pred, 1), fontsize=6, alpha=0.8)
                 ax.fill_between(
                     [xf, xf + between_x],
                     yf,
@@ -236,6 +243,8 @@ class ML:
                     alpha=pred * 0.7,
                     color="r",
                 )
+                if self.ohe and "group" in self.categories:
+                    obj["group_" + str(quad)] = 0
                 j += 1
             i += 1
             j = 0
