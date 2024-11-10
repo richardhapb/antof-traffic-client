@@ -18,12 +18,14 @@ import mlflow
 from mlflow.models import infer_signature
 from functools import wraps
 from sklearn import base
+import numpy as np
 
 CONCEPTS = ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"]
 
 
-mlflow.set_tracking_uri(uri="http://localhost:8080")
-mlflow.set_experiment("AntofTraffic")
+def init_mlflow():
+    mlflow.set_tracking_uri(uri="http://localhost:8080")
+    mlflow.set_experiment("AntofTraffic")
 
 
 def mlflow_logger(func):
@@ -56,16 +58,119 @@ class ML:
         self.onehot = None
         self.oe = None
         self.no_events = None
+        self.x = None
+        self.y = None
 
         if self.data is not None:
             self.data[column_y] = 1
 
+    @staticmethod
+    def convert_dataset_to_ohe(data: pd.DataFrame, categories: list):
+        labeled = []
+        onehot = {}
+        for c in categories:
+            onehot[c] = OneHotEncoder(handle_unknown="ignore")
+            oht = onehot[c].fit_transform(data[[c]])
+
+            labeled.append(
+                pd.DataFrame(
+                    oht.toarray(), columns=onehot[c].get_feature_names_out()
+                ).reset_index(drop=True)
+            )
+
+        return pd.concat([data.drop(categories, axis=1), *labeled], axis=1)
+
     def generate_neg_simulated_data(self, extra_cols: list, geodata: str = "group"):
-        no_events = utils.generate_no_events(self.data, geodata=geodata)
-        self.no_events = pd.DataFrame(no_events)
+        events2 = self.data.copy()
+        events2["happen"] = 1
+
+        if not isinstance(events2["inicio"].iloc[0], np.int64):
+            events2["inicio"] = np.int64(pd.to_numeric(events2["inicio"]) / 1_000_000)
+
+        step = np.int64(60_000 * 5)
+
+        min_tms = events2["inicio"].min()
+        max_tms = events2["inicio"].max()
+
+        intervals = np.arange(min_tms, max_tms + step, step)
+
+        events2["interval"] = ((events2["inicio"]) // step) * step
+
+        allgroups = events2[geodata].unique()
+        alltypes = events2["type"].unique()
+
+        combinations = pd.MultiIndex.from_product(
+            [intervals, allgroups, alltypes], names=["interval", geodata, "type"]
+        ).to_frame(index=False)
+
+        event_combinations = events2[["interval", geodata, "type"]]
+        event_combinations["happen"] = 1
+
+        merged = pd.merge(
+            combinations,
+            event_combinations,
+            on=["interval", geodata, "type"],
+            how="left",
+        )
+
+        merged = merged.sample(events2.shape[0], replace=False, random_state=42)
+        merged["happen"] = merged["happen"].fillna(0).astype(int)
+
+        merged["inicio"] = merged["interval"]
+
+        result = merged[["inicio", geodata, "type", "happen"]]
+
+        if not isinstance(self.data["inicio"].iloc[0], np.int64):
+            result["inicio"] = pd.to_datetime((result["inicio"] * 1_000_000), unit="ns")
+        else:
+            result["inicio"] = result["inicio"]
+
+        self.no_events = pd.DataFrame(result)
         self.no_events = utils.extract_event(
             self.no_events, CONCEPTS, extra_cols + ["happen"]
         )
+
+    def balance_day_type(self):
+        # Balance no events and events, for weekend and workdays
+        if (
+            "day_type" not in self.data.columns
+            or "day_type" not in self.no_events.columns
+        ):
+            raise ValueError("There are not day type data in dataset")
+
+        print("BEFORE")
+
+        print(self.data.day_type.value_counts())
+        print(self.no_events.day_type.value_counts())
+
+        days0 = self.data[(self.data.day_type == "f") | (self.data.day_type == 0)]
+        days1 = self.data[(self.data.day_type == "s") | (self.data.day_type == 1)]
+        q_days0 = days0.shape[0]
+        q_days1 = days1.shape[0]
+
+        diff = q_days1 - q_days0
+
+        self.data = pd.concat(
+            [days1, days0.sample(q_days0 + diff, replace=True, random_state=42)]
+        )
+
+        days0 = self.no_events[
+            (self.no_events.day_type == "f") | (self.no_events.day_type == 0)
+        ]
+        days1 = self.no_events[
+            (self.no_events.day_type == "s") | (self.no_events.day_type == 1)
+        ]
+
+        self.no_events = pd.concat(
+            [
+                days1.sample(q_days1, replace=True, random_state=42),
+                days0.sample(q_days0 + diff, replace=True, random_state=42),
+            ]
+        )
+
+        print("AFTER")
+        print(self.data.day_type.value_counts())
+        print(self.no_events.day_type.value_counts())
 
     def clean(self, columns_x, column_y):
         self.columns_x = columns_x
@@ -139,11 +244,11 @@ class ML:
             self.data_labeled = total_events.copy()
 
     def train(self):
-        x = self.data_labeled.drop(self.column_y, axis=1)
-        y = self.data_labeled[self.column_y]
+        self.x = self.data_labeled.drop(self.column_y, axis=1)
+        self.y = self.data_labeled[self.column_y]
 
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(
-            x, y, test_size=0.2, random_state=42
+            self.x, self.y, test_size=0.2, random_state=42
         )
 
         self.model.fit(self.x_train, self.y_train)

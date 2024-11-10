@@ -1,10 +1,12 @@
-from analytics.ml import ML
+from analytics.ml import ML, init_mlflow
 from utils import utils
 from analytics.grouper import Grouper
 import pandas as pd
 from xgboost import XGBClassifier
 from sklearn.ensemble import RandomForestClassifier
 import numpy as np
+
+init_mlflow()
 
 print("\n\n\n\n\n\n")
 
@@ -127,15 +129,22 @@ if GEODATA == "group":
     fig.savefig("graph/groups_with_numbers.png")
 
 model = XGBClassifier(
-    learning_rate=0.03,
+    learning_rate=0.1,
     random_state=42,
-    n_estimators=50,
-    max_depth=5,
-    gamma=0.2,
+    n_estimators=80,
+    max_depth=20,
+    gamma=0.8,
     colsample_bytree=0.7,
 )
 
-# model = RandomForestClassifier(random_state=42, n_estimators=100, max_depth=5)
+# model = RandomForestClassifier(
+#     random_state=42,
+#     n_estimators=100,
+#     max_depth=10,
+#     max_features=2,
+#     max_leaf_nodes=8,
+#     min_samples_leaf=2,
+# )
 
 route1 = [
     "Av. República de Croacia",  # No lo encuentra
@@ -181,6 +190,7 @@ ml = ML(
     ohe=True,
     categories=categories,
 )
+
 if ORDINAL_ENCODER:
     ml.ordinal_encoder(categories=[GEODATA])
 ml.generate_neg_simulated_data(
@@ -193,9 +203,9 @@ ml.prepare_train()
 geodata_element = 72
 
 initial_params = {
-    "day_type": 0,
+    "day_type": 1,
     "hour": 7,
-    "week_day": 6,
+    "week_day": 1,
     # GEODATA: geodata_element,
 }
 
@@ -221,7 +231,7 @@ else:
 
 print("\n—————————————————————————————————————————————————————————————————\n")
 
-type_event = "JAM"
+type_event = "ACCIDENT"
 
 probs = []
 if "group" in categories:
@@ -244,25 +254,29 @@ cm = ml.confusion_matrix()
 print("Confusion matrix:\n")
 print(cm)
 
-# ml.log_model_params(
-#     **initial_params,
-#     avg_pos_probs=np.average(np.array(probs[0]).ravel().reshape(-1, 2)[:, 1]),
-#     type_event=type_event,
-#     hash_encode=ml.hash,
-#     ohe=ml.ohe,
-#     sample=ml.data.shape,
-#     ordinal_encoder=ORDINAL_ENCODER,
-#     sample_no_events=ml.no_events.shape,
-#     geodata=GEODATA,
-#     geodata_element=geodata_element,
-#     categories=categories,
-# )
+ml.log_model_params(
+    **initial_params,
+    avg_pos_probs=np.average(np.array(probs[0]).ravel().reshape(-1, 2)[:, 1]),
+    type_event=type_event,
+    hash_encode=ml.hash,
+    ohe=ml.ohe,
+    sample=ml.data.shape,
+    ordinal_encoder=ORDINAL_ENCODER,
+    sample_no_events=ml.no_events.shape,
+    geodata=GEODATA,
+    geodata_element=geodata_element,
+    categories=categories,
+)
 
 # ml.ohe = False
 # ml.hash = True
 # ml.prepare_train()
 
+# cm = ml.confusion_matrix()
 # probs = predict_route(ml, initial_params, routes, type=type_event)
+
+# print("Confusion matrix:\n")
+# print(cm)
 
 # ml.log_model_params(
 #     **initial_params,
