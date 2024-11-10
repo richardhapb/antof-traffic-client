@@ -32,6 +32,11 @@ alerts = utils.extract_event(
 )
 
 
+alerts = utils.freq_nearby(alerts, nearby_meters=200)
+alerts = utils.filter_nearby(alerts, threshold=200)
+
+print(alerts[alerts["type"] == "ACCIDENT"].shape[0])
+
 g = Grouper(alerts)
 
 
@@ -254,19 +259,19 @@ cm = ml.confusion_matrix()
 print("Confusion matrix:\n")
 print(cm)
 
-ml.log_model_params(
-    **initial_params,
-    avg_pos_probs=np.average(np.array(probs[0]).ravel().reshape(-1, 2)[:, 1]),
-    type_event=type_event,
-    hash_encode=ml.hash,
-    ohe=ml.ohe,
-    sample=ml.data.shape,
-    ordinal_encoder=ORDINAL_ENCODER,
-    sample_no_events=ml.no_events.shape,
-    geodata=GEODATA,
-    geodata_element=geodata_element,
-    categories=categories,
-)
+# ml.log_model_params(
+#     **initial_params,
+#     avg_pos_probs=np.average(np.array(probs[0]).ravel().reshape(-1, 2)[:, 1]),
+#     type_event=type_event,
+#     hash_encode=ml.hash,
+#     ohe=ml.ohe,
+#     sample=ml.data.shape,
+#     ordinal_encoder=ORDINAL_ENCODER,
+#     sample_no_events=ml.no_events.shape,
+#     geodata=GEODATA,
+#     geodata_element=geodata_element,
+#     categories=categories,
+# )
 
 # ml.ohe = False
 # ml.hash = True

@@ -2,11 +2,10 @@ from utils import utils
 from analytics.grouper import Grouper
 import pandas as pd
 from analytics.ml import ML
-from sklearn.model_selection import learning_curve, validation_curve, GridSearchCV
+from sklearn.model_selection import learning_curve
 from xgboost import XGBClassifier
 import matplotlib.pyplot as plt
 import numpy as np
-from utils import utils
 
 CONCEPTS = ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"]
 x_vars = ["group", "hour", "day_type", "type", "week_day"]

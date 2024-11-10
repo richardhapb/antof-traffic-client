@@ -174,7 +174,7 @@ app.layout = html.Div(
 )
 def update_graphs(kind, start_date, end_date, active_cell):
     if start_date is None or end_date is None:
-        return go.Figure(), go.Figure()
+        return go.Figure(), go.Figure(), {}
 
     start = int((datetime.datetime.fromisoformat(start_date)).timestamp() * 1000)
     end = int((datetime.datetime.fromisoformat(end_date)).timestamp() * 1000)
@@ -183,7 +183,6 @@ def update_graphs(kind, start_date, end_date, active_cell):
     alerts = alerts.to_gdf(tz=tz)
     alerts = utils.freq_nearby(alerts, nearby_meters=200)
     alerts["freq"] = alerts.apply(lambda x: x["freq"] if x["freq"] > 0 else 1, axis=1)
-    alerts = utils.filter_nearby(alerts, threshold=200)
 
     streets_data = alerts.groupby("street")["type"].count().reset_index()
     streets_data["Calle"] = streets_data["street"]
@@ -199,7 +198,9 @@ def update_graphs(kind, start_date, end_date, active_cell):
 
     if kind == "all":
         events = utils.extract_event(
-            alerts, ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"]
+            alerts,
+            ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"],
+            ["day_type", "week_day", "day", "hour", "minute"],
         )
     else:
         events = utils.extract_event(alerts, [kind])
