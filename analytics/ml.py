@@ -220,14 +220,14 @@ class ML:
         fig, ax = plt.subplots()
 
         fig.set_size_inches((4.5, 9.5))
-        xc, yc = utils.get_center_points(grouper.grid)
+        xc, yc = grouper.get_center_points()
         i, j = 0, 0
         between_x = xc[0][1] - xc[0][0]
         between_y = yc[1][0] - yc[0][0]
 
         for xp in xc[0]:
             for yp in yc.T[0]:
-                quad = utils.calc_quadrant(i, j, grouper.grid[0].shape[1] - 1)
+                quad = grouper.calc_quadrant(i, j)
                 xf = xp - between_x / 2
                 yf = yp - between_y / 2
                 if self.ohe and "group" in self.categories:

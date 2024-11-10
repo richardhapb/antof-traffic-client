@@ -15,32 +15,114 @@ class Grouper:
         "ALL": "Eventos",
     }
 
-    def __init__(self):
-        self.data = None
+    def __init__(self, data: gpd.GeoDataFrame | pd.DataFrame):
+        self.data = data.copy()
         self.grid = None
         self.type = None
+        self.x_grid = None
+        self.y_grid = None
         pass
+
+    def get_grid(self, n_x_div: int, n_y_div: int):
+        geometry = self.data.geometry
+        bounds_x = np.array(
+            np.linspace(
+                geometry.to_crs(epsg=3857).geometry.x.min(),
+                geometry.to_crs(epsg=3857).geometry.x.max(),
+                n_x_div,
+            )
+        )
+        bounds_y = np.array(
+            np.linspace(
+                geometry.to_crs(epsg=3857).geometry.y.min(),
+                geometry.to_crs(epsg=3857).geometry.y.max(),
+                n_y_div,
+            )
+        )
+
+        self.grid = np.meshgrid(bounds_x, bounds_y)
+        self.x_grid = self.grid[0]
+        self.y_grid = self.grid[1]
+        self.x_len = self.x_grid.shape[1] - 1
+        self.y_len = self.y_grid.shape[0] - 1
+        return self.grid
+
+    def calc_quadrant(
+        self,
+        x_pos: int,
+        y_pos: int,
+    ):
+        return self.y_len * x_pos + y_pos + 1
+
+    def get_quadrant(self, point: tuple):
+        """
+        point: (x, y) positions, beginning in lower left corner
+        """
+        x_pos, y_pos = -1, -1
+
+        for xi in range(len(self.x_grid[0])):
+            if (
+                xi < len(self.x_grid[0]) - 1
+                and point[0] >= self.x_grid[0][xi]
+                and point[0] <= self.x_grid[0][xi + 1]
+            ):
+                x_pos = xi
+
+        for yi in range(len(self.y_grid)):
+            if (
+                yi < len(self.y_grid) - 1
+                and point[1] >= self.y_grid[yi][0]
+                and point[1] <= self.y_grid[yi + 1][0]
+            ):
+                y_pos = yi
+
+        if x_pos < 0 or y_pos < 0:
+            raise ValueError(f"El punto {point} no se encuentra en ningún cuadrante")
+
+        quadrant = x_pos, y_pos
+
+        return quadrant
+
+    def get_center_points(self):
+        # X
+        center_points_x = np.zeros((self.y_len, self.x_len))
+
+        x_half = (self.grid[0][0][1] - self.grid[0][0][0]) / 2
+
+        for x in range(len(self.grid[0][0]) - 1):
+            center_points_x[0][x] = self.grid[0][0][x] + x_half
+
+        center_points_x[:][:] = center_points_x[0][:]
+
+        # Y
+        center_points_y = np.zeros((self.y_len, self.x_len))
+
+        y_half = (self.grid[1][1][0] - self.grid[1][0][0]) / 2
+
+        for y in range(len(self.grid[1]) - 1):
+            center_points_y[y][0] = self.grid[1][y][0] + y_half
+
+        for c in range(len(center_points_y)):
+            center_points_y[c][:] = center_points_y[c][0]
+
+        return center_points_x, center_points_y
 
     def group(
         self,
-        data: gpd.GeoDataFrame | pd.DataFrame,
         grid_dim: tuple,
         concepts: list = ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"],
     ):
-        grouped = data.copy()
-        grid = utils.grid(data, *grid_dim)
-        self.grid = grid
+        grouped = self.data.copy()
+        self.get_grid(*grid_dim)
 
         grouped["group"] = grouped.to_crs(epsg=3857).geometry.apply(
-            lambda x: utils.calc_quadrant(
-                *utils.get_quadrant(
-                    *grid,
+            lambda x: self.calc_quadrant(
+                *self.get_quadrant(
                     (
                         x.x,
                         x.y,
                     ),
                 ),
-                grid[0].shape[1] - 1,
             ),
         )
 
@@ -71,14 +153,14 @@ class Grouper:
         grouped_day = self.group_by_day()
 
         fig.set_size_inches((4.5, 9.5))
-        xc, yc = utils.get_center_points(self.grid)
+        xc, yc = self.get_center_points()
         i, j = 0, 0
         between_x = xc[0][1] - xc[0][0]
         between_y = yc[1][0] - yc[0][0]
         labels = [False, False, False]
         for xp in xc[0]:
             for yp in yc.T[0]:
-                quad = utils.calc_quadrant(i, j, self.grid[0].shape[1] - 1)
+                quad = self.calc_quadrant(i, j)
                 xf = xp - between_x / 2
                 yf = yp - between_y / 2
                 group_freq = (
@@ -139,13 +221,13 @@ class Grouper:
 
         fig.set_size_inches((4.5, 9.5))
 
-        xc, yc = utils.get_center_points(self.grid)
+        xc, yc = self.get_center_points()
         i, j = 0, 0
         between_x = xc[0][1] - xc[0][0]
         between_y = yc[1][0] - yc[0][0]
         for xp in xc[0]:
             for yp in yc.T[0]:
-                quad = utils.calc_quadrant(i, j, self.grid[0].shape[1] - 1)
+                quad = self.calc_quadrant(i, j)
                 xf = xp - between_x / 2
                 yf = yp - between_y / 2
 
@@ -192,14 +274,14 @@ class Grouper:
 
         fig.set_size_inches((4.5, 9.5))
 
-        xc, yc = utils.get_center_points(self.grid)
+        xc, yc = self.get_center_points()
         i, j = 0, 0
         between_x = xc[0][1] - xc[0][0]
         between_y = yc[1][0] - yc[0][0]
         labels = [False, False, False]
         for xp in xc[0]:
             for yp in yc.T[0]:
-                quad = utils.calc_quadrant(i, j, self.grid[0].shape[1] - 1)
+                quad = self.calc_quadrant(i, j)
 
                 qty = (
                     np.int16(
@@ -267,13 +349,13 @@ class Grouper:
 
         fig.set_size_inches((4.5, 9.5))
 
-        xc, yc = utils.get_center_points(self.grid)
+        xc, yc = self.get_center_points()
         i, j = 0, 0
         between_x = xc[0][1] - xc[0][0]
         between_y = yc[1][0] - yc[0][0]
         for xp in xc[0]:
             for yp in yc.T[0]:
-                quad = utils.calc_quadrant(i, j, self.grid[0].shape[1] - 1)
+                quad = self.calc_quadrant(i, j)
                 # ax.text(xp - 150, yp - 150, quad, fontsize=6, alpha=0.5)
                 xf = xp - between_x / 2
                 yf = yp - between_y / 2
@@ -320,13 +402,13 @@ class Grouper:
         fig, ax = plt.subplots()
         fig.set_size_inches((4.5, 9.5))
 
-        xc, yc = utils.get_center_points(self.grid)
+        xc, yc = self.get_center_points()
         i, j = 0, 0
         between_x = xc[0][1] - xc[0][0]
         between_y = yc[1][0] - yc[0][0]
         for xp in xc[0]:
             for yp in yc.T[0]:
-                quad = utils.calc_quadrant(i, j, self.grid[0].shape[1] - 1)
+                quad = self.calc_quadrant(i, j)
                 ax.text(xp - 250, yp - 150, quad, fontsize=6, alpha=0.5)
                 xf = xp - between_x / 2
                 yf = yp - between_y / 2

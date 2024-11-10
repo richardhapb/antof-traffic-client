@@ -6,11 +6,37 @@ from xgboost import XGBClassifier
 from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 
-g = Grouper()
+print("\n\n\n\n\n\n")
+
+ROUTES_NAMES = [
+    "Costanera",
+    "Av Argentina - Iquique - Pedro Aguirre Cerda",
+    "Av. Argentina - Andrés Sabella - Antonio Rendic - Huamachuco - Pedro Aguirre Cerda",
+    "Av. Argentina - Circunvalación - Bonilla - Pedro Aguirre Cerda",
+]
+
+GEODATA = "group"
+
+CONCEPTS = ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"]
+
+alerts = pd.DataFrame(utils.load_data("alerts").data)
+alerts = utils.update_timezone(alerts, "America/Santiago")
+
+alerts = utils.extract_event(
+    alerts,
+    CONCEPTS,
+    ["type", "geometry", "hour", "day_type", "week_day"]
+    + (["street"] if GEODATA == "street" else []),
+)
+
+
+g = Grouper(alerts)
 
 
 def predict_route(ml, initial_params, routes, **kwargs):
-    print("\nHASHED DATA\n" if ml.hash else "\nONE HOT ENCODED DATA\n")
+    print(
+        ("\nHASHED DATA\n" if ml.hash else "\nONE HOT ENCODED DATA\n") + f"for {kwargs}"
+    )
 
     obj = pd.DataFrame(columns=ml.x_train.columns)
     obj.loc[0] = 0
@@ -39,17 +65,20 @@ def predict_route(ml, initial_params, routes, **kwargs):
 
     response = []
     if GEODATA == "group":
+        i = 0
         for route in routes:
+            print(
+                "\n—————————————————————————————————————————————————————————————————\n"
+            )
+            print(f"Ruta: {ROUTES_NAMES[i]}")
+            i += 1
             probs = []
             obj2 = pd.concat([obj] * len(route), ignore_index=True)
             obj2["group"] = route
             probs.append(ml.predict_proba(obj2))
             response.append(probs)
-            print(
-                "\n—————————————————————————————————————————————————————————————————\n"
-            )
 
-            print(f"Route: {route}")
+            print(f"Ruta: {route}")
             print("\nProbabilities:\n")
             print(probs)
             print(f"\nAverage probability: {np.average(np.array(probs)[0][:, 1])}\n")
@@ -92,22 +121,8 @@ def predict_route(ml, initial_params, routes, **kwargs):
     return response
 
 
-CONCEPTS = ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"]
-
-alerts = pd.DataFrame(utils.load_data("alerts").data)
-alerts = utils.update_timezone(alerts, "America/Santiago")
-
-GEODATA = "group"
-
-alerts = utils.extract_event(
-    alerts,
-    CONCEPTS,
-    ["type", "geometry", "hour", "day_type", "week_day"]
-    + (["street"] if GEODATA == "street" else []),
-)
-
 if GEODATA == "group":
-    g.group(alerts, (15, 30), CONCEPTS)
+    g.group((10, 20), CONCEPTS)
     fig = g.plot_with_numbers()
     fig.savefig("graph/groups_with_numbers.png")
 
@@ -136,59 +151,22 @@ route2 = [
     "Av. Pedro Aguirre Cerda",
 ]
 
-route1_group = [
-    45,
-    60,
-    75,
-    89,
-    90,
-    105,
-    119,
-    133,
-    134,
-    148,
-    162,
-    177,
-    191,
-    205,
-    218,
-    219,
-    232,
-    247,
-    260,
-    274,
-    287,
-    302,
-]
+# Costanera
+route1_group = [22, 42, 62, 81, 82, 83, 84, 103, 104, 105, 87, 107, 89, 90, 110]
 
-route2_group = [
-    46,
-    61,
-    76,
-    91,
-    106,
-    120,
-    121,
-    135,
-    150,
-    163,
-    178,
-    193,
-    206,
-    220,
-    233,
-    234,
-    247,
-    261,
-    275,
-    289,
-    303,
-]
+# Av Argentina - Iquique - Pedro Aguirre Cerda
+route2_group = [60, 61, 81, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110]
+
+# Av. Argentina - Andrés Sabella - Antonio Rendic - Huamachuco - Pedro Aguirre Cerda
+route3_group = [60, 61, 81, 101, 102, 103, 123, 124, 125, 144, 145, 127, 108, 109, 110]
+
+# Av. Argentina - Circunvalación - Bonilla - Pedro Aguirre Cerda
+route4_group = [60, 61, 81, 101, 121, 122, 142, 143, 144, 145, 127, 108, 109, 110]
 
 if GEODATA == "street":
     routes = [route1, route2]
 elif GEODATA == "group":
-    routes = [route1_group, route2_group]
+    routes = [route1_group, route2_group, route3_group, route4_group]
 
 
 x_vars = [GEODATA, "hour", "day_type", "type", "week_day"]
@@ -215,10 +193,10 @@ ml.prepare_train()
 geodata_element = 72
 
 initial_params = {
-    "day_type": 1,
-    "hour": 10,
-    "week_day": 2,
-    GEODATA: geodata_element,
+    "day_type": 0,
+    "hour": 7,
+    "week_day": 6,
+    # GEODATA: geodata_element,
 }
 
 print("\nINITIAL PARAMS:\n")
@@ -236,11 +214,14 @@ if "group" in obj:
     del obj["group"]
 
 fig = ml.plot_by_quad(g, obj)
-fig.savefig("graph/quad_with_probs_linear.png")
+if "group" in categories:
+    fig.savefig("graph/quad_with_probs_ohe.png")
+else:
+    fig.savefig("graph/quad_with_probs_linear.png")
 
 print("\n—————————————————————————————————————————————————————————————————\n")
 
-type_event = "ACCIDENT"
+type_event = "JAM"
 
 probs = []
 if "group" in categories:
@@ -260,21 +241,22 @@ print("\n———————————————————————�
 
 cm = ml.confusion_matrix()
 
+print("Confusion matrix:\n")
 print(cm)
 
-ml.log_model_params(
-    **initial_params,
-    avg_pos_probs=np.average(np.array(probs[0]).ravel().reshape(-1, 2)[:, 1]),
-    type_event=type_event,
-    hash_encode=ml.hash,
-    ohe=ml.ohe,
-    sample=ml.data.shape,
-    ordinal_encoder=ORDINAL_ENCODER,
-    sample_no_events=ml.no_events.shape,
-    geodata=GEODATA,
-    geodata_element=geodata_element,
-    categories=categories,
-)
+# ml.log_model_params(
+#     **initial_params,
+#     avg_pos_probs=np.average(np.array(probs[0]).ravel().reshape(-1, 2)[:, 1]),
+#     type_event=type_event,
+#     hash_encode=ml.hash,
+#     ohe=ml.ohe,
+#     sample=ml.data.shape,
+#     ordinal_encoder=ORDINAL_ENCODER,
+#     sample_no_events=ml.no_events.shape,
+#     geodata=GEODATA,
+#     geodata_element=geodata_element,
+#     categories=categories,
+# )
 
 # ml.ohe = False
 # ml.hash = True

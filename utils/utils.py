@@ -414,56 +414,6 @@ def get_holidays():
     return feriados
 
 
-def grid(geometry: gpd.GeoDataFrame | pd.DataFrame, n_x_div: int, n_y_div: int):
-    bounds_x = np.array(
-        np.linspace(
-            geometry.to_crs(epsg=3857).geometry.x.min(),
-            geometry.to_crs(epsg=3857).geometry.x.max(),
-            n_x_div,
-        )
-    )
-    bounds_y = np.array(
-        np.linspace(
-            geometry.to_crs(epsg=3857).geometry.y.min(),
-            geometry.to_crs(epsg=3857).geometry.y.max(),
-            n_y_div,
-        )
-    )
-
-    return np.meshgrid(bounds_x, bounds_y)
-
-
-def calc_quadrant(x_pos: int, y_pos: int, x_len: int):
-    return x_len * y_pos + x_pos + 1
-
-
-def get_quadrant(x_grid: np.array, y_grid: np.array, point: tuple):
-    x_pos, y_pos = -1, -1
-
-    for xi in range(len(x_grid[0])):
-        if (
-            xi < len(x_grid[0]) - 1
-            and point[0] >= x_grid[0][xi]
-            and point[0] <= x_grid[0][xi + 1]
-        ):
-            x_pos = xi
-
-    for yi in range(len(y_grid)):
-        if (
-            yi < len(y_grid) - 1
-            and point[1] >= y_grid[yi][0]
-            and point[1] <= y_grid[yi + 1][0]
-        ):
-            y_pos = yi
-
-    if x_pos < 0 or y_pos < 0:
-        raise ValueError(f"El punto {point} no se encuentra en ningún cuadrante")
-
-    quadrant = x_pos, y_pos
-
-    return quadrant
-
-
 def plot_antof():
     PERIM_AFTA = gpd.GeoDataFrame(geometry=gpd.points_from_xy(PERIM_X, PERIM_Y))
     PERIM_AFTA.crs = "EPSG:4326"
@@ -477,31 +427,6 @@ def plot_antof():
     ax.set_xlim(PERIM_AFTA.total_bounds[0], PERIM_AFTA.total_bounds[2])
     ax.set_ylim(PERIM_AFTA.total_bounds[1], PERIM_AFTA.total_bounds[3])
     return ax
-
-
-def get_center_points(grid: tuple):
-    # X
-    center_points_x = np.zeros((grid[0].shape[0] - 1, grid[0].shape[1] - 1))
-
-    x_half = (grid[0][0][1] - grid[0][0][0]) / 2
-
-    for x in range(len(grid[0][0]) - 1):
-        center_points_x[0][x] = grid[0][0][x] + x_half
-
-    center_points_x[:][:] = center_points_x[0][:]
-
-    # Y
-    center_points_y = np.zeros((grid[0].shape[0] - 1, grid[0].shape[1] - 1))
-
-    y_half = (grid[1][1][0] - grid[1][0][0]) / 2
-
-    for y in range(len(grid[1]) - 1):
-        center_points_y[y][0] = grid[1][y][0] + y_half
-
-    for c in range(len(center_points_y)):
-        center_points_y[c][:] = center_points_y[c][0]
-
-    return center_points_x, center_points_y
 
 
 def generate_no_events(events: gpd.GeoDataFrame | pd.DataFrame, geodata: str = "group"):
