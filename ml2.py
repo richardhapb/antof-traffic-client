@@ -5,6 +5,8 @@ from analytics.ml import ML
 from sklearn.model_selection import learning_curve, validation_curve, GridSearchCV
 from xgboost import XGBClassifier
 import matplotlib.pyplot as plt
+import numpy as np
+from utils import utils
 
 CONCEPTS = ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"]
 x_vars = ["group", "hour", "day_type", "type", "week_day"]
@@ -30,11 +32,11 @@ g = Grouper(alerts)
 g.group((10, 20))
 
 model = XGBClassifier(
-    learning_rate=0.03,
+    learning_rate=0.1,
     random_state=42,
-    n_estimators=50,
-    max_depth=5,
-    gamma=0.2,
+    n_estimators=80,
+    max_depth=20,
+    gamma=0.8,
     colsample_bytree=0.7,
 )
 
@@ -45,31 +47,25 @@ ml.prepare_train()
 
 
 params = {
-    "learning_rate": [0.01, 0.03, 0.05, 0.07, 0.1],
-    "n_estimators": [10, 30, 50, 80, 100, 150],
-    "max_depth": [2, 5, 8, 12, 15, 20],
-    "gamma": [0.2, 0.4, 0.6, 0.8],
-    "colsample_bytree": [0.3, 0.5, 0.7, 0.9],
+    "learning_rate": [0.1, 0.2, 0.4, 0.8],
+    "n_estimators": [80, 200],
+    "max_depth": [20, 30, 40],
+    "gamma": [0.8, 1, 1.2],
+    "colsample_bytree": [0.7],
 }
 
-
-gs = GridSearchCV(model, param_grid=params, cv=5)
-gs.fit(ml.x_train, ml.y_train)
-
-print("\nPARAMS: ")
-print(params)
-print("\nBEST_PARAMS: ")
-print(gs.best_params_)
-print("\nBEST_METRICS: ")
-print(gs.best_score_)
-
-# # Curva de Aprendizaje
-# train_sizes, train_scores, valid_scores = learning_curve(
-#     ml.model, ml.x_train, ml.y_train, cv=5
-# )
-# plt.plot(train_sizes, train_scores.mean(axis=1), label="Training score")
-# plt.plot(train_sizes, valid_scores.mean(axis=1), label="Validation score")
-# plt.xlabel("Training Size")
-# plt.ylabel("Score")
-# plt.legend()
-# plt.show()
+# Curva de Aprendizaje
+train_sizes, train_scores, valid_scores = learning_curve(
+    ml.model, ml.x_train, ml.y_train, cv=5
+)
+plt.plot(train_sizes, train_scores.mean(axis=1), label="Training score")
+plt.plot(train_sizes, valid_scores.mean(axis=1), label="Validation score")
+plt.xticks(train_sizes, fontsize=10)
+plt.yticks(np.arange(0, 1.0001, 0.1), fontsize=10)
+plt.xlabel("Training Size")
+plt.ylabel("Score")
+plt.legend(fontsize=11)
+plt.title("Learning Curve")
+plt.tight_layout()
+plt.savefig("graph/learning_curve.png")
+plt.show()

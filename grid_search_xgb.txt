@@ -7,3 +7,21 @@ BEST_PARAMS:
 
 BEST_METRICS: 
 0.8659209545115585
+
+PARAMS: 
+{'learning_rate': [0.1, 1.2, 1.4, 1.8], 'n_estimators': [80, 200], 'max_depth': [20, 30, 40], 'gamma': [0.8, 1, 1.2], 'colsample_bytree': [0.7]}
+
+BEST_PARAMS: 
+{'colsample_bytree': 0.7, 'gamma': 1, 'learning_rate': 0.1, 'max_depth': 30, 'n_estimators': 80}
+
+BEST_METRICS: 
+0.8664828669969596
+
+PARAMS: 
+{'learning_rate': [0.1, 0.2, 0.4, 0.8], 'n_estimators': [80, 200], 'max_depth': [20, 30, 40], 'gamma': [0.8, 1, 1.2], 'colsample_bytree': [0.7]}
+
+BEST_PARAMS: 
+{'colsample_bytree': 0.7, 'gamma': 1, 'learning_rate': 0.1, 'max_depth': 30, 'n_estimators': 80}
+
+BEST_METRICS: 
+0.8664828669969596
