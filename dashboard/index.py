@@ -176,8 +176,17 @@ def update_graphs(kind, start_date, end_date, active_cell):
     if start_date is None or end_date is None:
         return go.Figure(), go.Figure(), {}
 
-    start = int((datetime.datetime.fromisoformat(start_date)).timestamp() * 1000)
-    end = int((datetime.datetime.fromisoformat(end_date)).timestamp() * 1000)
+    start = int(
+        (datetime.datetime.fromisoformat(start_date).astimezone(pytz.utc)).timestamp()
+        * 1000
+    )
+    end = int(
+        (datetime.datetime.fromisoformat(end_date).astimezone(pytz.utc)).timestamp()
+        * 1000
+    )
+
+    if end < start:
+        end = start + 24 * 60 * 60 * 1000
 
     alerts = utils.load_data("alerts", mode="between", between=(start, end))
     alerts = alerts.to_gdf(tz=tz)
@@ -185,25 +194,25 @@ def update_graphs(kind, start_date, end_date, active_cell):
     alerts["freq"] = alerts.apply(lambda x: x["freq"] if x["freq"] > 0 else 1, axis=1)
 
     streets_data = alerts.groupby("street")["type"].count().reset_index()
-    streets_data["Calle"] = streets_data["street"]
-    streets_data["Eventos"] = streets_data["type"]
+    streets_data = streets_data.rename(columns={"street": "Calle", "type": "Eventos"})
     streets_data = streets_data.sort_values(by="Eventos", ascending=False)
 
     table_data = streets_data.to_dict("records")
 
     if active_cell is not None:
         alerts = alerts[
-            alerts["street"] == streets_data.iloc[active_cell["row"]]["street"]
+            alerts["street"] == streets_data.iloc[active_cell["row"]]["Calle"]
         ]
 
+    extra_cols = ["day_type", "week_day", "day", "hour", "minute"]
     if kind == "all":
         events = utils.extract_event(
             alerts,
             ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"],
-            ["day_type", "week_day", "day", "hour", "minute"],
+            extra_cols,
         )
     else:
-        events = utils.extract_event(alerts, [kind])
+        events = utils.extract_event(alerts, [kind], extra_cols)
     hourly = utils.hourly_group(events).reset_index().copy()
     hourly = pd.melt(
         hourly,
@@ -224,7 +233,7 @@ def update_graphs(kind, start_date, end_date, active_cell):
     if kind != "all":
         map_data = alerts[alerts["type"] == kind].copy()
     else:
-        map_data = alerts
+        map_data = alerts.copy()
 
     map_data["time"] = map_data["pubMillis"].apply(lambda x: x.strftime("%H:%M:%S"))
     map_data["date"] = map_data["pubMillis"].apply(lambda x: x.strftime("%d-%m-%Y"))

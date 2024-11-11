@@ -291,19 +291,22 @@ class Events:
         for sql in sqls:
             cur.execute(sql)
             record = cur.fetchall()
-            if self.table_name == "alerts":
-                record = record[len(record) - len(self.data) :]
-            elif self.table_name == "jams":
+            if self.table_name == "jams":
                 record = [r for r in record if r[1] in self.index_map]
 
             records.append(record)
         cur.close()
 
         if self.table_name == "alerts":
-            for i, record in enumerate(records[0]):
-                self.data[i]["location"] = {"x": record[-2], "y": record[-1]}
+            for record in records[0]:
+                if record[0] not in self.index_map:
+                    continue
+                self.data[self.index_map[record[0]]]["location"] = {
+                    "x": record[-2],
+                    "y": record[-1],
+                }
         elif self.table_name == "jams":
-            for i, record in enumerate(records[0]):
+            for record in records[0]:
                 if "segments" not in self.data[self.index_map[record[1]]]:
                     self.data[self.index_map[record[1]]]["segments"] = []
                 self.data[self.index_map[record[1]]]["segments"] += [
@@ -315,7 +318,7 @@ class Events:
                         )
                     }
                 ]
-            for i, record in enumerate(records[1]):
+            for record in records[1]:
                 if "line" not in self.data[self.index_map[record[1]]]:
                     self.data[self.index_map[record[1]]]["line"] = []
                 self.data[self.index_map[record[1]]]["line"] += [
@@ -338,15 +341,14 @@ class Events:
         is_between = "between" in mode and between is not None
         all = "all" in mode
 
+        cur = self.db.cursor()
         if not_ended:
-            cur = self.db.cursor()
             cur.execute(
                 "SELECT * FROM " + self.table_name + " WHERE end_pub_millis IS NULL"
             )
             events = cur.fetchall()
 
         if last_24h:
-            cur = self.db.cursor()
             cur.execute(
                 "SELECT * FROM " + self.table_name + " WHERE pub_millis > %s",
                 (int((datetime.now(tz=pytz.utc).timestamp() - (24 * 60 * 60)) * 1000),),
@@ -354,7 +356,6 @@ class Events:
             events = cur.fetchall()
 
         if since:
-            cur = self.db.cursor()
             cur.execute(
                 "SELECT * FROM " + self.table_name + " WHERE pub_millis > %s",
                 (epoch,),
@@ -362,7 +363,6 @@ class Events:
             events = cur.fetchall()
 
         if is_between:
-            cur = self.db.cursor()
             cur.execute(
                 "SELECT * FROM "
                 + self.table_name
@@ -372,7 +372,6 @@ class Events:
             events = cur.fetchall()
 
         if all:
-            cur = self.db.cursor()
             cur.execute("SELECT * FROM " + self.table_name)
             events = cur.fetchall()
 
