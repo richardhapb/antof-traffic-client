@@ -12,9 +12,13 @@ html {
 h1 {
     font-size: 2rem;
     margin: 2rem 0 0 0;
-    color: #ccc;
     text-align: center;
 }
+
+h1, h2, h3 {
+    color: #ccc;
+}
+
 
 .subtitle {
     font-size: 1rem;
@@ -66,6 +70,7 @@ h1 {
     align-items: center;
     justify-content: center;
     gap: 4rem;
+    margin: 2rem 1rem;
 }
 
 .plot {
@@ -75,12 +80,17 @@ h1 {
     justify-content: flex-start;
 }
 
+.ml-map {
+    height: 1000px;
+    width: 500px;
+}
+
 .plot-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 0;
+    justify-content: flex-start;
+    gap: 2rem;
 }
 
 .plot-container > h2 {
@@ -113,10 +123,17 @@ input, .Select-value-label {
     color: #fff !important;
 }
 
-#dd_type{
+#dd_type {
+    margin: 2rem 0 1rem 0;
+}
+
+#dd_type, #dd_type_ml, #dd_hour_ml {
     width: 300px;
     font-size: 1.2rem;
-    margin: 2rem 0 1rem 0;
+}
+
+h3 {
+    margin: 1rem 0 0 0;
 }
 
 .Select-control {

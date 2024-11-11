@@ -7,7 +7,7 @@ import contextily as cx
 import matplotlib.pyplot as plt
 from scipy.spatial import cKDTree
 import requests
-import time
+import json
 import warnings
 
 # Deshabilitar SettingWithCopyWarning
@@ -22,7 +22,7 @@ PERIM_AFTA = gpd.GeoDataFrame(geometry=gpd.points_from_xy(PERIM_X, PERIM_Y))
 PERIM_AFTA.crs = "EPSG:4326"
 PERIM_AFTA = PERIM_AFTA.to_crs("EPSG:3857")
 
-API_FERIADOS = "https://api.boostr.cl/holidays/2024.json"
+API_FERIADOS = "https://api.boostr.cl/holidays.json"
 
 
 def load_data(
@@ -198,7 +198,20 @@ def extract_event(data: gpd.GeoDataFrame, concept: list, extra_col: list = []):
 
     millis = ["inicio", "fin"]
 
-    feriados = get_holidays()
+    try:
+        try:
+            feriados = get_holidays()
+            with open("data/holidays.json", "w") as fp:
+                json.dump({"feriados": feriados}, fp)
+        except ConnectionError or TimeoutError:
+            print(
+                "Error al conectar para obtener feriados, cargando archivo de respaldo"
+            )
+            with open("data/holidays.json", "r") as f:
+                feriados = json.load(f)["feriados"]
+    except FileNotFoundError or json.JSONDecodeError:
+        print("Error al leer el archivo")
+        feriados = []
 
     dat["hour"] = dat["inicio"].dt.hour
     dat["minute"] = dat["inicio"].dt.minute
@@ -254,6 +267,8 @@ def hourly_group(data: pd.DataFrame):
     # df = calculate_hours(df)
 
     days = (data["inicio"].max() - data["inicio"].min()).days
+
+    days = 1 if days <= 0 else days
 
     # Agrupar por hora y tipo de día
     hourly_reports = (
