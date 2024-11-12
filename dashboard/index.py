@@ -51,7 +51,8 @@ selected_time = int(
 )
 
 alerts = utils.load_data("alerts", mode="since", epoch=since)
-alerts = alerts.to_gdf(tz=tz)
+alerts = Grouper(alerts.to_gdf(tz=tz))
+alerts.group((10, 20)).filter_by_group_time(80, True)
 
 app.layout = html.Div(
     [
@@ -349,8 +350,7 @@ def update_ML(
     kind: str,
     higlighted_segment: int | None = None,
 ):
-    g = Grouper(alerts)
-    g.group((10, 20))
+    g = alerts
 
     x_var = pd.DataFrame(
         {
@@ -527,9 +527,11 @@ def update_graphs(kind, start_date, end_date, active_cell):
     if end <= start:
         end = start + (23 * 60 * 60 + 60**2 * 59) * 1000
 
-    filtered_alerts = alerts[
-        (alerts["pubMillis"] >= start) & (alerts["pubMillis"] <= end)
-    ]
+    filtered_alerts = gpd.GeoDataFrame(
+        alerts.data[
+            (alerts.data["pubMillis"] >= start) & (alerts.data["pubMillis"] <= end)
+        ]
+    )
     streets_data = filtered_alerts.groupby("street")["type"].count().reset_index()
     streets_data = streets_data.rename(columns={"street": "Calle", "type": "Eventos"})
     streets_data = streets_data.sort_values(by="Eventos", ascending=False)

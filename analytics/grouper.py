@@ -135,6 +135,67 @@ class Grouper:
 
         return self
 
+    def filter_by_group_time(self, timedelta_min: int, inplace: bool = False):
+        if self.data is None or "pubMillis" not in self.data.columns:
+            return None
+        events2 = self.data.copy()
+
+        # Asegurar que 'pubMillis' es np.int64 y está en milisegundos
+        if not isinstance(events2["pubMillis"].iloc[0], np.int64):
+            events2["pubMillis"] = (
+                (pd.to_numeric(events2["pubMillis"]) / 1_000_000)
+                .round()
+                .astype(np.int64)
+            )
+
+        step = np.int64(60_000 * timedelta_min)  # step en milisegundos
+
+        # Calcular intervalos ajustando 'pubMillis' al múltiplo más cercano de 'step'
+        events2["interval"] = ((events2["pubMillis"]) // step) * step
+
+        min_t = (events2["pubMillis"].min() // step) * step
+        max_t = (events2["pubMillis"].max() // step) * step
+
+        intervals = np.arange(min_t, max_t + step, step).astype(np.int64)
+        groups = events2["group"].astype(str).unique()
+        types = events2["type"].astype(str).unique()
+
+        combinations = pd.MultiIndex.from_product(
+            [intervals, groups, types], names=["interval", "group", "type"]
+        ).to_frame(index=False)
+
+        # Asegurar tipos consistentes
+        events2["group"] = events2["group"].astype(str)
+        events2["type"] = events2["type"].astype(str)
+
+        merged = pd.merge(
+            combinations, events2, how="left", on=["interval", "group", "type"]
+        )
+
+        # Si deseas eliminar filas solo donde ciertas columnas son nulas
+        merged = merged.dropna()
+
+        # Actualizar 'pubMillis' y convertir a datetime si es necesario
+        merged["pubMillis"] = merged["interval"]
+        merged = merged.drop(columns=["interval"])
+        merged["group"] = merged["group"].astype(np.int16)
+
+        if not isinstance(self.data["pubMillis"].iloc[0], np.int64):
+            merged["pubMillis"] = pd.to_datetime(
+                (merged["pubMillis"] * 1_000_000), unit="ns"
+            )
+            merged["pubMillis"] = merged["pubMillis"].dt.tz_localize("America/Santiago")
+        else:
+            merged["pubMillis"] = pd.to_datetime(merged["pubMillis"], unit="ms")
+            merged["pubMillis"] = merged["pubMillis"].dt.tz_localize("America/Santiago")
+
+        result = merged
+
+        if inplace:
+            self.data = result
+
+        return result
+
     def group_by_day(self):
         grouped_day = (
             pd.DataFrame(
