@@ -1,6 +1,8 @@
 :root {
     --bg-color: #111;
     --bg-color-secondary: #333;
+    --bg-color-tertiary: rgba(85, 85, 85, 0.1);
+
 }
 
 html {
@@ -83,6 +85,18 @@ h1, h2, h3 {
 .ml-map {
     height: 1000px;
     width: 500px;
+}
+
+
+.ml-zone {
+    background-color: var(--bg-color-tertiary);
+    mask-image: linear-gradient(to bottom, transparent 0%,black 10%, black 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding: 4rem;
 }
 
 .plot-container {

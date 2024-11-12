@@ -8,6 +8,7 @@ import psycopg2
 from functools import wraps
 from utils import utils
 import pandas as pd
+import json
 
 
 def db_connection(func):
@@ -246,7 +247,7 @@ class Events:
     def to_gdf(self, tz: str = "America/Santiago"):
         if len(self.data) == 0:
             return None
-        df = pd.DataFrame(self.data)
+        df = pd.DataFrame(self.data, columns=self.data[0].keys())
         df = utils.update_timezone(df, tz)
 
         return utils.separate_coords(df)
