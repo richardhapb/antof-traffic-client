@@ -171,8 +171,6 @@ class Grouper:
 
         result = grouped_events.reset_index(drop=True)
 
-        print(f"Se filtraron: {before - result.shape[0]} elementos")
-        print(f"Antes: {before}, después: {result.shape[0]}")
         result["pubMillis"] = pd.to_datetime(result["pubMillis"], unit="ms")
         result["pubMillis"] = result["pubMillis"].dt.tz_localize("America/Santiago")
 

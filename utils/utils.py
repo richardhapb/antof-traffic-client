@@ -230,7 +230,7 @@ def extract_event(data: gpd.GeoDataFrame, concept: list, extra_col: list = []):
     return dat
 
 
-def hourly_group(data: pd.DataFrame):
+def hourly_group(data: pd.DataFrame, sum: bool = False):
     """
     Transforma un DataFrame de eventos en un reporte por hora
     """
@@ -293,9 +293,10 @@ def hourly_group(data: pd.DataFrame):
     else:
         hourly_reports["f"] = hourly_reports["f"].astype(float)
 
-    # Calcular la tasa por tipo de día
-    hourly_reports["f"] = hourly_reports["f"] / days
-    hourly_reports["s"] = hourly_reports["s"] / days
+    if not sum:
+        # Calcular la tasa por tipo de día
+        hourly_reports["f"] = hourly_reports["f"] / days
+        hourly_reports["s"] = hourly_reports["s"] / days
 
     return hourly_reports
 
@@ -331,7 +332,7 @@ def daily_group(data: pd.DataFrame):
                 )
         return df
 
-    df = calculate_days(df)
+    # df = calculate_days(df)
 
     # Agrupar por día y tipo de día
     daily_reports = (
@@ -341,9 +342,29 @@ def daily_group(data: pd.DataFrame):
     # Crear un índice que incluya todos los días del mes
     all_days = pd.Index(range(1, 32), name="day")
 
+    start_date = data["inicio"].min()
+    end_date = data["inicio"].max()
+    months = (end_date.year - start_date.year) * 12 + (
+        end_date.month - start_date.month
+    )
+
+    months = 1 if months <= 0 else months
     # Reindexar el DataFrame para incluir todos los días del mes
     daily_reports = daily_reports.reindex(all_days, fill_value=0)
 
+    if "s" not in daily_reports.columns:
+        daily_reports["s"] = 0.0
+    else:
+        daily_reports["s"] = daily_reports["s"].astype(float)
+
+    if "f" not in daily_reports.columns:
+        daily_reports["f"] = 0.0
+    else:
+        daily_reports["f"] = daily_reports["f"].astype(float)
+
+    # Calcular la tasa por tipo de día
+    daily_reports["f"] = daily_reports["f"] / months
+    daily_reports["s"] = daily_reports["s"] / months
     return daily_reports
 
 

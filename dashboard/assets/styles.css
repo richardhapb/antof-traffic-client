@@ -2,11 +2,12 @@
     --bg-color: #111;
     --bg-color-secondary: #333;
     --bg-color-tertiary: rgba(85, 85, 85, 0.1);
+    --bg-gradient: linear-gradient(32deg, rgba(0,0,0,1) 0%, rgba(40,40,40,1) 58%, rgba(107,107,107,1) 100%);
 
 }
 
 html {
-    background-color: var(--bg-color);
+    background-image: var(--bg-gradient);
     color: #fff;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
@@ -28,6 +29,28 @@ h1, h2, h3 {
     color: #ccc;
     text-align: center;
     font-weight: lighter;
+}
+
+.instructions {
+    max-width: 900px;
+    font-size: 10pt;
+    text-wrap: wrap;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(20px);
+    color: black;
+    border-radius: 10px;
+    box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.5);
+}
+
+.instructions h3 {
+    color: black;
+}
+
+.instructions ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .container {

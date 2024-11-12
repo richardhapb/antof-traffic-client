@@ -46,6 +46,7 @@ selected_time = int(
         datetime.datetime.now(pytz.timezone(tz)).replace(
             hour=0, minute=0, second=0, microsecond=0
         )
+        - datetime.timedelta(days=30)
     ).timestamp()
     * 1000
 )
@@ -67,6 +68,34 @@ app.layout = html.Div(
                 ),
                 html.Div(
                     [
+                        html.H3("Instrucciones:"),
+                        html.Ul(
+                            [
+                                html.Li(
+                                    "El dashboard se divide en dos secciones princiaples, la representaciones descriptivas de los datos, la cual se compone de los 6 primeros gráficos/tablas, siendo el de correlación el último. La segunda sección corresponde al modelo predictivo, compuesto por el mapa, las entradas de parámetros y la tabla de información."
+                                ),
+                                html.Li(
+                                    "La primera sección (tres primeras filas) es controlada por los filtros de tipo de evento y rango, se exceptúa en el filtro de tipo el gráfico de correlación y el listado de últimos eventos, el cual es independiente."
+                                ),
+                                html.Li(
+                                    "Los gráficos son interactivos, se pueden filtrar por calle, haciendo click en las tablas de calles, como también en las leyendas"
+                                ),
+                                html.Li(
+                                    "El modelo predictivo está basado en el modelo XGBClassifier y segmentado por parámetros temporales (tipo de día, día de la semana, día del mes, hora del día) y de parametros geospaciales, los cuales se resumen en el segmento asociado."
+                                ),
+                                html.Li(
+                                    "La tabla del modelo predictivo también es interactiva, se puede visualizar el segmento asociado haciendo click en la fila correspondiente."
+                                ),
+                                html.Li(
+                                    "Los datos están disponibles a partir del 1 de octubre de 2024, por lo que se pueden aplicar filtros de fecha hasta es punto."
+                                ),
+                            ],
+                        ),
+                    ],
+                    className="instructions",
+                ),
+                html.Div(
+                    children=[
                         dcc.Dropdown(
                             id="dd_type",
                             options=[
@@ -107,7 +136,8 @@ app.layout = html.Div(
         html.Div(
             [
                 html.Div(
-                    [
+                    id="map-zone",
+                    children=[
                         dcc.Graph(id="map", className="plot"),
                     ],
                     className="plot-container",
@@ -186,7 +216,66 @@ app.layout = html.Div(
                     className="plot-container",
                 ),
                 html.Div(
-                    [html.H3("Otro gráfico"), dcc.Graph(id="ML3", className="plot")],
+                    [
+                        dcc.Graph(
+                            id="daily",
+                            className="plot",
+                        )
+                    ],
+                    className="plot-container",
+                ),
+            ],
+            className="row",
+        ),
+        html.Div(
+            [
+                html.Div(
+                    [
+                        html.H3("Últimos eventos reportados"),
+                        dash_table.DataTable(
+                            id="table_last",
+                            columns=[
+                                {"name": i, "id": i}
+                                for i in ["Tipo", "Fecha", "Hora", "Calle", "Segmento"]
+                            ],
+                            data=[],
+                            page_action="native",
+                            page_current=0,
+                            page_size=10,
+                            style_table={"overflowX": "auto"},
+                            style_cell={
+                                "textAlign": "center",
+                                "padding": "5px",
+                            },
+                            style_header={
+                                "backgroundColor": "rgba(30,30,30,0.6)",
+                                "color": "#ccc",
+                                "fontWeight": "semibold",
+                                "fontFamily": "Verdana",
+                                "fontSize": "1rem",
+                                "textAlign": "center",
+                                "border": "1px solid #555",
+                            },
+                            style_data={
+                                "backgroundColor": "rgba(30,30,30,0.6)",
+                                "color": "#fff",
+                                "fontWeight": "lighter",
+                                "fontFamily": "Verdana",
+                                "fontSize": "1rem",
+                                "textAlign": "center",
+                                "border": "1px solid #555",
+                            },
+                        ),
+                    ],
+                    className="plot-container",
+                ),
+                html.Div(
+                    [
+                        dcc.Graph(
+                            id="scatter",
+                            className="plot",
+                        )
+                    ],
                     className="plot-container",
                 ),
             ],
@@ -272,20 +361,6 @@ app.layout = html.Div(
                                             page_size=10,
                                             style_table={"overflowX": "auto"},
                                             style_cell={"textAlign": "center"},
-                                            style_data_conditional=[
-                                                {
-                                                    "if": {"column_id": "Segmento"},
-                                                    "width": "100px",
-                                                    "textAlign": "center",
-                                                },
-                                                {
-                                                    "if": {
-                                                        "column_id": "Probabilidad evento"
-                                                    },
-                                                    "width": "350px",
-                                                    "textAlign": "left",
-                                                },
-                                            ],
                                             style_header={
                                                 "backgroundColor": "rgba(30,30,30,0.6)",
                                                 "color": "#ccc",
@@ -503,6 +578,8 @@ def update_ML(
         Output("map", "figure"),
         Output("hourly", "figure"),
         Output("table", "data"),
+        Output("daily", "figure"),
+        Output("scatter", "figure"),
     ],
     [
         Input("dd_type", "value"),
@@ -512,8 +589,11 @@ def update_ML(
     ],
 )
 def update_graphs(kind, start_date, end_date, active_cell):
+    STANDARD_RETURN = go.Figure(), go.Figure(), {}, None
     if start_date is None or end_date is None:
-        return go.Figure(), go.Figure(), {}, None
+        return STANDARD_RETURN
+
+    extra_cols = ["day_type", "week_day", "day", "hour", "minute"]
 
     start = (
         (datetime.datetime.fromisoformat(start_date))
@@ -534,7 +614,36 @@ def update_graphs(kind, start_date, end_date, active_cell):
             (alerts.data["pubMillis"] >= start) & (alerts.data["pubMillis"] <= end)
         ]
     )
-    streets_data = filtered_alerts.groupby("street")["type"].count().reset_index()
+
+    if filtered_alerts.shape[0] == 0:
+        return STANDARD_RETURN
+
+    scatter_data_acc = utils.extract_event(
+        filtered_alerts,
+        ["ACCIDENT"],
+        extra_col=extra_cols,
+    )
+
+    scatter_data_acc = utils.hourly_group(scatter_data_acc, sum=True)
+
+    scatter_data_jam = utils.extract_event(
+        filtered_alerts,
+        ["JAM"],
+        extra_col=extra_cols,
+    )
+
+    scatter_data_jam = utils.hourly_group(scatter_data_jam, sum=True)
+
+    if kind is not None and kind != "all":
+        streets_data = (
+            filtered_alerts[filtered_alerts["type"] == kind]
+            .groupby("street")["type"]
+            .count()
+            .reset_index()
+        )
+    else:
+        streets_data = filtered_alerts.groupby("street")["type"].count().reset_index()
+
     streets_data = streets_data.rename(columns={"street": "Calle", "type": "Eventos"})
     streets_data = streets_data.sort_values(by="Eventos", ascending=False)
 
@@ -545,7 +654,6 @@ def update_graphs(kind, start_date, end_date, active_cell):
             filtered_alerts["street"] == streets_data.iloc[active_cell["row"]]["Calle"]
         ]
 
-    extra_cols = ["day_type", "week_day", "day", "hour", "minute"]
     if kind == "all":
         events = utils.extract_event(
             filtered_alerts,
@@ -559,6 +667,15 @@ def update_graphs(kind, start_date, end_date, active_cell):
     hourly = pd.melt(
         hourly,
         id_vars=["hour"],
+        value_vars=["s", "f"],
+        var_name="day_type",
+        value_name="events",
+    )
+
+    daily = utils.daily_group(events).reset_index().copy()
+    daily = pd.melt(
+        daily,
+        id_vars=["day"],
         value_vars=["s", "f"],
         var_name="day_type",
         value_name="events",
@@ -611,8 +728,19 @@ def update_graphs(kind, start_date, end_date, active_cell):
                 opacity=0.8,
                 name={"f": "Fin de semana / Feriado", "s": "Semana"}[day_type],
                 marker_color={"f": "salmon", "s": "skyblue"}[day_type],
+                hoverlabel=dict(
+                    bgcolor="lightblue",
+                    font_size=12,
+                    font_family="Arial",
+                    font_color="black",
+                ),
             ),
         )
+
+    # Configurar el estilo del tooltip para todas las trazas
+    hourly_fig.update_traces(
+        hovertemplate="x: %{x}<br>y: %{y}<extra></extra>",
+    )
 
     hourly_fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
@@ -635,7 +763,71 @@ def update_graphs(kind, start_date, end_date, active_cell):
         ),
         xaxis=dict(title="Hora del día", showgrid=False),
         barmode="group",
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1,
+            bgcolor="rgb(37, 37, 37)",
+        ),
+        margin=dict(t=120, b=20, l=100, r=30),
+    )
+
+    daily_fig = go.Figure()
+    for day_type in ["s", "f"]:
+        daily_fig.add_trace(
+            go.Bar(
+                x=daily["day"].astype(str),
+                y=daily[daily["day_type"] == day_type]["events"],
+                opacity=0.8,
+                name={"f": "Fin de semana / Feriado", "s": "Semana"}[day_type],
+                marker_color={"f": "rgb(210, 41, 252)", "s": "rgb(34, 243, 173)"}[
+                    day_type
+                ],
+                hoverlabel=dict(
+                    bgcolor="lightgreen",
+                    font_size=12,
+                    font_family="Arial",
+                    font_color="black",
+                ),
+            ),
+        )
+
+    # Configurar el estilo del tooltip para todas las trazas
+    daily_fig.update_traces(
+        hovertemplate="x: %{x}<br>y: %{y}<extra></extra>",
+    )
+
+    daily_fig.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="#ccc"),
+        title=dict(
+            text=f"Promedio de {names[kind].lower()} por día del mes",
+            font=dict(
+                color="#ccc",
+                weight=600,
+                family="Verdana",
+                size=20,
+            ),
+            pad=dict(b=30, l=50),
+        ),
+        grid_ygap=1,
+        # nogrid
+        yaxis=dict(
+            title=f"Promedio de {names[kind].lower()} reportados", showgrid=False
+        ),
+        xaxis=dict(title="Día del mes", showgrid=False),
+        barmode="group",
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1,
+            bgcolor="rgb(37, 37, 37)",
+        ),
         margin=dict(t=120, b=20, l=100, r=30),
     )
 
@@ -666,7 +858,110 @@ def update_graphs(kind, start_date, end_date, active_cell):
             legend_font=dict(color="#ccc"),
         )
 
-    return map_fig, hourly_fig, table_data
+    ## SCATTER PLOT
+
+    scatter_data = scatter_data_jam.join(
+        scatter_data_acc, on="hour", lsuffix="_jam", rsuffix="_accident"
+    ).reset_index()
+    scatter_data = scatter_data[
+        (scatter_data["s_jam"] > 0)
+        & (scatter_data["s_accident"] > 0)
+        & (scatter_data["f_jam"] > 0)
+        & (scatter_data["f_accident"] > 0)
+    ]
+
+    scatter_fig = go.Figure()
+    scatter_fig.add_trace(
+        go.Scatter(
+            x=scatter_data["s_jam"],
+            y=scatter_data["s_accident"],
+            mode="markers",
+            marker=dict(  # Tamaños variados para el efecto de burbuja
+                color="rgba(54, 170, 263, 0.6)",  # Color azul con transparencia (0.6)
+                size=20,
+                line=dict(
+                    width=1, color="DarkSlateGrey"
+                ),  # Borde alrededor de las burbujas
+            ),
+            name="Día de semana",
+        )
+    )
+
+    scatter_fig.add_trace(
+        go.Scatter(
+            x=scatter_data["f_jam"],
+            y=scatter_data["f_accident"],
+            mode="markers",
+            marker=dict(  # Tamaños variados para el efecto de burbuja
+                color="rgba(170, 54, 263, 0.6)",  # Color azul con transparencia (0.6)
+                size=20,
+                line=dict(
+                    width=1, color="DarkSlateGrey"
+                ),  # Borde alrededor de las burbujas
+            ),
+            name="Fin de semana / Feriado",
+            xaxis="x2",
+            yaxis="y2",
+        )
+    )
+
+    # Configuración adicional para un estilo atractivo
+    scatter_fig.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(
+            color="#ccc",
+            weight=500,
+            family="Verdana",
+            size=14,
+        ),
+        xaxis2=dict(
+            title="Eventos de congestión en fin de semana",
+            overlaying="x",
+            side="top",
+            showgrid=False,
+            title_font=dict(size=12),
+            showline=False,
+            zeroline=False,
+        ),
+        yaxis2=dict(
+            title="Eventos de accidentes en fin de semana",
+            overlaying="y",  # Superpone el eje sobre el primero
+            side="right",  # Ubica el eje secundario a la derecha
+            showgrid=False,  # Opcional para ocultar la cuadrícula del segundo eje
+            title_font=dict(size=12),
+            showline=False,
+            zeroline=False,
+        ),
+        hoverlabel_font=dict(color="#fff"),
+        title="Relación entre congestión de tráfico y accidentes",
+        xaxis=dict(
+            title="Eventos de congestión día de semana",
+            showgrid=False,
+            title_font=dict(size=12),
+        ),
+        yaxis=dict(
+            title="Eventos de accidente día de semana",
+            showgrid=False,
+            title_font=dict(size=12),
+        ),
+        showlegend=True,
+        margin=dict(t=180),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.45,
+            xanchor="right",
+            x=1,
+            bgcolor="rgb(37, 37, 37)",
+            font=dict(
+                size=10,
+                color="white",
+            ),
+        ),
+    )
+
+    return map_fig, hourly_fig, table_data, daily_fig, scatter_fig
 
 
 @app.callback(
@@ -705,3 +1000,42 @@ def update_ml_graphs(
     group_fig, table_data = update_ML(hour, day_type, week_day, day, kind, segment)
 
     return group_fig, table_data
+
+
+@app.callback(
+    Output("table_last", "data"),
+    Input("dd_type", "value"),
+)
+def update_last_events(kind):
+    last_events = alerts.data.sort_values(by="pubMillis", ascending=False).iloc[:21]
+
+    if last_events.shape[0] == 0:
+        return []
+
+    concepts = [n for n in names.keys() if n != "all"]
+    if kind != "all" and kind is not None:
+        last_events = last_events[last_events["type"] == kind]
+        concepts = [kind]
+
+    if last_events.shape[0] == 0:
+        return []
+
+    last_events = utils.extract_event(
+        last_events, concepts, ["type", "group", "hour", "minute", "street"]
+    )
+    last_events["hour"] = last_events.apply(
+        lambda row: f"{int(row['hour']):02}:{int(row['minute']):02}", axis=1
+    )
+    last_events["date"] = last_events.inicio.dt.strftime("%d/%M/%Y")
+
+    last_events = last_events.rename(
+        columns={
+            "type": "Tipo",
+            "group": "Segmento",
+            "hour": "Hora",
+            "date": "Fecha",
+            "street": "Calle",
+        }
+    )
+
+    return last_events.to_dict("records")
