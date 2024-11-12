@@ -12,7 +12,7 @@ import geopandas as gpd
 from shapely.geometry import Point, Polygon
 
 init_mlflow()
-model = mlflow.sklearn.load_model("models:/XGBClassifier/149")
+model = mlflow.sklearn.load_model("models:/XGBClassifier/156")
 
 names = {
     "all": "Evento",
@@ -52,7 +52,7 @@ selected_time = int(
 
 alerts = utils.load_data("alerts", mode="since", epoch=since)
 alerts = Grouper(alerts.to_gdf(tz=tz))
-alerts.group((10, 20)).filter_by_group_time(80, True)
+alerts.group((10, 20)).filter_by_group_time(60, True)
 
 app.layout = html.Div(
     [
@@ -347,6 +347,7 @@ def update_ML(
     hour: int,
     day_type: int,
     week_day: int,
+    day: int,
     kind: str,
     higlighted_segment: int | None = None,
 ):
@@ -357,6 +358,7 @@ def update_ML(
             "day_type": [day_type],
             "hour": [hour],
             "week_day": [week_day],
+            "day": [day],
             "group": [0],
             "type_ACCIDENT": [1 if "ACCIDENT" in kind else 0],
             "type_JAM": [1 if "JAM" in kind else 0],
@@ -422,11 +424,11 @@ def update_ML(
             locations=gdf_polygons.index,
             z=gdf_polygons["probability"],
             text=gdf_polygons["segment"],
-            hovertemplate="<b>%{text}</b><br>Probabilidad de evento: %{z:.2f}<extra></extra>",
+            hovertemplate="<b>%{text}</b><br>Probabilidad de evento: %{z:.3f}<extra></extra>",
             colorscale="Blues",
             zmin=0,
             zmax=1,
-            marker_opacity=0.2,
+            marker_opacity=0.3,
             marker_line_width=1,
         )
     )
@@ -484,7 +486,7 @@ def update_ML(
     gdf_polygons["segment"] = gdf_polygons["segment"].str.replace(
         "Segmento ", "", regex=False
     )
-    gdf_polygons["probability"] = gdf_polygons["probability"].round(2)
+    gdf_polygons["probability"] = gdf_polygons["probability"].round(3)
 
     table_data = (
         gdf_polygons[["segment", "probability"]]
@@ -593,12 +595,9 @@ def update_graphs(kind, start_date, end_date, active_cell):
                 "street": "Calle",
                 "time": "Hora de reporte",
                 "date": "Fecha de reporte",
+                "group": "Segmento",
             },
-            hover_data={
-                "street": True,
-                "time": True,
-                "date": True,
-            },
+            hover_data={"street": True, "time": True, "date": True, "group": True},
             opacity=0.8,
         )
     )
@@ -678,9 +677,13 @@ def update_graphs(kind, start_date, end_date, active_cell):
         Input("dd_hour_ml", "value"),
         Input("table_ml", "active_cell"),
         Input("table_ml", "data"),
+        Input("table_ml", "page_current"),
+        Input("table_ml", "page_size"),
     ],
 )
-def update_ml_graphs(kind, date_value, hour, active_cell, table_data):
+def update_ml_graphs(
+    kind, date_value, hour, active_cell, table_data, page_current, page_size
+):
     if kind is None:
         kind = "ACCIDENT"
     if date_value is None:
@@ -688,6 +691,7 @@ def update_ml_graphs(kind, date_value, hour, active_cell, table_data):
     else:
         date_ml = datetime.date.fromisoformat(date_value)
 
+    day = date_ml.day
     week_day = date_ml.weekday()
     day_type = (
         0 if (date_ml.weekday() >= 5) | (date_value in utils.get_holidays()) else 1
@@ -695,8 +699,9 @@ def update_ml_graphs(kind, date_value, hour, active_cell, table_data):
 
     segment = None
     if table_data and active_cell:
-        segment = table_data[active_cell["row"]]["Segmento"]
+        global_index = page_current * page_size + active_cell["row"]
+        segment = table_data[global_index]["Segmento"]
 
-    group_fig, table_data = update_ML(hour, day_type, week_day, kind, segment)
+    group_fig, table_data = update_ML(hour, day_type, week_day, day, kind, segment)
 
     return group_fig, table_data

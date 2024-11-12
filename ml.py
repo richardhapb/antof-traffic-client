@@ -27,13 +27,10 @@ alerts = utils.update_timezone(alerts, "America/Santiago")
 alerts = utils.extract_event(
     alerts,
     CONCEPTS,
-    ["type", "geometry", "hour", "day_type", "week_day"]
+    ["type", "geometry", "hour", "day_type", "week_day", "day"]
     + (["street"] if GEODATA == "street" else []),
 )
 
-
-alerts = utils.freq_nearby(alerts, nearby_meters=200)
-alerts = utils.filter_nearby(alerts, threshold=200)
 
 print(alerts[alerts["type"] == "ACCIDENT"].shape[0])
 
@@ -130,6 +127,7 @@ def predict_route(ml, initial_params, routes, **kwargs):
 
 if GEODATA == "group":
     g.group((10, 20), CONCEPTS)
+    g.filter_by_group_time(60, True)
     fig = g.plot_with_numbers()
     fig.savefig("graph/groups_with_numbers.png")
 
@@ -183,7 +181,7 @@ elif GEODATA == "group":
     routes = [route1_group, route2_group, route3_group, route4_group]
 
 
-x_vars = [GEODATA, "hour", "day_type", "type", "week_day"]
+x_vars = [GEODATA, "hour", "day_type", "type", "week_day", "day"]
 categories = ["type"]
 
 ORDINAL_ENCODER = False
@@ -211,6 +209,7 @@ initial_params = {
     "day_type": 1,
     "hour": 7,
     "week_day": 1,
+    "day": 20,
     # GEODATA: geodata_element,
 }
 
@@ -224,6 +223,8 @@ obj.loc[0] = 0
 
 for k, v in initial_params.items():
     obj[k] = v
+
+obj["type_ACCIDENT"] = 1
 
 if "group" in obj:
     del obj["group"]
@@ -259,19 +260,19 @@ cm = ml.confusion_matrix()
 print("Confusion matrix:\n")
 print(cm)
 
-# ml.log_model_params(
-#     **initial_params,
-#     avg_pos_probs=np.average(np.array(probs[0]).ravel().reshape(-1, 2)[:, 1]),
-#     type_event=type_event,
-#     hash_encode=ml.hash,
-#     ohe=ml.ohe,
-#     sample=ml.data.shape,
-#     ordinal_encoder=ORDINAL_ENCODER,
-#     sample_no_events=ml.no_events.shape,
-#     geodata=GEODATA,
-#     geodata_element=geodata_element,
-#     categories=categories,
-# )
+ml.log_model_params(
+    **initial_params,
+    avg_pos_probs=np.average(np.array(probs[0]).ravel().reshape(-1, 2)[:, 1]),
+    type_event=type_event,
+    hash_encode=ml.hash,
+    ohe=ml.ohe,
+    sample=ml.data.shape,
+    ordinal_encoder=ORDINAL_ENCODER,
+    sample_no_events=ml.no_events.shape,
+    geodata=GEODATA,
+    geodata_element=geodata_element,
+    categories=categories,
+)
 
 # ml.ohe = False
 # ml.hash = True
