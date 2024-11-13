@@ -139,8 +139,6 @@ class Grouper:
             return None
         events2 = self.data.copy()
 
-        before = events2.shape[0]
-
         if not isinstance(events2["pubMillis"].iloc[0], np.int64):
             events2["pubMillis"] = (
                 (pd.to_numeric(events2["pubMillis"]) / 1_000_000)
@@ -154,8 +152,10 @@ class Grouper:
         events2["interval_start"] = ((events2["pubMillis"]) // step) * step
 
         # Convertir 'interval_start' a datetime
-        events2["interval_start"] = pd.to_datetime(events2["interval_start"], unit="ms")
-        events2["interval_start"] = events2["interval_start"].dt.tz_localize(
+        events2["interval_start"] = pd.to_datetime(
+            events2["interval_start"], unit="ms", utc=True
+        )
+        events2["interval_start"] = events2["interval_start"].dt.tz_convert(
             "America/Santiago"
         )
 
@@ -171,8 +171,8 @@ class Grouper:
 
         result = grouped_events.reset_index(drop=True)
 
-        result["pubMillis"] = pd.to_datetime(result["pubMillis"], unit="ms")
-        result["pubMillis"] = result["pubMillis"].dt.tz_localize("America/Santiago")
+        result["pubMillis"] = pd.to_datetime(result["pubMillis"], unit="ms", utc=True)
+        result["pubMillis"] = result["pubMillis"].dt.tz_convert("America/Santiago")
 
         if inplace:
             self.data = result

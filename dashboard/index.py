@@ -12,7 +12,7 @@ import geopandas as gpd
 from shapely.geometry import Point, Polygon
 
 init_mlflow()
-model = mlflow.sklearn.load_model("models:/XGBClassifier/156")
+model = mlflow.sklearn.load_model("models:/XGBClassifier/157")
 
 names = {
     "all": "Evento",
@@ -81,13 +81,16 @@ app.layout = html.Div(
                                     "Los gráficos son interactivos, se pueden filtrar por calle, haciendo click en las tablas de calles, como también en las leyendas"
                                 ),
                                 html.Li(
-                                    "El modelo predictivo está basado en el modelo XGBClassifier y segmentado por parámetros temporales (tipo de día, día de la semana, día del mes, hora del día) y de parametros geospaciales, los cuales se resumen en el segmento asociado."
+                                    "El modelo predictivo está basado en el modelo XGBClassifier y segmentado por parámetros temporales (tipo de día, día de la semana, día del mes, hora del día) y de parámetros geospaciales, los cuales se resumen en el segmento asociado."
                                 ),
                                 html.Li(
                                     "La tabla del modelo predictivo también es interactiva, se puede visualizar el segmento asociado haciendo click en la fila correspondiente."
                                 ),
                                 html.Li(
                                     "Los datos están disponibles a partir del 1 de octubre de 2024, por lo que se pueden aplicar filtros de fecha hasta es punto."
+                                ),
+                                html.Li(
+                                    "El objetivo del modelo predictivo es valorar la probabilidad de que un evento ocurra bajo los parámetros previamente establecidos, tiene aplicaciones como la de visualizar la ruta con menor probabilidad de evento desde un segmento A a un segmento B, también para poder identificar patrones para la gestión del tráfico."
                                 ),
                             ],
                         ),
@@ -281,13 +284,14 @@ app.layout = html.Div(
             ],
             className="row",
         ),
+        html.H1("Modelo predictivo", className="title_ml"),
         html.Div(
             [
                 html.Div(
                     [
                         html.Div(
                             [
-                                html.H2("Parámetros para el modelo predictivo"),
+                                html.H2("Parámetros para el modelo"),
                                 html.H3("Tipo de evento"),
                                 dcc.Dropdown(
                                     id="dd_type_ml",
@@ -1026,7 +1030,9 @@ def update_last_events(kind):
     last_events["hour"] = last_events.apply(
         lambda row: f"{int(row['hour']):02}:{int(row['minute']):02}", axis=1
     )
-    last_events["date"] = last_events.inicio.dt.strftime("%d/%M/%Y")
+    last_events["date"] = last_events.inicio.dt.strftime("%d/%m/%Y")
+
+    last_events["type"] = last_events["type"].map(names)
 
     last_events = last_events.rename(
         columns={
