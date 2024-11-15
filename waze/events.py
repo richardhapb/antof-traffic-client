@@ -9,7 +9,7 @@ from functools import wraps
 from utils import utils
 import pandas as pd
 import json
-
+import geopandas as gpd
 
 def db_connection(func):
     @wraps(func)
@@ -244,7 +244,7 @@ class Events:
             ]
             self.data = [{k: v for k, v in zip(cols, d)} for d in self.data]
 
-    def to_gdf(self, tz: str = "America/Santiago"):
+    def to_gdf(self, tz: str = "America/Santiago")->gpd.GeoDataFrame:
         if len(self.data) == 0:
             return None
         df = pd.DataFrame(self.data, columns=self.data[0].keys())

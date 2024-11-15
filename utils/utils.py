@@ -174,7 +174,7 @@ def separate_coords(df):
     return dfg
 
 
-def extract_event(data: gpd.GeoDataFrame, concept: list, extra_col: list = []):
+def extract_event(data: gpd.GeoDataFrame | pd.DataFrame, concept: list, extra_col: list = [])->gpd.GeoDataFrame:
     """
     Extraer los eventos de un tipo específico de un GeoDataFrame
     """

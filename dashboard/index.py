@@ -51,8 +51,8 @@ selected_time = int(
     * 1000
 )
 
-alerts = utils.load_data("alerts", mode="since", epoch=since)
-alerts = Grouper(alerts.to_gdf(tz=tz))
+alerts_query = utils.load_data("alerts", mode="since", epoch=since)
+alerts = Grouper(alerts_query.to_gdf(tz=tz))
 alerts.group((10, 20)).filter_by_group_time(60, True)
 
 app.layout = html.Div(
@@ -72,7 +72,7 @@ app.layout = html.Div(
                         html.Ul(
                             [
                                 html.Li(
-                                    "El dashboard se divide en dos secciones princiaples, la representaciones descriptivas de los datos, la cual se compone de los 6 primeros gráficos/tablas, siendo el de correlación el último. La segunda sección corresponde al modelo predictivo, compuesto por el mapa, las entradas de parámetros y la tabla de información."
+                                    "El dashboard se divide en dos secciones principales, la representaciones descriptivas de los datos, la cual se compone de los 6 primeros gráficos/tablas, siendo el de correlación el último. La segunda sección corresponde al modelo predictivo, compuesto por el mapa, las entradas de parámetros y la tabla de información."
                                 ),
                                 html.Li(
                                     "La primera sección (tres primeras filas) es controlada por los filtros de tipo de evento y rango, se exceptúa en el filtro de tipo el gráfico de correlación y el listado de últimos eventos, el cual es independiente."
@@ -451,6 +451,8 @@ def update_ML(
         x_var["type_ACCIDENT"] = 1
         kind = "ACCIDENT"
 
+    assert g.x_grid is not None, "Error: x_grid must not be None"
+    assert g.y_grid is not None, "Error: y_grid must not be None"
     # Convierte las coordenadas en una lista de puntos (x, y)
     points = [
         Point(x, y)
@@ -458,14 +460,21 @@ def update_ML(
         for x, y in zip(x_row, y_row)
     ]
 
-    # Crear un GeoDataFrame
-    gdf = gpd.GeoDataFrame(geometry=points, crs="EPSG:3857")
-    # Convierte a EPSG:4326 (lat/lon)
-    gdf = gdf.to_crs(epsg=4326)
+    if points:
+        # Crear un GeoDataFrame
+        gdf = gpd.GeoDataFrame(geometry=points, crs="EPSG:3857")
+        # Convierte a EPSG:4326 (lat/lon)
+        gdf = gdf.to_crs(epsg=4326)
 
-    # Extrae las coordenadas convertidas para Plotly
-    lats = sorted(list(set(gdf.geometry.y.tolist())))
-    lons = sorted(list(set(gdf.geometry.x.tolist())))
+        if gdf is None:
+            raise ValueError("Something was wrong, the geometry is null, verify the points")
+        # Extrae las coordenadas convertidas para Plotly
+        lats = sorted(list(set(gdf.geometry.y.tolist())))
+        lons = sorted(list(set(gdf.geometry.x.tolist())))
+
+    else:
+        lats = []
+        lons = []
 
     polygons = []
 
@@ -482,9 +491,7 @@ def update_ML(
             polygons.append(poly)
 
     # Convertir a GeoDataFrame
-    gdf_polygons = gpd.GeoDataFrame(geometry=polygons, crs="EPSG:4326")
-
-    # Añadir datos de ejemplo al GeoDataFrame, como probabilidades
+    gdf_polygons:gpd.GeoDataFrame = gpd.GeoDataFrame(geometry=polygons, crs="EPSG:4326")
     gdf_polygons["probability"] = [
         model.predict_proba(x_var.assign(group=g.calc_quadrant(j, i)))[0][1]
         if g.calc_quadrant(j, i) in set(g.data["group"])
@@ -568,7 +575,7 @@ def update_ML(
     gdf_polygons["probability"] = gdf_polygons["probability"].round(3)
 
     table_data = (
-        gdf_polygons[["segment", "probability"]]
+        gdf_polygons.loc[:, ["segment", "probability"]]
         .rename(columns={"segment": "Segmento", "probability": "Probabilidad"})
         .sort_values(by="Probabilidad", ascending=False)
         .to_dict("records")
@@ -611,7 +618,7 @@ def update_graphs(kind, start_date, end_date, active_cell):
     )
 
     if end <= start:
-        end = start + (23 * 60 * 60 + 60**2 * 59) * 1000
+        end = start.timestamp() + (23 * 60 * 60 + 60**2 * 59) * 1000
 
     filtered_alerts = gpd.GeoDataFrame(
         alerts.data[
@@ -619,7 +626,7 @@ def update_graphs(kind, start_date, end_date, active_cell):
         ]
     )
 
-    if filtered_alerts.shape[0] == 0:
+    if filtered_alerts is None or filtered_alerts.shape[0] == 0:
         return STANDARD_RETURN
 
     scatter_data_acc = utils.extract_event(
@@ -654,9 +661,10 @@ def update_graphs(kind, start_date, end_date, active_cell):
     table_data = streets_data.to_dict("records")
 
     if active_cell is not None:
-        filtered_alerts = filtered_alerts[
+        filtered_alerts = filtered_alerts.loc[
             filtered_alerts["street"] == streets_data.iloc[active_cell["row"]]["Calle"]
         ]
+
 
     if kind == "all":
         events = utils.extract_event(
@@ -690,14 +698,16 @@ def update_graphs(kind, start_date, end_date, active_cell):
     else:
         map_data = filtered_alerts.copy()
     map_data = utils.freq_nearby(map_data, nearby_meters=200)
+    if map_data is None:
+        raise ValueError("Map data is None")
     map_data["freq"] = map_data.apply(
         lambda x: x["freq"] if x["freq"] > 0 else 1, axis=1
     )
 
-    map_data["time"] = map_data["pubMillis"].apply(lambda x: x.strftime("%H:%M:%S"))
-    map_data["date"] = map_data["pubMillis"].apply(lambda x: x.strftime("%d-%m-%Y"))
+    map_data["time"] = map_data.pubMillis.apply(lambda x: x.strftime("%H:%M:%S"))
+    map_data["date"] = map_data.pubMillis.apply(lambda x: x.strftime("%d-%m-%Y"))
 
-    map_data["type"] = map_data["type"].map(names)
+    map_data["type"] = map_data.type.map(names)
 
     map_fig = go.Figure(
         px.scatter_map(
@@ -707,7 +717,7 @@ def update_graphs(kind, start_date, end_date, active_cell):
             color="type",
             hover_name="uuid",
             size="freq",
-            zoom=10.5,
+            zoom=11,
             labels={
                 "type": "Tipo de evento",
                 "freq": "Frecuencia",
@@ -1032,7 +1042,7 @@ def update_last_events(kind):
     )
     last_events["date"] = last_events.inicio.dt.strftime("%d/%m/%Y")
 
-    last_events["type"] = last_events["type"].map(names)
+    last_events["type"] = last_events.type.map(names)
 
     last_events = last_events.rename(
         columns={
