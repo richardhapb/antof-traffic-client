@@ -1,4 +1,4 @@
-from dash import Dash, html, dcc, Input, Output, dash_table
+from dash import Dash, html, dcc, Input, Output, dash_table, State
 import plotly.express as px
 from utils import utils
 import datetime
@@ -148,6 +148,7 @@ app.layout = html.Div(
                 html.Div(
                     [
                         html.H3("Eventos por calle"),
+                        html.Button("Limpiar selección", id="table_clear"),
                         dash_table.DataTable(
                             id="table",
                             columns=[
@@ -245,6 +246,7 @@ app.layout = html.Div(
                             page_action="native",
                             page_current=0,
                             page_size=10,
+                            cell_selectable=False,
                             style_table={"overflowX": "auto"},
                             style_cell={
                                 "textAlign": "center",
@@ -351,6 +353,7 @@ app.layout = html.Div(
                                 html.Div(
                                     [
                                         html.H3("Segmentos y probabilidades"),
+                                        html.Button("Limpiar selección", id="table_ml_clear"),
                                         dash_table.DataTable(
                                             id="table_ml",
                                             columns=[
@@ -1055,3 +1058,17 @@ def update_last_events(kind):
     )
 
     return last_events.to_dict("records")
+
+@app.callback(
+        Output("table_ml", "active_cell"),
+        Input("table_ml_clear", "n_clicks")
+        )
+def clear_ml(_):
+    return None
+
+@app.callback(
+        Output("table", "active_cell"),
+        Input("table_clear", "n_clicks")
+        )
+def clear(_):
+    return None
