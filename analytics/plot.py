@@ -3,21 +3,28 @@ import matplotlib.pyplot as plt
 from utils import utils
 import geopandas as gpd
 import contextily as cx
+from matplotlib.figure import Figure
 
 
 class Plot:
-    def heat_map(self, data: gpd.GeoDataFrame):
+    def heat_map(self, data: gpd.GeoDataFrame)->Figure:
         event = data.copy()
 
+        if event is None:
+            return plt.figure()
+
         if len(event) == 0:
-            return None
+            return plt.figure()
         event = event[["geometry"]]
         event = event.to_crs(epsg=3857)  # Para visualización correcta en plano
 
+        if event is None:
+            return plt.figure()
+
         fig, ax = plt.subplots()
         fig.set_size_inches((4.5, 9.5))
-        sc = event["geometry"].plot(ax=ax, alpha=0.5, cmap="GnBu")
-        cx.add_basemap(ax, source=cx.providers.OpenStreetMap.Mapnik)
+        sc = event["geometry"].plot(ax=ax, alpha=0.5, cmap="GnBu") 
+        cx.add_basemap(ax, source=cx.providers.OpenStreetMap.Mapnik) # type: ignore
         # Añadir la barra de colores
         cbar = sc.get_figure().colorbar(sc.collections[0], ax=ax)
         cbar.set_label("Frecuencia")
@@ -30,13 +37,13 @@ class Plot:
 
         return fig
 
-    def hourly_report(self, data: gpd.GeoDataFrame):
+    def hourly_report(self, data: gpd.GeoDataFrame)->Figure:
         """
         Reportes de eventos por día de la semana
         """
 
         if data.empty:
-            return None
+            return plt.figure()
 
         hourly_reports = utils.hourly_group(data)
 
@@ -86,13 +93,13 @@ class Plot:
 
         return fig
 
-    def daily_report(self, data: gpd.GeoDataFrame):
+    def daily_report(self, data: gpd.GeoDataFrame)->Figure:
         """
         Reportes de eventos por día de la semana
         """
 
         if data.empty:
-            return None
+            return plt.figure()
 
         daily_reports = utils.daily_group(data)
 

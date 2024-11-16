@@ -1,3 +1,4 @@
+from typing import Dict, List, cast
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder
 from sklearn.metrics import (
@@ -8,7 +9,7 @@ from sklearn.metrics import (
     confusion_matrix,
 )
 from sklearn.feature_extraction import FeatureHasher
-from sklearn.base import clone
+from sklearn.base import clone, ClassifierMixin
 import pandas as pd
 from analytics.grouper import Grouper
 from utils import utils
@@ -17,8 +18,9 @@ import contextily as cx
 import mlflow
 from mlflow.models import infer_signature
 from functools import wraps
-from sklearn import base
 import numpy as np
+from geopandas import GeoDataFrame
+from matplotlib.figure import Figure
 
 CONCEPTS = ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"]
 
@@ -40,32 +42,38 @@ def mlflow_logger(func):
 
 class ML:
     def __init__(
-        self, data, model, column_y=None, categories=None, ohe=False, hash=False
+            self,
+            data:GeoDataFrame | pd.DataFrame,
+            model:ClassifierMixin,
+            column_y:str | None = None,
+            categories: List | None = None,
+            ohe: bool=False,
+            hash:bool=False
     ):
-        self.data = data
-        self.model = clone(model)
-        self.columns_x = [column for column in self.data.columns if column != column_y]
-        self.column_y = column_y
-        self.categories = categories
-        self.ohe = ohe
-        self.hash = hash
-        self.hasher = None
-        self.data_labeled = None
-        self.x_train = None
-        self.x_test = None
-        self.y_train = None
-        self.y_test = None
-        self.onehot = None
-        self.oe = None
-        self.no_events = None
-        self.x = None
-        self.y = None
+        self.data:GeoDataFrame | pd.DataFrame = data
+        self.model: ClassifierMixin = cast(ClassifierMixin, clone(model)) 
+        self.columns_x : List = [column for column in self.data.columns if column != column_y]
+        self.column_y : str | None = column_y
+        self.categories: List | None = categories
+        self.ohe: bool = ohe
+        self.hash: bool = hash
+        self.hasher: Dict[ str, FeatureHasher ] | None = None
+        self.data_labeled: GeoDataFrame | pd.DataFrame | None = None
+        self.x_train:pd.DataFrame | None = None
+        self.x_test:pd.DataFrame | None = None
+        self.y_train:pd.DataFrame | None = None
+        self.y_test:pd.DataFrame | None = None
+        self.onehot: Dict[ str, OneHotEncoder ] | None = None
+        self.oe: Dict[ str, OrdinalEncoder ] | None = None # Ordinal Encoder
+        self.no_events: pd.DataFrame | GeoDataFrame | None = None
+        self.x : np.ndarray | None = None
+        self.y: np.ndarray | None = None
 
         if self.data is not None:
             self.data[column_y] = 1
 
     @staticmethod
-    def convert_dataset_to_ohe(data: pd.DataFrame, categories: list):
+    def convert_dataset_to_ohe(data: pd.DataFrame, categories: list)->pd.DataFrame:
         labeled = []
         onehot = {}
         for c in categories:
@@ -80,12 +88,12 @@ class ML:
 
         return pd.concat([data.drop(categories, axis=1), *labeled], axis=1)
 
-    def generate_neg_simulated_data(self, extra_cols: list, geodata: str = "group"):
+    def generate_neg_simulated_data(self, extra_cols: List, geodata: str = "group")->None:
         events2 = self.data.copy()
         events2["happen"] = 1
 
-        if not isinstance(events2["inicio"].iloc[0], np.int64):
-            events2["inicio"] = np.int64(pd.to_numeric(events2["inicio"]) / 1_000_000)
+        if not isinstance(events2["inicio"].iloc[0], np.integer):
+            events2["inicio"] = events2["inicio"].astype(np.int64, errors="ignore") / 1_000_000
 
         step = np.int64(60_000 * 5)
 
@@ -120,7 +128,7 @@ class ML:
 
         result = merged[["inicio", geodata, "type", "happen"]]
 
-        if not isinstance(self.data["inicio"].iloc[0], np.int64):
+        if not isinstance(self.data["inicio"].iloc[0], np.integer):
             result["inicio"] = pd.to_datetime((result["inicio"] * 1_000_000), unit="ns")
         else:
             result["inicio"] = result["inicio"]
@@ -130,15 +138,15 @@ class ML:
             self.no_events, CONCEPTS, extra_cols + ["happen"]
         )
 
-    def balance_day_type(self):
+    def balance_day_type(self)->None:
         # Balance no events and events, for weekend and workdays
         if (
+            self.no_events is None
+            or
             "day_type" not in self.data.columns
             or "day_type" not in self.no_events.columns
         ):
             raise ValueError("There are not day type data in dataset")
-
-        print("BEFORE")
 
         print(self.data.day_type.value_counts())
         print(self.no_events.day_type.value_counts())
@@ -152,7 +160,7 @@ class ML:
 
         self.data = pd.concat(
             [days1, days0.sample(q_days0 + diff, replace=True, random_state=42)]
-        )
+            ) # type: ignore
 
         days0 = self.no_events[
             (self.no_events.day_type == "f") | (self.no_events.day_type == 0)
@@ -166,22 +174,18 @@ class ML:
                 days1.sample(q_days1, replace=True, random_state=42),
                 days0.sample(q_days0 + diff, replace=True, random_state=42),
             ]
-        )
+            ) # type: ignore
 
-        print("AFTER")
-        print(self.data.day_type.value_counts())
-        print(self.no_events.day_type.value_counts())
-
-    def clean(self, columns_x, column_y):
+    def clean(self, columns_x: List, column_y:str)->None:
         self.columns_x = columns_x
         self.column_y = column_y
 
         # Clean the data
-        self.data = self.data[columns_x + [column_y]]
+        self.data = self.data.loc[:, columns_x + [column_y]]
         if self.no_events is not None:
-            self.no_events = self.no_events[columns_x + [column_y]]
+            self.no_events = self.no_events.loc[:, columns_x + [column_y]]
 
-    def prepare(self, no_features=None):
+    def prepare(self, no_features=None)->None:
         if self.data is None:
             raise ValueError("Not have data for model generation")
 
@@ -192,11 +196,14 @@ class ML:
         )
 
         if "day_type" in total_events.columns:
-            total_events["day_type"] = total_events["day_type"].map({"f": 0, "s": 1})
+            total_events["day_type"] = total_events["day_type"].replace({"f": 0, "s": 1})
 
         if self.ohe:
             labeled = []
             self.onehot = {}
+
+            if self.categories is None:
+                self.categories = list(self.data.columns)
             for c in self.categories:
                 self.onehot[c] = OneHotEncoder(handle_unknown="ignore")
                 oht = self.onehot[c].fit_transform(total_events[[c]])
@@ -218,6 +225,8 @@ class ML:
             labeled = []
             self.hasher = {}
             no_features = no_features if no_features else 5
+            if self.categories is None:
+                self.categories = list(self.data.columns)
             for c in self.categories:
                 self.hasher[c] = FeatureHasher(
                     n_features=no_features, input_type="string"
@@ -229,7 +238,7 @@ class ML:
                 labeled.append(
                     pd.DataFrame(
                         hashed.toarray(),
-                        columns=[f"{c}_{i}" for i in range(no_features)],
+                        columns=[f"{c}_{i}" for i in range(no_features)], # type: ignore
                     ).reset_index(drop=True)
                 )
 
@@ -243,20 +252,23 @@ class ML:
         else:
             self.data_labeled = total_events.copy()
 
-    def train(self):
-        self.x = self.data_labeled.drop(self.column_y, axis=1)
-        self.y = self.data_labeled[self.column_y]
+    def train(self)->None:
+        if self.data_labeled is None:
+            self.prepare()
+        self.x = self.data_labeled.drop(self.column_y, axis=1) # type: ignore
+        self.y = self.data_labeled.loc[:, self.column_y] # type: ignore
 
-        self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(
+        self.x_train, self.x_test, self.y_train, self.y_test = train_test_split( # type: ignore
             self.x, self.y, test_size=0.2, random_state=42
-        )
+            ) 
 
-        self.model.fit(self.x_train, self.y_train)
+        self.model.fit(self.x_train, self.y_train) # type: ignore
 
-    def cross_validation(self):
+    def cross_validation(self)->List:
         if self.data_labeled is None:
             self.train()
 
+        assert self.data_labeled is not None, "Data labeled is empty, did you prepare the model?"
         x = self.data_labeled.drop(self.column_y, axis=1)
         y = self.data_labeled[self.column_y]
 
@@ -264,30 +276,32 @@ class ML:
 
         return scores
 
-    def predict(self, data):
+    def predict(self, data)->List:
         if self.data_labeled is None:
             self.train()
 
+        assert self.data_labeled is not None, "Data is not labeled, did you prepare the model?"
         data = data[[e for e in list(self.data_labeled.columns) if e != self.column_y]]
 
-        return self.model.predict(data)
+        return self.model.predict(data) # type: ignore
 
-    def predict_proba(self, data):
+    def predict_proba(self, data)->None:
         if self.data_labeled is None:
             self.train()
 
+        assert self.data_labeled is not None, "Data is not labeled, did you prepare the model?"
         data = data[[e for e in list(self.data_labeled.columns) if e != self.column_y]]
 
-        return self.model.predict_proba(data)
+        return self.model.predict_proba(data) # type: ignore
 
-    def select_best_params(self, param_grid):
+    def select_best_params(self)->List:
         if self.data_labeled is None:
             self.train()
 
-        return self.model.best_params_
+        return self.model.best_params_ # type: ignore
 
-    def metrics(self):
-        y_pred = self.model.predict(self.x_test)
+    def metrics(self)->Dict:
+        y_pred = self.model.predict(self.x_test) # type: ignore
 
         metrics = {
             "accuracy": accuracy_score(self.y_test, y_pred),
@@ -298,27 +312,30 @@ class ML:
 
         return metrics
 
-    def confusion_matrix(self):
+    def confusion_matrix(self)->List:
+        if self.y_train is None:
+            return []
         return confusion_matrix(
             self.y_test,
-            self.model.predict(self.x_test),
+            self.model.predict(self.x_test), # type: ignore
             labels=self.y_train.unique(),
         )
 
-    def encode(self, data, category):
+    def encode(self, data, category)->np.ndarray:
         if self.data_labeled is None:
             self.train()
 
-        if self.ohe:
+        if self.ohe and self.onehot:
             return (
                 self.onehot[category]
-                .transform(pd.DataFrame([data], columns=[category]))
+                .transform(pd.DataFrame([data], columns=[category])) # type: ignore
                 .toarray()
             )
-        elif self.hash:
+        elif self.hash and self.hasher:
             return self.hasher[category].transform([[s] for s in data]).toarray()
+        return np.array([])
 
-    def plot_by_quad(self, grouper: Grouper, obj: pd.DataFrame):
+    def plot_by_quad(self, grouper: Grouper, obj: pd.DataFrame)->Figure:
         obj = obj.copy()
         if self.data_labeled is None:
             self.train()
@@ -330,6 +347,9 @@ class ML:
         between_x = xc[0][1] - xc[0][0]
         between_y = yc[1][0] - yc[0][0]
 
+        if self.categories is None:
+            self.categories = list(self.data.columns)
+
         for xp in xc[0]:
             for yp in yc.T[0]:
                 quad = grouper.calc_quadrant(i, j)
@@ -339,8 +359,10 @@ class ML:
                     obj["group_" + str(quad)] = 1
                 else:
                     obj["group"] = quad
-                pred = self.predict_proba(obj)[0][1]
-                ax.text(xp - 250, yp - 150, round(pred, 1), fontsize=6, alpha=0.8)
+                pred = self.predict_proba(obj)
+                pred = pred[0][1] if pred else 0
+
+                ax.text(xp - 250, yp - 150, str(round(pred, 1)), fontsize=6, alpha=0.8)
                 ax.fill_between(
                     [xf, xf + between_x],
                     yf,
@@ -357,7 +379,7 @@ class ML:
         cx.add_basemap(
             ax,
             crs=grouper.data.crs.to_string(),
-            source=cx.providers.OpenStreetMap.Mapnik,
+            source=cx.providers.OpenStreetMap.Mapnik, # type: ignore
         )
 
         ax.set_title("Accidentes por cuadrante")
@@ -368,19 +390,23 @@ class ML:
         return fig
 
     @mlflow_logger
-    def log_model_params(self, **params):
-        signature = infer_signature(self.x_train, self.model.predict(self.x_train))
+    def log_model_params(self, **params)->None:
 
-        if isinstance(self.model, base.BaseEstimator):
+        if self.x_train is None:
+            return
+
+        signature = infer_signature(self.x_train, self.model.predict(self.x_train)) # type: ignore
+
+        if isinstance(self.model, ClassifierMixin):
             mlflow.sklearn.log_model(
                 sk_model=self.model,
                 artifact_path="waze_data",
                 signature=signature,
-                input_example=self.x_train.head(),
+                input_example=self.x_train.head(), 
                 registered_model_name=type(self.model).__name__,
             )
 
-        model_params = self.model.get_params()
+        model_params = self.model.get_params() # type: ignore
         mlflow.log_params({k: v for k, v in model_params.items() if v is not None})
 
         scores = self.cross_validation()
