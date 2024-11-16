@@ -1,12 +1,24 @@
-import json
+
+# Typing
+from typing import List, Dict, Any, Set
+
+# Datetime
 from datetime import datetime
 import pytz
+
+# Filesystem
 import shutil
 import os
+
+# DATABASE
 from config import DATABASE_CONFIG
 import psycopg2
+from psycopg2.extensions import connection
+
+# Decorator
 from functools import wraps
-from utils import utils
+
+# data
 import pandas as pd
 import json
 import geopandas as gpd
@@ -21,7 +33,9 @@ def db_connection(func):
             self.db.set_client_encoding("UTF8")
 
         try:
-            result = func(self, *args, **kwargs)
+            result = None
+            if self.db:
+                result = func(self, *args, **kwargs)
         except psycopg2.Error as e:
             self.db.rollback()
             raise ValueError(f"Error executing database query: {e}")
@@ -41,7 +55,7 @@ class Events:
     # Cada tabla tiene diccionarios dentro, para esos casos se considera [nombre_atributo]_id
     # Además existe una tabla para cada diccionario dentro de los datos, con nombre [nombre_tabla]_[nombre_atributo]
 
-    db_columns_map = {
+    db_columns_map : Dict = {
         "alerts": {
             "uuid": "uuid",
             "reliability": "reliability",
@@ -80,90 +94,89 @@ class Events:
         },
     }
 
-    def __init__(self, data=[], filename=None, table_name=None):
-        self.data = data
-        self.filename = filename
-        self.table_name = table_name
-        self.pending_endreports = set()
-        self.db = None
-        self.index_map = {}
+    def __init__(self, data:List[Dict[str, Any]]=[], filename:str | None=None, table_name:str | None=None)->None:
+        self.data:List[Dict[str, Any]] = data
+        self.filename:str | None = filename
+        self.table_name:str | None = table_name
+        self.pending_endreports: Set = set()
+        self.db: connection | None = None
+        self.index_map: Dict = {}
 
         if self.data is not None:
             self.update_index_map()
             self.update_pending_endreports()
 
-    def __del__(self):
+    def __del__(self)->None:
         if self.db is not None and not self.db.closed:
             self.db.close()
 
-    def __add__(self, other):
-        if isinstance(other, Events):
-            if other.data is not None and len(other.data) > 0:
-                new_data = [
-                    d for d in other.data if d["uuid"] not in self.pending_endreports
-                ]
-            elif self.data is not None and len(self.data) > 0:
-                new_data = [
-                    d for d in self.data if d["uuid"] not in other.pending_endreports
-                ]
-            else:
-                return Events([])
-
-            events = Events(
-                new_data + self.data,
-                self.filename,
-                self.table_name if self.table_name else other.table_name,
-            )
-
-            events.pending_endreports = (
-                self.pending_endreports | other.pending_endreports
-            )
-
-            # Update pending endreports if an uuid is not found in the new data
-            for uuid in self.pending_endreports:
-                if uuid not in other.pending_endreports:
-                    events.end_report(uuid)
-
-            return events
-        else:
+    def __add__(self, other: "Events")->"Events":
+        if not isinstance(other, Events):
             raise TypeError("Operador + no soportado")
-
-    def __sub__(self, other):
-        if isinstance(other, Events):
-            if other.data is not None and len(other.data) > 0:
-                new_data = [
-                    d for d in self.data if d["uuid"] not in other.pending_endreports
-                ]
-            else:
-                new_data = self.data
-
-            events = Events(
-                new_data,
-                self.filename if self.filename else other.filename,
-                self.table_name if self.table_name else other.table_name,
-            )
-
-            events.pending_endreports = (
-                self.pending_endreports - other.pending_endreports
-            )
-
-            return events
+        if other.data is not None and len(other.data) > 0:
+            new_data = [
+                d for d in other.data if d["uuid"] not in self.pending_endreports
+            ]
+        elif self.data is not None and len(self.data) > 0:
+            new_data = [
+                d for d in self.data if d["uuid"] not in other.pending_endreports
+            ]
         else:
-            raise TypeError("Operador - no soportado")
+            return Events([])
 
-    def update_index_map(self):
+        events = Events(
+            new_data + self.data,
+            self.filename,
+            self.table_name if self.table_name else other.table_name,
+        )
+
+        events.pending_endreports = (
+            self.pending_endreports | other.pending_endreports
+        )
+
+        # Update pending endreports if an uuid is not found in the new data
+        for uuid in self.pending_endreports:
+            if uuid not in other.pending_endreports:
+                events.end_report(uuid)
+
+        return events
+
+    def __sub__(self, other:"Events")->"Events":
+        if not isinstance(other, Events):
+            raise TypeError("Operador - no soportado")
+        if other.data is not None and len(other.data) > 0:
+            new_data = [
+                d for d in self.data if d["uuid"] not in other.pending_endreports
+            ]
+        else:
+            new_data = self.data
+
+        events = Events(
+            new_data,
+            self.filename if self.filename else other.filename,
+            self.table_name if self.table_name else other.table_name,
+        )
+
+        events.pending_endreports = (
+            self.pending_endreports - other.pending_endreports
+        )
+
+        return events
+
+    def update_index_map(self)->None:
         if self.data is not None:
             self.index_map = {d["uuid"]: i for i, d in enumerate(self.data)}
         else:
             self.index_map = {}
 
-    def read_file(self, filename=None):
+    def read_file(self, filename:str | None=None) -> List[Dict[str, Any]]:
         if filename is None and self.filename is None:
             raise ValueError("Se requiere una ruta para leer el archivo")
 
         if filename is not None:
             self.filename = filename
-
+        else:
+            return []
         if not os.path.exists(self.filename):
             raise FileNotFoundError(f"Archivo {self.filename} no existe")
 
@@ -184,12 +197,14 @@ class Events:
         self.update_pending_endreports()
         return self.data
 
-    def write_file(self, filename=None):
+    def write_file(self, filename:str | None=None)->None:
         if filename is None and self.filename is None:
             raise ValueError("Se requiere una ruta para crear el archivo")
 
         if filename is not None:
             self.filename = filename
+        else:
+            return
 
         if not os.path.exists(os.path.dirname(self.filename)):
             os.makedirs(os.path.dirname(self.filename))
@@ -200,7 +215,7 @@ class Events:
         with open(self.filename, "w") as f:
             json.dump(self.data, f)
 
-    def update_pending_endreports(self):
+    def update_pending_endreports(self)->None:
         if self.data is None:
             return
         self.pending_endreports = {
@@ -209,7 +224,7 @@ class Events:
             if "endreport" not in d or d["endreport"] is None
         }
 
-    def end_report(self, uuid):
+    def end_report(self, uuid:str)->None:
         now = int((datetime.now(tz=pytz.utc).timestamp() - (5 * 60 / 2)) * 1000)
 
         idx = self.index_map.get(uuid, None)
@@ -222,7 +237,9 @@ class Events:
 
             self.pending_endreports.discard(uuid)
 
-    def clean_data(self):
+    def clean_data(self)->None:
+        if self.data is None or self.table_name is None:
+            return
         deletions = set(k for d in self.data for k in d) - set(
             self.db_columns_map[self.table_name].keys()
         )
@@ -231,33 +248,43 @@ class Events:
                 if key in item:
                     item.pop(key, None)
 
-    def format_data(self):
-        if self.data is None or len(self.data) == 0:
-            return
-        if not isinstance(self.data[0], tuple):
-            return
-        if self.data is not None:
+    @staticmethod
+    def format_data(data: List[tuple[Any]], table_name:str)->List[Dict[str, Any]]:
+        if data is None or len(data) == 0:
+            return []
+        if not isinstance(data[0], tuple):
+            return []
+        if not table_name:
+            return []
+        if data is not None:
             cols = [
                 k
-                for k in self.db_columns_map[self.table_name].keys()
+                for k in Events.db_columns_map[table_name].keys()
                 if k not in ["line", "segments"]
             ]
-            self.data = [{k: v for k, v in zip(cols, d)} for d in self.data]
+            events = [{k: v for k, v in zip(cols, d)} for d in data]
+
+        return events
 
     def to_gdf(self, tz: str = "America/Santiago")->gpd.GeoDataFrame:
+        from utils import utils
         if len(self.data) == 0:
-            return None
-        df = pd.DataFrame(self.data, columns=self.data[0].keys())
+            return gpd.GeoDataFrame()
+        df = pd.DataFrame(self.data, columns=list(self.data[0].keys())) # type: ignore
         df = utils.update_timezone(df, tz)
 
         return utils.separate_coords(df)
 
     def fetch_from_db(
-        self, mode="last_24h", with_nested_items=False, epoch=None, between=None
+            self, mode:str="last_24h", with_nested_items:bool=False, epoch:int | None=None, between:tuple | None=None
     ):
-        self.data = self.get_all_from_db(mode=mode, epoch=epoch, between=between)
+        data = self.get_all_from_db(mode=mode, epoch=epoch, between=between)
 
-        self.format_data()
+        if data is None:
+            return
+
+        self.data = data
+
         self.update_index_map()
         self.update_pending_endreports()
         if with_nested_items:
@@ -288,6 +315,9 @@ class Events:
             return
 
         records = []
+
+        assert isinstance(self.db, connection), "Error in db connection"
+        
         cur = self.db.cursor()
         for sql in sqls:
             cur.execute(sql)
@@ -334,14 +364,19 @@ class Events:
 
     @db_connection
     def get_all_from_db(
-        self, mode: str = "last_24h", epoch: int = None, between: tuple = None
+        self, mode: str = "last_24h", epoch: int | None = None, between: tuple | None = None
     ):
+        if self.table_name is None:
+            return
         not_ended = "not_ended" in mode
         last_24h = "last_24h" in mode
         since = "since" in mode and epoch is not None
         is_between = "between" in mode and between is not None
         all = "all" in mode
 
+        events = []
+
+        assert isinstance(self.db, connection), "Error in db connection"
         cur = self.db.cursor()
         if not_ended:
             cur.execute(
@@ -377,14 +412,19 @@ class Events:
             events = cur.fetchall()
 
         cur.close()
-        return events
+       
+        data = Events.format_data(events, self.table_name)
+        return data
 
     @db_connection
-    def insert_to_db(self, review_mode="last_24h"):
+    def insert_to_db(self, review_mode:str="last_24h")->None:
+        if self.table_name is None:
+            return
         only_review_not_ended = "not_ended" in review_mode
         only_review_last_24h = "last_24h" in review_mode
         review_all = "all" in review_mode
 
+        assert isinstance(self.db, connection), "Error in db connection"
         cur = self.db.cursor()
 
         if only_review_not_ended:
@@ -424,10 +464,12 @@ class Events:
                             location_data["y"],
                         ),
                     )
-                    location_id = cur.fetchone()[0]  # Obtener el `location_id` generado
+                    result = cur.fetchone()
+                    if result is not None:
+                        location_id = result[0]  # Obtener el `location_id` generado
 
-                    # Agregar `location_id` a `record` para la inserción en `alerts`
-                    record["location"] = location_id
+                        # Agregar `location_id` a `record` para la inserción en `alerts`
+                        record["location"] = location_id
 
                 # Insertar en la tabla `alerts`
                 columns = ", ".join(
@@ -496,11 +538,14 @@ class Events:
 
         # Cerrar el cursor
         cur.close()
-        return True
 
     @db_connection
-    def update_endreport_to_db(self, endreport, uuid):
+    def update_endreport_to_db(self, endreport:int, uuid:str)->None:
+        if self.table_name is None:
+            return
+        cur = None
         try:
+            assert isinstance(self.db, connection), "Error in db connection"
             cur = self.db.cursor()
             cur.execute(
                 "UPDATE "
@@ -512,13 +557,18 @@ class Events:
         except psycopg2.Error as e:
             raise ValueError(f"Error updating data to database: {e}")
         finally:
-            cur.close()
+            if cur is not None:
+                cur.close()
 
-        return True
 
     @db_connection
-    def update_endreports_to_db(self, from_new_data=False):
+    def update_endreports_to_db(self, from_new_data:bool=False)->int:
+        if self.table_name is None:
+            return 0
+
+        cur = None
         try:
+            assert isinstance(self.db, connection), "Error in db connection"
             cur = self.db.cursor()
 
             now = int((datetime.now(tz=pytz.utc).timestamp() - (5 * 60 / 2)) * 1000)
@@ -551,7 +601,8 @@ class Events:
         except psycopg2.Error as e:
             raise ValueError(f"Error updating data to database: {e}")
         finally:
-            cur.close()
+            if cur is not None:
+                cur.close()
 
         return len(elements)
 

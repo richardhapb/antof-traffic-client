@@ -707,7 +707,7 @@ def update_graphs(kind, start_date, end_date, active_cell):
     map_data["time"] = map_data.pubMillis.apply(lambda x: x.strftime("%H:%M:%S"))
     map_data["date"] = map_data.pubMillis.apply(lambda x: x.strftime("%d-%m-%Y"))
 
-    map_data["type"] = map_data.type.map(names)
+    map_data["type"] = map_data["type"].map(names)
 
     map_fig = go.Figure(
         px.scatter_map(

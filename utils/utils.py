@@ -1,3 +1,4 @@
+from geopandas.geodataframe import GeoDataFrame
 from waze.events import Events
 import pandas as pd
 import numpy as np
@@ -156,7 +157,7 @@ def freq_nearby(gdf, nearby_meters=200):
     return gdf
 
 
-def separate_coords(df):
+def separate_coords(df:pd.DataFrame)->GeoDataFrame:
     """
     Separa las coordenadas de un DataFrame en dos columnas, retornando un GeoDataFrame
     """
