@@ -29,6 +29,7 @@ h1, h2, h3 {
     color: #ccc;
     text-align: center;
     font-weight: lighter;
+    text-wrap: wrap;
 }
 
 .instructions {
@@ -104,6 +105,7 @@ h1, h2, h3 {
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
+    white-space: normal;
 }
 
 .ml-map {
@@ -164,6 +166,10 @@ input, .Select-value-label {
     stroke: #fff !important;
 }
 
+#table, #table_ml, #table_last {
+    width 100%;
+}
+
 #dd_type {
     margin: 2rem 0 1rem 0;
 }
@@ -205,17 +211,35 @@ h3 {
         justify-content: center;
         gap: 2rem;
     }
+
+    .ml-map {
+        height: 1000px;
+        width: 380px;
+    }
+    .ml-zone {
+        padding: 0 ;
+        flex-direction: column-reverse;
+    }
+    .row {
+        flex-direction: column;
+    }
     
     .plot-container {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 0;
+        gap: 1rem ;
+    }
+
+    #table, #table_ml, #table_last {
+        padding: 1rem 0;
+        width: 380px ;
+        text-wrap: wrap;
     }
 
     .plot, .plot-container, #map, #hourly, #dd_type, #date_range, .header, .first-row {
 
-        width: 100%;
+        width: 380px;
         height: auto;
     }
 
@@ -231,6 +255,8 @@ h3 {
 
     h1 {
         font-size: 2rem;
+    }
+    h1, h2, h3, h4 {
         text-wrap: wrap;
     }
     

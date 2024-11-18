@@ -1,4 +1,4 @@
-from dash import Dash, html, dcc, Input, Output, dash_table, State
+from dash import Dash, html, dcc, Input, Output, dash_table 
 import plotly.express as px
 from utils import utils
 import datetime
@@ -161,16 +161,16 @@ app.layout = html.Div(
                             page_current=0,
                             page_size=10,
                             style_table={"overflowX": "auto"},
-                            style_cell={"textAlign": "center"},
+                            style_cell={"textAlign": "center", "height": "auto", "whiteSpace": "normal"},
                             style_data_conditional=[
                                 {
                                     "if": {"column_id": "Eventos"},
-                                    "width": "100px",
+                                    "width": "27%",
                                     "textAlign": "center",
                                 },
                                 {
                                     "if": {"column_id": "Calle"},
-                                    "width": "350px",
+                                    "width": "73%",
                                     "textAlign": "left",
                                 },
                             ],
@@ -250,7 +250,9 @@ app.layout = html.Div(
                             style_table={"overflowX": "auto"},
                             style_cell={
                                 "textAlign": "center",
-                                "padding": "5px",
+                                "whiteSpace": "normal",
+                                "height": "auto",
+                                "wordBreak": "break-all"
                             },
                             style_header={
                                 "backgroundColor": "rgba(30,30,30,0.6)",
@@ -367,7 +369,7 @@ app.layout = html.Div(
                                             page_current=0,
                                             page_size=10,
                                             style_table={"overflowX": "auto"},
-                                            style_cell={"textAlign": "center"},
+                                            style_cell={"textAlign": "center", "height": "auto", "whiteSpace": "normal"},
                                             style_header={
                                                 "backgroundColor": "rgba(30,30,30,0.6)",
                                                 "color": "#ccc",
@@ -411,7 +413,7 @@ app.layout = html.Div(
                             id="ML",
                             className="ml-map",
                             config={
-                                "scrollZoom": True  # Habilita el zoom de desplazamiento en el mapa
+                                "scrollZoom": True  
                             },
                         )
                     ],
@@ -542,9 +544,9 @@ def update_ML(
                 lon=lon_coords,
                 mode="lines",
                 fill="toself",
-                fillcolor="rgba(255, 0, 0, 0.3)",  # Relleno rojo con opacidad
-                line=dict(color="red", width=2),  # Borde rojo más grueso
-                hoverinfo="skip",  # Evita que interfiera con el hover de Choropleth
+                fillcolor="rgba(255, 0, 0, 0.3)",  
+                line=dict(color="red", width=2),  
+                hoverinfo="skip", 
             )
         )
 
@@ -769,9 +771,10 @@ def update_graphs(kind, start_date, end_date, active_cell):
                 color="#ccc",
                 weight=600,
                 family="Verdana",
-                size=20,
+                size=18,
             ),
             pad=dict(b=30, l=50),
+            x=0.5
         ),
         grid_ygap=1,
         # nogrid
@@ -826,9 +829,10 @@ def update_graphs(kind, start_date, end_date, active_cell):
                 color="#ccc",
                 weight=600,
                 family="Verdana",
-                size=20,
+                size=18,
             ),
             pad=dict(b=30, l=50),
+            x=0.5
         ),
         grid_ygap=1,
         # nogrid
