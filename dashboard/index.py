@@ -23,7 +23,7 @@ names = {
 }
 
 
-tz = "America/Santiago"
+TZ = "America/Santiago"
 
 app = Dash(__name__)
 
@@ -36,14 +36,14 @@ since = int(
         minute=0,
         second=0,
         microsecond=0,
-        tzinfo=pytz.timezone(tz),
+        tzinfo=pytz.timezone(TZ),
     ).timestamp()
     * 1000
 )
 
 selected_time = int(
     (
-        datetime.datetime.now(pytz.timezone(tz)).replace(
+        datetime.datetime.now(pytz.timezone(TZ)).replace(
             hour=0, minute=0, second=0, microsecond=0
         )
         - datetime.timedelta(days=30)
@@ -52,7 +52,7 @@ selected_time = int(
 )
 
 alerts_query = utils.load_data("alerts", mode="since", epoch=since)
-alerts = Grouper(alerts_query.to_gdf(tz=tz))
+alerts = Grouper(alerts_query.to_gdf(tz=TZ))
 alerts.group((10, 20)).filter_by_group_time(60, True)
 
 app.layout = html.Div(
@@ -116,18 +116,18 @@ app.layout = html.Div(
                             end_date_placeholder_text="Hasta",
                             id="date_range",
                             min_date_allowed=datetime.datetime.fromtimestamp(
-                                since / 1000, pytz.timezone(tz)
+                                since / 1000, pytz.timezone(TZ)
                             ),
-                            max_date_allowed=datetime.datetime.now(pytz.timezone(tz)),
+                            max_date_allowed=datetime.datetime.now(pytz.timezone(TZ)),
                             initial_visible_month=datetime.datetime.fromtimestamp(
-                                selected_time / 1000, pytz.timezone(tz)
+                                selected_time / 1000, pytz.timezone(TZ)
                             ),
                             display_format="DD-MM-YYYY",
                             calendar_orientation="vertical",
                             start_date=datetime.datetime.fromtimestamp(
-                                selected_time / 1000, pytz.timezone(tz)
+                                selected_time / 1000, pytz.timezone(TZ)
                             ),
-                            end_date=datetime.datetime.now(pytz.timezone(tz)),
+                            end_date=datetime.datetime.now(pytz.timezone(TZ)),
                             first_day_of_week=1,
                         ),
                     ],
@@ -254,6 +254,28 @@ app.layout = html.Div(
                                 "height": "auto",
                                 "wordBreak": "break-all"
                             },
+                            style_data_conditional=[ 
+                            {
+                                "if": {"column_id": "Tipo"},
+                                "width": "20%"
+                            },
+                            {
+                                "if": {"column_id": "Fecha"},
+                                "width": "20%"
+                            },
+                            {
+                                "if": {"column_id": "Hora"},
+                                "width": "10%"
+                            },
+                            {
+                                    "if": {"column_id": "Calle"},
+                                    "width": "40%"
+                            },
+                            {
+                                    "if": {"column_id": "Segmento"},
+                                    "width": "10%"
+                            }
+                            ],
                             style_header={
                                 "backgroundColor": "rgba(30,30,30,0.6)",
                                 "color": "#ccc",
@@ -614,12 +636,12 @@ def update_graphs(kind, start_date, end_date, active_cell):
     start = (
         (datetime.datetime.fromisoformat(start_date))
         .replace(hour=0, minute=0, second=0, microsecond=0)
-        .astimezone(tz=pytz.timezone(tz))
+        .astimezone(tz=pytz.timezone(TZ))
     )
     end = (
         (datetime.datetime.fromisoformat(end_date))
         .replace(hour=23, minute=59, second=59, microsecond=0)
-        .astimezone(tz=pytz.timezone(tz))
+        .astimezone(tz=pytz.timezone(TZ))
     )
 
     if end <= start:
