@@ -74,22 +74,22 @@ app.layout = html.Div(
                         html.Ul(
                             [
                                 html.Li(
-                                    "El dashboard se divide en dos secciones principales, la representaciones descriptivas de los datos, la cual se compone de los 6 primeros gráficos/tablas, siendo el de correlación el último. La segunda sección corresponde al modelo predictivo, compuesto por el mapa, las entradas de parámetros y la tabla de información."
+                                    "El dashboard se divide en dos secciones principales, la primera corresponde a representaciones descriptivas de los datos, la cual se compone de los 6 primeros gráficos/tablas, siendo el de correlación el último. La segunda sección corresponde al modelo predictivo, compuesto por el mapa, las entradas de parámetros y la tabla de información."
                                 ),
                                 html.Li(
-                                    "La primera sección (tres primeras filas) es controlada por los filtros de tipo de evento y rango, se exceptúa en el filtro de tipo el gráfico de correlación y el listado de últimos eventos, el cual es independiente."
+                                    "La primera sección es controlada por los filtros de tipo de evento y rango, se exceptúa en el filtro de tipo el gráfico de correlación, para el caso de los últimos eventos solo se toma en cuenta el filtro de tipo."
                                 ),
                                 html.Li(
-                                    "Los gráficos son interactivos, se pueden filtrar por calle, haciendo click en las tablas de calles, como también en las leyendas"
+                                    "Los gráficos son interactivos, se pueden filtrar por calle, haciendo click en la tabla de calles, como también en las leyendas"
                                 ),
                                 html.Li(
-                                    "El modelo predictivo está basado en el modelo XGBClassifier y segmentado por parámetros temporales (tipo de día, día de la semana, día del mes, hora del día) y de parámetros geospaciales, los cuales se resumen en el segmento asociado."
+                                    "El modelo predictivo está basado en un modelo de Machine Learning y segmentado por parámetros temporales (tipo de día, día de la semana, día del mes, hora del día) y parámetros geospaciales, los cuales se resumen en el segmento asociado."
                                 ),
                                 html.Li(
                                     "La tabla del modelo predictivo también es interactiva, se puede visualizar el segmento asociado haciendo click en la fila correspondiente."
                                 ),
                                 html.Li(
-                                    "Los datos están disponibles a partir del 1 de octubre de 2024, por lo que se pueden aplicar filtros de fecha hasta es punto."
+                                    "Los datos están disponibles a partir del 1 de octubre de 2024, por lo que se pueden aplicar filtros de fecha hasta ese punto."
                                 ),
                                 html.Li(
                                     "El objetivo del modelo predictivo es valorar la probabilidad de que un evento ocurra bajo los parámetros previamente establecidos, tiene aplicaciones como la de visualizar la ruta con menor probabilidad de evento desde un segmento A a un segmento B, también para poder identificar patrones para la gestión del tráfico."
@@ -793,6 +793,8 @@ def update_graphs(kind, start_date, end_date, active_cell):
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(color="#ccc"),
+        autosize=True,
+        width=None,
         title=dict(
             text=f"Promedio de {names[kind].lower()} por hora del día",
             font=dict(
@@ -851,6 +853,8 @@ def update_graphs(kind, start_date, end_date, active_cell):
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(color="#ccc"),
+        autosize=True,
+        width=None,
         title=dict(
             text=f"Promedio de {names[kind].lower()} por día del mes",
             font=dict(

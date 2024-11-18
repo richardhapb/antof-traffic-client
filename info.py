@@ -1,6 +1,8 @@
 import time
 from waze.events import Events
 from waze.api import WazeAPI
+from datetime import datetime
+import pytz
 
 
 def main():
@@ -56,4 +58,5 @@ if __name__ == "__main__":
         print("Saliendo...")
         exit(0)
     except Exception as e:
+        print(f"Error de actualización, time: {datetime.now(tz=pytz.timezone('America/Santiago'))}")
         print(f"Error: {e}")
