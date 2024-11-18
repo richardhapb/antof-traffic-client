@@ -22,31 +22,52 @@ h1, h2, h3 {
     color: #ccc;
 }
 
-
 .subtitle {
     font-size: 1rem;
-    margin: 0 0 0 0;
+    margin: 1rem 0 .5rem 0;
     color: #ccc;
     text-align: center;
     font-weight: lighter;
     text-wrap: wrap;
 }
 
+.hidden {
+    opacity: 0;
+    transition: all 1s ease;
+    max-height: 0;
+    max-width: 0 !important;
+    overflow: hidden;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
 .instructions {
-    max-width: 900px;
     width: 80%;
     font-size: 10pt;
     text-wrap: wrap;
-    padding: 1rem;
     background-color: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(20px);
     color: white;
     border-radius: 10px;
     box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.5);
+    margin-top: 1rem;
+    padding: 1rem;
+}
+
+.show {
+    opacity: 1;
+    transition: all 1s ease;
+    max-height: 2000px;
+    max-width: 900px;
+    overflow: hidden;
 }
 
 .instructions h3 {
     color: white;
+}
+
+#toggle_instructions {
+    margin-top: 1rem;
 }
 
 .instructions ul {
@@ -71,8 +92,11 @@ h1, h2, h3 {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2rem;
     text-wrap: wrap;
+}
+
+.header h1 {
+    margin: 2rem 0 .5rem 0;
 }
 
 .controls {
@@ -121,12 +145,15 @@ h1, h2, h3 {
     font-size: 2.5rem;
 }
 
-.ml-zone {
+.ml-zone, .parameters_ml {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 2rem;
+}
+
+.ml-zone {
     padding: 4rem;
 }
 
@@ -175,7 +202,7 @@ input, .Select-value-label {
 }
 
 #dd_type {
-    margin: 2rem 0 1rem 15rem;
+    margin: 2rem 0 1rem 10rem;
     width: 30%;
 }
 
@@ -188,8 +215,30 @@ h3 {
     margin: 1rem 0 0 0;
 }
 
+#table_clear, #table_ml_clear, #toggle_instructions {
+    padding: 0.5rem 1rem;
+    color: white;
+    background-color: var(--bg-color-tertiary);
+    border: 1px white solid;
+    cursor: pointer;
+}
+
+#table_clear:hover, #table_ml_clear:hover, #toggle_instructions:hover {
+    background-color: var(--bg-color);
+    transition: ease .2s;
+}
+
 .Select-control {
     background-color: var(--bg-color-secondary) !important;
+}
+
+.DayPickerNavigation_svg__vertical {
+    stroke: white;
+    fill: white;
+}
+
+.DateInput, .DateRangePicker_picker, .DayPicker, .CalendarMonthGrid {
+    background-color: var(--bg-color-secondary);
 }
 
 #date_range {
@@ -225,6 +274,14 @@ h3 {
         align-items: center;
         justify-content: center;
         gap: 2rem;
+    }
+
+    #toggle_instructions, .instructions {
+        margin-bottom: 2rem;
+    }
+
+    .instructions {
+        padding: 1rem !important;
     }
 
     .ml-map {
