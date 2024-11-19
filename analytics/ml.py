@@ -414,6 +414,7 @@ class ML:
 
         for idx, score in enumerate(scores):
             mlflow.log_metric(f"cv_score_fold_{idx}", score)
+        mlflow.log_metric("cv_score_avg", np.average(scores).astype(float))
         metrics = self.metrics()
 
         cats = ["positive", "negative"]
@@ -437,3 +438,12 @@ class ML:
                 raise ValueError(cat + " is not in data")
             self.oe[cat] = OrdinalEncoder()
             self.data[cat] = self.oe[cat].fit_transform(self.data[[cat]])
+
+    @staticmethod
+    def get_last_model(model_name: str)->int:
+        client = mlflow.tracking.MlflowClient()
+        
+        model_versions = client.search_model_versions(f"name='{model_name}'")
+        latest_version = max(model_versions, key=lambda v: int(v.version))
+
+        return int(latest_version.version)

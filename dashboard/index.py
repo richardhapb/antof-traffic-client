@@ -6,13 +6,17 @@ import pytz
 import plotly.graph_objs as go
 import pandas as pd
 import mlflow
-from analytics.ml import init_mlflow
+from analytics.ml import init_mlflow, ML
 from analytics.grouper import Grouper
 import geopandas as gpd
 from shapely.geometry import Point, Polygon
 
 init_mlflow()
-model = mlflow.sklearn.load_model("models:/XGBClassifier/157")
+MODEL_NAME="XGBClassifier"
+last_model = ML.get_last_model(MODEL_NAME)
+model = mlflow.sklearn.load_model(f"models:/{MODEL_NAME}/{last_model}")
+
+print(f"Model {MODEL_NAME} version {last_model} successfully loaded")
 
 names = {
     "all": "Evento",
