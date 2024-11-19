@@ -10,13 +10,28 @@ from analytics.ml import init_mlflow, ML
 from analytics.grouper import Grouper
 import geopandas as gpd
 from shapely.geometry import Point, Polygon
+from apscheduler.schedulers.background import BackgroundScheduler
+from train import train
 
 init_mlflow()
-MODEL_NAME="XGBClassifier"
-last_model = ML.get_last_model(MODEL_NAME)
-model = mlflow.sklearn.load_model(f"models:/{MODEL_NAME}/{last_model}")
 
-print(f"Model {MODEL_NAME} version {last_model} successfully loaded")
+model = None
+
+def load_model():
+    global model
+    MODEL_NAME="XGBClassifier"
+    last_model = ML.get_last_model(MODEL_NAME)
+    model = mlflow.sklearn.load_model(f"models:/{MODEL_NAME}/{last_model}")
+    print(f"Model {MODEL_NAME} version {last_model} successfully loaded")
+
+# Train and Load the model dinamically
+scheduler = BackgroundScheduler()
+scheduler.add_job(train, 'interval', days=30)
+scheduler.add_job(load_model, 'interval', days=30, minutes=5)
+scheduler.start()
+
+load_model()
+
 
 names = {
     "all": "Evento",
@@ -467,6 +482,8 @@ def update_ML(
     kind: str,
     higlighted_segment: int | None = None,
 ):
+    if model is None:
+        return go.Figure()
     g = alerts
 
     x_var = pd.DataFrame(
