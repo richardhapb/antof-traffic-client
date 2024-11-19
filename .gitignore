@@ -16,4 +16,4 @@ v.py
 mlartifacts
 mlruns
 sql.json
-backup-waze.sql
+backup_waze.sql
