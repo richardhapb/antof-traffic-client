@@ -19,10 +19,7 @@ TZ = "America/Santiago"
 
 selected_time = int(datetime.datetime.now().timestamp()) * 1000
 since = selected_time
-
-alerts_query = utils.load_data("alerts", mode="since", epoch=since)
-alerts = Grouper(alerts_query.to_gdf(tz=TZ))
-alerts.group((10, 20)).filter_by_group_time(60, True)
+alerts = None
 
 def update_data():
     global selected_time, since, alerts
@@ -53,6 +50,8 @@ def update_data():
     alerts_query = utils.load_data("alerts", mode="since", epoch=since)
     alerts = Grouper(alerts_query.to_gdf(tz=TZ))
     alerts.group((10, 20)).filter_by_group_time(60, True)
+
+update_data()
 
 model = None
 last_model = 0
