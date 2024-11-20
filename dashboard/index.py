@@ -15,6 +15,45 @@ from train import train
 
 init_mlflow()
 
+TZ = "America/Santiago"
+
+selected_time = int(datetime.datetime.now().timestamp()) * 1000
+since = selected_time
+
+alerts_query = utils.load_data("alerts", mode="since", epoch=since)
+alerts = Grouper(alerts_query.to_gdf(tz=TZ))
+alerts.group((10, 20)).filter_by_group_time(60, True)
+
+def update_data():
+    global selected_time, since, alerts
+    since = int(
+        datetime.datetime(
+            year=2024,
+            month=10,
+            day=1,
+            hour=0,
+            minute=0,
+            second=0,
+            microsecond=0,
+            tzinfo=pytz.timezone(TZ),
+        ).timestamp()
+        * 1000
+    )
+
+    selected_time = int(
+        (
+            datetime.datetime.now(pytz.timezone(TZ)).replace(
+                hour=0, minute=0, second=0, microsecond=0
+            )
+            - datetime.timedelta(days=30)
+        ).timestamp()
+        * 1000
+    )
+
+    alerts_query = utils.load_data("alerts", mode="since", epoch=since)
+    alerts = Grouper(alerts_query.to_gdf(tz=TZ))
+    alerts.group((10, 20)).filter_by_group_time(60, True)
+
 model = None
 last_model = 0
 
@@ -27,6 +66,7 @@ def load_model():
 
 # Train and Load the model dinamically
 scheduler = BackgroundScheduler()
+scheduler.add_job(update_data, 'interval', minutes=5)
 scheduler.add_job(train, 'interval', days=30)
 scheduler.add_job(load_model, 'interval', days=30, minutes=5)
 scheduler.start()
@@ -43,7 +83,6 @@ names = {
 }
 
 
-TZ = "America/Santiago"
 
 app = Dash(__name__, update_title=None, meta_tags=[
         {
@@ -83,34 +122,6 @@ app = Dash(__name__, update_title=None, meta_tags=[
 app._favicon = ("favicon.png")
 app.title = "Gestión del tráfico en Antofagasta"
 server = app.server
-
-since = int(
-    datetime.datetime(
-        year=2024,
-        month=10,
-        day=1,
-        hour=0,
-        minute=0,
-        second=0,
-        microsecond=0,
-        tzinfo=pytz.timezone(TZ),
-    ).timestamp()
-    * 1000
-)
-
-selected_time = int(
-    (
-        datetime.datetime.now(pytz.timezone(TZ)).replace(
-            hour=0, minute=0, second=0, microsecond=0
-        )
-        - datetime.timedelta(days=30)
-    ).timestamp()
-    * 1000
-)
-
-alerts_query = utils.load_data("alerts", mode="since", epoch=since)
-alerts = Grouper(alerts_query.to_gdf(tz=TZ))
-alerts.group((10, 20)).filter_by_group_time(60, True)
 
 app.layout = html.Div(
     [
@@ -1120,7 +1131,7 @@ def update_ml_graphs(
     Input("dd_type", "value"),
 )
 def update_last_events(kind):
-    last_events = alerts.data.sort_values(by="pubMillis", ascending=False).iloc[:21]
+    last_events = alerts.data.sort_values(by="pubMillis", ascending=False)
 
     if last_events.shape[0] == 0:
         return []
@@ -1129,6 +1140,8 @@ def update_last_events(kind):
     if kind != "all" and kind is not None:
         last_events = last_events[last_events["type"] == kind]
         concepts = [kind]
+
+    last_events = last_events.iloc[:20]
 
     if last_events.shape[0] == 0:
         return []
