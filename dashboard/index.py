@@ -47,10 +47,13 @@ def update_data():
         * 1000
     )
 
-    alerts_query = utils.load_data("alerts", mode="since", epoch=since)
-    alerts = Grouper(alerts_query.to_gdf(tz=TZ))
-    alerts.group((10, 20)).filter_by_group_time(60, True)
-
+    try:
+        alerts_query = utils.load_data("alerts", mode="since", epoch=since)
+        alerts = Grouper(alerts_query.to_gdf(tz=TZ))
+        alerts.group((10, 20)).filter_by_group_time(60, True)
+    except Exception as e:
+        print("Something was wrong while updating alerts")
+        print(f"Error: {e}")
 update_data()
 
 model = None
