@@ -1129,14 +1129,17 @@ def update_ml_graphs(
 
 
 @app.callback(
-    Output("table_last", "data"),
+    [
+        Output("table_last", "data"),
+        Output("date_range", "max_date_allowed")
+    ],
     Input("dd_type", "value"),
 )
 def update_last_events(kind):
     last_events = alerts.data.sort_values(by="pubMillis", ascending=False)
 
     if last_events.shape[0] == 0:
-        return []
+        return [], datetime.datetime.now(pytz.timezone(TZ))
 
     concepts = [n for n in names.keys() if n != "all"]
     if kind != "all" and kind is not None:
@@ -1146,7 +1149,7 @@ def update_last_events(kind):
     last_events = last_events.iloc[:20]
 
     if last_events.shape[0] == 0:
-        return []
+        return [], datetime.datetime.now(pytz.timezone(TZ))
 
     last_events = utils.extract_event(
         last_events, concepts, ["type", "group", "hour", "minute", "street"]
@@ -1168,7 +1171,7 @@ def update_last_events(kind):
         }
     )
 
-    return last_events.to_dict("records")
+    return last_events.to_dict("records"), datetime.datetime.now(pytz.timezone(TZ))
 
 # Clear filter in table selections
 @app.callback(
