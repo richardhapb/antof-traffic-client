@@ -3,17 +3,16 @@ import warnings
 from datetime import datetime
 from typing import List
 
-import contextily as cx
-import geopandas as gpd
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import requests
 from geopandas.geodataframe import GeoDataFrame
-from matplotlib.axes import Axes
-from matplotlib.figure import Figure
-from scipy.spatial import cKDTree
+import pandas as pd
+import numpy as np
+import geopandas as gpd
 from shapely.geometry import Point
+import contextily as cx
+import matplotlib.pyplot as plt
+from scipy.spatial import cKDTree
+import requests
+from matplotlib.figure import Figure
 
 from waze.events import Events
 
@@ -39,7 +38,7 @@ def load_data(
     mode: str = "all",
     epoch: int | None = None,
     between: tuple | None = None,
-)->Events:
+) -> Events:
     """
     Carga los datos de eventos de Waze desde un archivo JSON o desde la BD SQL
 
@@ -60,7 +59,9 @@ def load_data(
     return events
 
 
-def update_timezone(data: pd.DataFrame, tz: str = TZ)->pd.DataFrame | gpd.GeoDataFrame:
+def update_timezone(
+    data: pd.DataFrame, tz: str = TZ
+) -> pd.DataFrame | gpd.GeoDataFrame:
     """
     Actualiza el timezone de los datos de eventos
     """
@@ -75,62 +76,7 @@ def update_timezone(data: pd.DataFrame, tz: str = TZ)->pd.DataFrame | gpd.GeoDat
     return data_copy
 
 
-def filter_location(dat: pd.DataFrame, x: list, y: list)->pd.DataFrame:
-    """
-    Filtra las coordenadas para Antofagasta, excluyendo las otras comunas
-    """
-    try:  # Alerts
-        dat = dat.loc[
-            (dat["location"].apply(lambda loc: loc["x"] >= x[0] and loc["x"] <= x[1]))
-        ]
-        dat = dat.loc[
-            (dat["location"].apply(lambda loc: loc["y"] >= y[0] and loc["y"] <= y[1]))
-        ]
-    except KeyError:  # Jam
-        dat = dat.loc[
-            (
-                dat["line"].apply(
-                    lambda line: line[0]["x"] >= x[0] and line[0]["x"] <= x[1]
-                )
-            )
-        ]
-        dat = dat.loc[
-            (
-                dat["line"].apply(
-                    lambda line: line[0]["y"] >= y[0] and line[0]["y"] <= y[1]
-                )
-            )
-        ]
-
-    return dat
-
-
-def haversine(coordx: list, coordy: list)->int:
-    """
-    Calcula la distancia entre dos coordenadas geográficas
-    """
-    lon1, lon2 = coordx
-    lat1, lat2 = coordy
-
-    # Convertir coordenadas de grados a radianes
-    lat1, lon1, lat2, lon2 = map(np.radians, [lat1, lon1, lat2, lon2])
-
-    # Diferencias de latitud y longitud
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-
-    # Fórmula de Haversine
-    a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2) ** 2
-    c = 2 * np.asin(np.sqrt(a))
-
-    # Radio de la Tierra en kilómetros
-    r = 6371
-
-    # Distancia en metros
-    return c * r * 1000
-
-
-def freq_nearby(gdf:gpd.GeoDataFrame, nearby_meters=200)->gpd.GeoDataFrame:
+def freq_nearby(gdf: gpd.GeoDataFrame, nearby_meters=200) -> gpd.GeoDataFrame:
     """
     Cuenta cuántos puntos cercanos hay dentro de un radio especificado para cada punto en el GeoDataFrame.
 
@@ -166,7 +112,7 @@ def freq_nearby(gdf:gpd.GeoDataFrame, nearby_meters=200)->gpd.GeoDataFrame:
     return gdf2
 
 
-def separate_coords(df:pd.DataFrame)->GeoDataFrame:
+def separate_coords(df: pd.DataFrame) -> GeoDataFrame:
     """
     Separa las coordenadas de un DataFrame en dos columnas, retornando un GeoDataFrame
     """
@@ -180,15 +126,17 @@ def separate_coords(df:pd.DataFrame)->GeoDataFrame:
     # Establecer el sistema de referencia de coordenadas
 
     dfg = dfg.set_crs(epsg=4326)
-    dfg = dfg.to_crs(epsg=3857)  # Adecuado para visualización en plot_antof
+    dfg = dfg.to_crs(epsg=3857)  # Adecuado para visualización en mapa
 
     if dfg is None:
         dfg = gpd.GeoDataFrame()
 
-    return dfg 
+    return dfg
 
 
-def extract_event(data: gpd.GeoDataFrame | pd.DataFrame, concept: list, extra_col: list = [])->gpd.GeoDataFrame:
+def extract_event(
+    data: gpd.GeoDataFrame | pd.DataFrame, concept: list, extra_col: list
+) -> gpd.GeoDataFrame:
     """
     Extraer los eventos de un tipo específico de un GeoDataFrame
     """
@@ -212,29 +160,16 @@ def extract_event(data: gpd.GeoDataFrame | pd.DataFrame, concept: list, extra_co
 
     millis = ["inicio", "fin"]
 
-    try:
-        try:
-            feriados = get_holidays()
-            with open("data/holidays.json", "w") as fp:
-                json.dump({"feriados": feriados}, fp)
-        except ConnectionError or TimeoutError:
-            print(
-                "Error al conectar para obtener feriados, cargando archivo de respaldo"
-            )
-            with open("data/holidays.json", "r") as f:
-                feriados = json.load(f)["feriados"]
-    except FileNotFoundError or json.JSONDecodeError:
-        print("Error al leer el archivo")
-        feriados = []
+    holidays = get_holidays()
 
     dat["hour"] = dat["inicio"].dt.hour
     dat["minute"] = dat["inicio"].dt.minute
     dat["day"] = dat["inicio"].dt.day
     dat["week_day"] = dat["inicio"].dt.dayofweek
     dat["day_type"] = dat["inicio"].apply(
-        lambda x: "f"
-        if (x.weekday() >= 5) | (x.strftime("%Y-%m-%d") in feriados)
-        else "s"
+        lambda x: (
+            "f" if (x.weekday() >= 5) | (x.strftime("%Y-%m-%d") in holidays) else "s"
+        )
     )
     try:
         dat = dat.loc[dat["type"].isin(concept)][millis + extra_col]
@@ -244,7 +179,9 @@ def extract_event(data: gpd.GeoDataFrame | pd.DataFrame, concept: list, extra_co
     return dat
 
 
-def hourly_group(data: pd.DataFrame | gpd.GeoDataFrame, sum: bool = False)->pd.DataFrame | gpd.GeoDataFrame:
+def hourly_group(
+    data: pd.DataFrame | gpd.GeoDataFrame, do_sum: bool = False
+) -> pd.DataFrame | gpd.GeoDataFrame:
     """
     Transforma un DataFrame de eventos en un reporte por hora
     """
@@ -259,7 +196,10 @@ def hourly_group(data: pd.DataFrame | gpd.GeoDataFrame, sum: bool = False)->pd.D
 
     # Agrupar por hora y tipo de día
     hourly_reports = (
-            df.loc[:, ["day_type", "hour"]].groupby(["day_type", "hour"]).size().unstack(level=0)
+        df.loc[:, ["day_type", "hour"]]
+        .groupby(["day_type", "hour"])
+        .size()
+        .unstack(level=0)
     )
 
     # Crear un índice que incluya todas las horas del día
@@ -280,7 +220,7 @@ def hourly_group(data: pd.DataFrame | gpd.GeoDataFrame, sum: bool = False)->pd.D
     else:
         hourly_reports["f"] = hourly_reports["f"].astype(float)
 
-    if not sum:
+    if not do_sum:
         # Calcular la tasa por tipo de día
         hourly_reports["f"] = hourly_reports["f"] / days
         hourly_reports["s"] = hourly_reports["s"] / days
@@ -288,7 +228,9 @@ def hourly_group(data: pd.DataFrame | gpd.GeoDataFrame, sum: bool = False)->pd.D
     return hourly_reports
 
 
-def daily_group(data: pd.DataFrame | gpd.GeoDataFrame)-> pd.DataFrame | gpd.GeoDataFrame:
+def daily_group(
+    data: pd.DataFrame | gpd.GeoDataFrame,
+) -> pd.DataFrame | gpd.GeoDataFrame:
     """
     Transforma un DataFrame de eventos en un reporte por día
     """
@@ -299,7 +241,10 @@ def daily_group(data: pd.DataFrame | gpd.GeoDataFrame)-> pd.DataFrame | gpd.GeoD
 
     # Agrupar por día y tipo de día
     daily_reports = (
-            df.loc[:, ["day_type", "day"]].groupby(["day_type", "day"]).size().unstack(level=0)
+        df.loc[:, ["day_type", "day"]]
+        .groupby(["day_type", "day"])
+        .size()
+        .unstack(level=0)
     )
 
     # Crear un índice que incluya todos los días del mes
@@ -331,120 +276,38 @@ def daily_group(data: pd.DataFrame | gpd.GeoDataFrame)-> pd.DataFrame | gpd.GeoD
     return daily_reports
 
 
-def filter_nearby(gdf: gpd.GeoDataFrame, threshold=300)->gpd.GeoDataFrame:
+def get_holidays() -> List:
     """
-    Filtra los puntos que tienen otros puntos cercanos dentro de un umbral dado.
-    Retorna un GeoDataFrame con puntos únicos sin vecinos cercanos.
-
-    Parámetros:
-    - gdf: GeoDataFrame con geometrías de puntos.
-    - threshold: Distancia umbral en metros.
-
-    Retorna:
-    - GeoDataFrame filtrado.
+    Retorna listado de feriados
+    Args:
+    :param None: No parameters.
+    Returns:
+        Return list: Listado de feriados en formato dd-mm-YY
     """
-    gdf2 = gdf.copy()
-    # Verificar y reproyectar si es necesario
-    if gdf2.crs.is_geographic:
-        gdf2 = gdf.to_crs(epsg=3857)
-
-    if gdf2 is None:
-        return gpd.GeoDataFrame()
-
-    # Extraer coordenadas x e y
-    coords = np.vstack((gdf2.geometry.x, gdf2.geometry.y)).T
-
-    # Construir el cKDTree
-    tree = cKDTree(coords)
-
-    # Inicializar un arreglo booleano para marcar los puntos a conservar
-    n_points = gdf2.shape[0]
-    keep = np.ones(n_points, dtype=bool)
-
-    # Iterar sobre cada punto
-    for idx in range(n_points):
-        if keep[idx]:
-            # Encontrar los índices de los puntos dentro del umbral
-            indices = tree.query_ball_point(coords[idx], r=threshold)
-            # Excluir el propio punto
-            indices = [i for i in indices if i != idx]
-            # Marcar los vecinos cercanos como False (eliminados)
-            keep[indices] = False
-        else:
-            continue
-
-    # Filtrar el GeoDataFrame
-    gdf_filtered = gdf2[keep].reset_index(drop=True)
-
-    return gdf_filtered #type: ignore
-
-
-def plot_map(
-    data: gpd.GeoDataFrame,
-    title: str,
-    cmap: str = "viridis",
-    markersize: int = 10,
-    ax: Axes | None = None,
-    figsize: tuple = (4.5, 9.5),
-)->Figure:
-    """
-    Grafica un GeoDataFrame en un eje de coordenadas
-    """
-    if ax is None:
-        fig, ax = plt.subplots()
-        fig.set_size_inches(figsize)
-    else:
-        fig = ax.get_figure()
-        if fig is None:
-            fig = plt.figure()
-
-    sc = data.to_crs(epsg=3857).geometry.plot( # type: ignore
-        ax=ax, cmap=cmap, alpha=0.8, markersize=markersize, c=data.freq
-    )
-
-    if PERIM_AFTA is None:
-        raise ValueError("The perimeter of the city is not defined")
-
-    ax.set_xlim(PERIM_AFTA.total_bounds[0], PERIM_AFTA.total_bounds[2])
-    ax.set_ylim(PERIM_AFTA.total_bounds[1], PERIM_AFTA.total_bounds[3])
-    cx.add_basemap(ax, source=cx.providers.OpenStreetMap.Mapnik) # type: ignore
-    cbar = sc.get_figure().colorbar(sc.collections[0], ax=ax)
-    cbar.set_label("Frecuencia")
-    ax.set_xlabel("Longitud")
-    ax.set_ylabel("Latitud")
-    plt.xticks(rotation=45)
-    ax.set_title(title)
-
-    return fig
-
-
-def get_holidays()->List:
     years = [year for year in range(2024, datetime.now().year + 1)]
-    feriados = []
-    for year in years:
-        url = API_FERIADOS.format(year=year)
-        response = requests.get(url, timeout=10).json()['data']
-        feriados.extend(response)
+    holidays = []
 
-    feriados = [f["date"] for f in feriados]
+    try:
+        try:
+            for year in years:
+                url = API_FERIADOS.format(year=year)
+                response = requests.get(url, timeout=10).json()['data']
+                holidays.extend(response)
 
-    return feriados
+            holidays = [f["date"] for f in holidays]
 
+            with open("data/holidays.json", "w", encoding="utf-8") as fp:
+                json.dump({"holidays": holidays}, fp)
+        except (ConnectionError, TimeoutError) as e:
+            print(
+                "Error al conectar para obtener feriados, cargando archivo de respaldo"
+            )
+            print(f"ERROR: {e}")
+            with open("data/holidays.json", "r", encoding="utf-8") as f:
+                holidays = json.load(f)["holidays"]
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        print("Error al leer el archivo")
+        print(f"ERROR: {e}")
+        holidays = []
 
-def plot_antof()->Figure:
-    PERIM_AFTA = gpd.GeoDataFrame(geometry=gpd.points_from_xy(PERIM_X, PERIM_Y))
-    PERIM_AFTA.crs = "EPSG:4326"
-    PERIM_AFTA = PERIM_AFTA.to_crs(epsg=3857)
-
-    fig, ax = plt.subplots()
-
-    if PERIM_AFTA is None:
-        return fig
-
-    fig.set_size_inches(10, 10)
-    PERIM_AFTA.plot(ax=ax, color="red")
-    cx.add_basemap(ax, source=cx.providers.OpenStreetMap.Mapnik) #type: ignore
-    ax.set_xlim(PERIM_AFTA.total_bounds[0], PERIM_AFTA.total_bounds[2])
-    ax.set_ylim(PERIM_AFTA.total_bounds[1], PERIM_AFTA.total_bounds[3])
-
-    return fig
+    return holidays

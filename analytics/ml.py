@@ -21,12 +21,14 @@ from functools import wraps
 import numpy as np
 from geopandas import GeoDataFrame
 from matplotlib.figure import Figure
+import os
 
 CONCEPTS = ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"]
 
 
 def init_mlflow():
-    mlflow.set_tracking_uri(uri="http://localhost:8080")
+    mlflow_uri = os.getenv('MLFLOW_TRACKING_URI', 'http://localhost:8080')
+    mlflow.set_tracking_uri(uri=mlflow_uri)
     mlflow.set_experiment("AntofTraffic")
 
 
@@ -42,38 +44,40 @@ def mlflow_logger(func):
 
 class ML:
     def __init__(
-            self,
-            data:GeoDataFrame | pd.DataFrame,
-            model:ClassifierMixin,
-            column_y:str | None = None,
-            categories: List | None = None,
-            ohe: bool=False,
-            hash:bool=False
+        self,
+        data: GeoDataFrame | pd.DataFrame,
+        model: ClassifierMixin,
+        column_y: str | None = None,
+        categories: List | None = None,
+        ohe: bool = False,
+        hash: bool = False,
     ):
-        self.data:GeoDataFrame | pd.DataFrame = data
-        self.model: ClassifierMixin = cast(ClassifierMixin, clone(model)) 
-        self.columns_x : List = [column for column in self.data.columns if column != column_y]
-        self.column_y : str | None = column_y
+        self.data: GeoDataFrame | pd.DataFrame = data
+        self.model: ClassifierMixin = cast(ClassifierMixin, clone(model))
+        self.columns_x: List = [
+            column for column in self.data.columns if column != column_y
+        ]
+        self.column_y: str | None = column_y
         self.categories: List | None = categories
         self.ohe: bool = ohe
         self.hash: bool = hash
-        self.hasher: Dict[ str, FeatureHasher ] | None = None
+        self.hasher: Dict[str, FeatureHasher] | None = None
         self.data_labeled: GeoDataFrame | pd.DataFrame | None = None
-        self.x_train:pd.DataFrame | None = None
-        self.x_test:pd.DataFrame | None = None
-        self.y_train:pd.DataFrame | None = None
-        self.y_test:pd.DataFrame | None = None
-        self.onehot: Dict[ str, OneHotEncoder ] | None = None
-        self.oe: Dict[ str, OrdinalEncoder ] | None = None # Ordinal Encoder
+        self.x_train: pd.DataFrame | None = None
+        self.x_test: pd.DataFrame | None = None
+        self.y_train: pd.DataFrame | None = None
+        self.y_test: pd.DataFrame | None = None
+        self.onehot: Dict[str, OneHotEncoder] | None = None
+        self.oe: Dict[str, OrdinalEncoder] | None = None  # Ordinal Encoder
         self.no_events: pd.DataFrame | GeoDataFrame | None = None
-        self.x : np.ndarray | None = None
+        self.x: np.ndarray | None = None
         self.y: np.ndarray | None = None
 
         if self.data is not None:
             self.data[column_y] = 1
 
     @staticmethod
-    def convert_dataset_to_ohe(data: pd.DataFrame, categories: list)->pd.DataFrame:
+    def convert_dataset_to_ohe(data: pd.DataFrame, categories: list) -> pd.DataFrame:
         labeled = []
         onehot = {}
         for c in categories:
@@ -88,12 +92,16 @@ class ML:
 
         return pd.concat([data.drop(categories, axis=1), *labeled], axis=1)
 
-    def generate_neg_simulated_data(self, extra_cols: List, geodata: str = "group")->None:
+    def generate_neg_simulated_data(
+        self, extra_cols: List, geodata: str = "group"
+    ) -> None:
         events2 = self.data.copy()
         events2["happen"] = 1
 
         if not isinstance(events2["inicio"].iloc[0], np.integer):
-            events2["inicio"] = events2["inicio"].astype(np.int64, errors="ignore") / 1_000_000
+            events2["inicio"] = (
+                events2["inicio"].astype(np.int64, errors="ignore") / 1_000_000
+            )
 
         step = np.int64(60_000 * 5)
 
@@ -138,12 +146,11 @@ class ML:
             self.no_events, CONCEPTS, extra_cols + ["happen"]
         )
 
-    def balance_day_type(self)->None:
+    def balance_day_type(self) -> None:
         # Balance no events and events, for weekend and workdays
         if (
             self.no_events is None
-            or
-            "day_type" not in self.data.columns
+            or "day_type" not in self.data.columns
             or "day_type" not in self.no_events.columns
         ):
             raise ValueError("There are not day type data in dataset")
@@ -160,7 +167,7 @@ class ML:
 
         self.data = pd.concat(
             [days1, days0.sample(q_days0 + diff, replace=True, random_state=42)]
-            ) # type: ignore
+        )  # type: ignore
 
         days0 = self.no_events[
             (self.no_events.day_type == "f") | (self.no_events.day_type == 0)
@@ -174,9 +181,9 @@ class ML:
                 days1.sample(q_days1, replace=True, random_state=42),
                 days0.sample(q_days0 + diff, replace=True, random_state=42),
             ]
-            ) # type: ignore
+        )  # type: ignore
 
-    def clean(self, columns_x: List, column_y:str)->None:
+    def clean(self, columns_x: List, column_y: str) -> None:
         self.columns_x = columns_x
         self.column_y = column_y
 
@@ -185,7 +192,7 @@ class ML:
         if self.no_events is not None:
             self.no_events = self.no_events.loc[:, columns_x + [column_y]]
 
-    def prepare(self, no_features=None)->None:
+    def prepare(self, no_features=None) -> None:
         if self.data is None:
             raise ValueError("Not have data for model generation")
 
@@ -196,7 +203,9 @@ class ML:
         )
 
         if "day_type" in total_events.columns:
-            total_events["day_type"] = total_events["day_type"].replace({"f": 0, "s": 1})
+            total_events["day_type"] = total_events["day_type"].replace(
+                {"f": 0, "s": 1}
+            )
 
         if self.ohe:
             labeled = []
@@ -238,7 +247,7 @@ class ML:
                 labeled.append(
                     pd.DataFrame(
                         hashed.toarray(),
-                        columns=[f"{c}_{i}" for i in range(no_features)], # type: ignore
+                        columns=[f"{c}_{i}" for i in range(no_features)],  # type: ignore
                     ).reset_index(drop=True)
                 )
 
@@ -252,23 +261,25 @@ class ML:
         else:
             self.data_labeled = total_events.copy()
 
-    def train(self)->None:
+    def train(self) -> None:
         if self.data_labeled is None:
             self.prepare()
-        self.x = self.data_labeled.drop(self.column_y, axis=1) # type: ignore
-        self.y = self.data_labeled.loc[:, self.column_y] # type: ignore
+        self.x = self.data_labeled.drop(self.column_y, axis=1)  # type: ignore
+        self.y = self.data_labeled.loc[:, self.column_y]  # type: ignore
 
-        self.x_train, self.x_test, self.y_train, self.y_test = train_test_split( # type: ignore
+        self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(  # type: ignore
             self.x, self.y, test_size=0.2, random_state=42
-            ) 
+        )
 
-        self.model.fit(self.x_train, self.y_train) # type: ignore
+        self.model.fit(self.x_train, self.y_train)  # type: ignore
 
-    def cross_validation(self)->List:
+    def cross_validation(self) -> List:
         if self.data_labeled is None:
             self.train()
 
-        assert self.data_labeled is not None, "Data labeled is empty, did you prepare the model?"
+        assert (
+            self.data_labeled is not None
+        ), "Data labeled is empty, did you prepare the model?"
         x = self.data_labeled.drop(self.column_y, axis=1)
         y = self.data_labeled[self.column_y]
 
@@ -276,32 +287,36 @@ class ML:
 
         return scores
 
-    def predict(self, data)->List:
+    def predict(self, data) -> List:
         if self.data_labeled is None:
             self.train()
 
-        assert self.data_labeled is not None, "Data is not labeled, did you prepare the model?"
+        assert (
+            self.data_labeled is not None
+        ), "Data is not labeled, did you prepare the model?"
         data = data[[e for e in list(self.data_labeled.columns) if e != self.column_y]]
 
-        return self.model.predict(data) # type: ignore
+        return self.model.predict(data)  # type: ignore
 
-    def predict_proba(self, data)->None:
+    def predict_proba(self, data) -> None:
         if self.data_labeled is None:
             self.train()
 
-        assert self.data_labeled is not None, "Data is not labeled, did you prepare the model?"
+        assert (
+            self.data_labeled is not None
+        ), "Data is not labeled, did you prepare the model?"
         data = data[[e for e in list(self.data_labeled.columns) if e != self.column_y]]
 
-        return self.model.predict_proba(data) # type: ignore
+        return self.model.predict_proba(data)  # type: ignore
 
-    def select_best_params(self)->List:
+    def select_best_params(self) -> List:
         if self.data_labeled is None:
             self.train()
 
-        return self.model.best_params_ # type: ignore
+        return self.model.best_params_  # type: ignore
 
-    def metrics(self)->Dict:
-        y_pred = self.model.predict(self.x_test) # type: ignore
+    def metrics(self) -> Dict:
+        y_pred = self.model.predict(self.x_test)  # type: ignore
 
         metrics = {
             "accuracy": accuracy_score(self.y_test, y_pred),
@@ -312,30 +327,30 @@ class ML:
 
         return metrics
 
-    def confusion_matrix(self)->List:
+    def confusion_matrix(self) -> List:
         if self.y_train is None:
             return []
         return confusion_matrix(
             self.y_test,
-            self.model.predict(self.x_test), # type: ignore
+            self.model.predict(self.x_test),  # type: ignore
             labels=self.y_train.unique(),
         )
 
-    def encode(self, data, category)->np.ndarray:
+    def encode(self, data, category) -> np.ndarray:
         if self.data_labeled is None:
             self.train()
 
         if self.ohe and self.onehot:
             return (
                 self.onehot[category]
-                .transform(pd.DataFrame([data], columns=[category])) # type: ignore
+                .transform(pd.DataFrame([data], columns=[category]))  # type: ignore
                 .toarray()
             )
         elif self.hash and self.hasher:
             return self.hasher[category].transform([[s] for s in data]).toarray()
         return np.array([])
 
-    def plot_by_quad(self, grouper: Grouper, obj: pd.DataFrame)->Figure:
+    def plot_by_quad(self, grouper: Grouper, obj: pd.DataFrame) -> Figure:
         obj = obj.copy()
         if self.data_labeled is None:
             self.train()
@@ -379,7 +394,7 @@ class ML:
         cx.add_basemap(
             ax,
             crs=grouper.data.crs.to_string(),
-            source=cx.providers.OpenStreetMap.Mapnik, # type: ignore
+            source=cx.providers.OpenStreetMap.Mapnik,  # type: ignore
         )
 
         ax.set_title("Accidentes por cuadrante")
@@ -390,23 +405,23 @@ class ML:
         return fig
 
     @mlflow_logger
-    def log_model_params(self, **params)->None:
+    def log_model_params(self, **params) -> None:
 
         if self.x_train is None:
             return
 
-        signature = infer_signature(self.x_train, self.model.predict(self.x_train)) # type: ignore
+        signature = infer_signature(self.x_train, self.model.predict(self.x_train))  # type: ignore
 
         if isinstance(self.model, ClassifierMixin):
             mlflow.sklearn.log_model(
                 sk_model=self.model,
                 artifact_path="waze_data",
                 signature=signature,
-                input_example=self.x_train.head(), 
+                input_example=self.x_train.head(),
                 registered_model_name=type(self.model).__name__,
             )
 
-        model_params = self.model.get_params() # type: ignore
+        model_params = self.model.get_params()  # type: ignore
         mlflow.log_params({k: v for k, v in model_params.items() if v is not None})
 
         scores = self.cross_validation()
@@ -440,9 +455,9 @@ class ML:
             self.data[cat] = self.oe[cat].fit_transform(self.data[[cat]])
 
     @staticmethod
-    def get_last_model(model_name: str)->int:
+    def get_last_model(model_name: str) -> int:
         client = mlflow.tracking.MlflowClient()
-        
+
         model_versions = client.search_model_versions(f"name='{model_name}'")
         latest_version = max(model_versions, key=lambda v: int(v.version))
 

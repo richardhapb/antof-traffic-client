@@ -1,27 +1,27 @@
-
 # Typing
 from typing import List, Dict, Any, Set
-
-# Datetime
-from datetime import datetime
-import pytz
 
 # Filesystem
 import shutil
 import os
 
-# DATABASE
-from config import DATABASE_CONFIG
-import psycopg2
-from psycopg2.extensions import connection
-
 # Decorator
 from functools import wraps
+
+# Datetime
+from datetime import datetime
+import pytz
 
 # data
 import pandas as pd
 import json
 import geopandas as gpd
+
+# DATABASE
+import psycopg2
+from psycopg2.extensions import connection
+from config import DATABASE_CONFIG
+
 
 def db_connection(func):
     @wraps(func)
@@ -55,7 +55,7 @@ class Events:
     # Cada tabla tiene diccionarios dentro, para esos casos se considera [nombre_atributo]_id
     # Además existe una tabla para cada diccionario dentro de los datos, con nombre [nombre_tabla]_[nombre_atributo]
 
-    db_columns_map : Dict = {
+    db_columns_map: Dict = {
         "alerts": {
             "uuid": "uuid",
             "reliability": "reliability",
@@ -94,10 +94,15 @@ class Events:
         },
     }
 
-    def __init__(self, data:List[Dict[str, Any]]=[], filename:str | None=None, table_name:str | None=None)->None:
-        self.data:List[Dict[str, Any]] = data
-        self.filename:str | None = filename
-        self.table_name:str | None = table_name
+    def __init__(
+        self,
+        data: List[Dict[str, Any]] = [],
+        filename: str | None = None,
+        table_name: str | None = None,
+    ) -> None:
+        self.data: List[Dict[str, Any]] = data
+        self.filename: str | None = filename
+        self.table_name: str | None = table_name
         self.pending_endreports: Set = set()
         self.db: connection | None = None
         self.index_map: Dict = {}
@@ -106,11 +111,11 @@ class Events:
             self.update_index_map()
             self.update_pending_endreports()
 
-    def __del__(self)->None:
+    def __del__(self) -> None:
         if self.db is not None and not self.db.closed:
             self.db.close()
 
-    def __add__(self, other: "Events")->"Events":
+    def __add__(self, other: "Events") -> "Events":
         if not isinstance(other, Events):
             raise TypeError("Operador + no soportado")
         if other.data is not None and len(other.data) > 0:
@@ -130,9 +135,7 @@ class Events:
             self.table_name if self.table_name else other.table_name,
         )
 
-        events.pending_endreports = (
-            self.pending_endreports | other.pending_endreports
-        )
+        events.pending_endreports = self.pending_endreports | other.pending_endreports
 
         # Update pending endreports if an uuid is not found in the new data
         for uuid in self.pending_endreports:
@@ -141,7 +144,7 @@ class Events:
 
         return events
 
-    def __sub__(self, other:"Events")->"Events":
+    def __sub__(self, other: "Events") -> "Events":
         if not isinstance(other, Events):
             raise TypeError("Operador - no soportado")
         if other.data is not None and len(other.data) > 0:
@@ -157,19 +160,17 @@ class Events:
             self.table_name if self.table_name else other.table_name,
         )
 
-        events.pending_endreports = (
-            self.pending_endreports - other.pending_endreports
-        )
+        events.pending_endreports = self.pending_endreports - other.pending_endreports
 
         return events
 
-    def update_index_map(self)->None:
+    def update_index_map(self) -> None:
         if self.data is not None:
             self.index_map = {d["uuid"]: i for i, d in enumerate(self.data)}
         else:
             self.index_map = {}
 
-    def read_file(self, filename:str | None=None) -> List[Dict[str, Any]]:
+    def read_file(self, filename: str | None = None) -> List[Dict[str, Any]]:
         if filename is None and self.filename is None:
             raise ValueError("Se requiere una ruta para leer el archivo")
 
@@ -181,23 +182,23 @@ class Events:
             raise FileNotFoundError(f"Archivo {self.filename} no existe")
 
         try:
-            with open(self.filename, "r") as f:
+            with open(self.filename, "r", encoding="utf-8") as f:
                 self.data = json.load(f)
         except json.decoder.JSONDecodeError as e:
             print(f"Error decodificando archivo {self.filename}: {e}")
             print("Se utilizará backup")
             try:
-                with open(self.filename + ".bak", "r") as f:
+                with open(self.filename + ".bak", "r", encoding="utf-8") as f:
                     self.data = json.load(f)
-            except json.decoder.JSONDecodeError as e:
-                print(f"Error decodificando backup: {e}")
-                raise e
+            except json.decoder.JSONDecodeError as ex:
+                print(f"Error decodificando backup: {ex}")
+                raise ex
 
         self.update_index_map()
         self.update_pending_endreports()
         return self.data
 
-    def write_file(self, filename:str | None=None)->None:
+    def write_file(self, filename: str | None = None) -> None:
         if filename is None and self.filename is None:
             raise ValueError("Se requiere una ruta para crear el archivo")
 
@@ -215,7 +216,7 @@ class Events:
         with open(self.filename, "w") as f:
             json.dump(self.data, f)
 
-    def update_pending_endreports(self)->None:
+    def update_pending_endreports(self) -> None:
         if self.data is None:
             return
         self.pending_endreports = {
@@ -224,7 +225,7 @@ class Events:
             if "endreport" not in d or d["endreport"] is None
         }
 
-    def end_report(self, uuid:str)->None:
+    def end_report(self, uuid: str) -> None:
         now = int((datetime.now(tz=pytz.utc).timestamp() - (5 * 60 / 2)) * 1000)
 
         idx = self.index_map.get(uuid, None)
@@ -237,7 +238,7 @@ class Events:
 
             self.pending_endreports.discard(uuid)
 
-    def clean_data(self)->None:
+    def clean_data(self) -> None:
         if self.data is None or self.table_name is None:
             return
         deletions = set(k for d in self.data for k in d) - set(
@@ -249,34 +250,38 @@ class Events:
                     item.pop(key, None)
 
     @staticmethod
-    def format_data(data: List[tuple[Any]], table_name:str)->List[Dict[str, Any]]:
+    def format_data(data: List[tuple[Any]], table_name: str) -> List[Dict[str, Any]]:
         if data is None or len(data) == 0:
             return []
         if not isinstance(data[0], tuple):
             return []
         if not table_name:
             return []
-        if data is not None:
-            cols = [
-                k
-                for k in Events.db_columns_map[table_name].keys()
-                if k not in ["line", "segments"]
-            ]
-            events = [{k: v for k, v in zip(cols, d)} for d in data]
+        cols = [
+            k
+            for k in Events.db_columns_map[table_name].keys()
+            if k not in ["line", "segments"]
+        ]
+        events = [dict(zip(cols, d)) for d in data]
 
         return events
 
-    def to_gdf(self, tz: str = "America/Santiago")->gpd.GeoDataFrame:
+    def to_gdf(self, tz: str = "America/Santiago") -> gpd.GeoDataFrame:
         from utils import utils
+
         if len(self.data) == 0:
             return gpd.GeoDataFrame()
-        df = pd.DataFrame(self.data, columns=list(self.data[0].keys())) # type: ignore
+        df = pd.DataFrame(self.data, columns=list(self.data[0].keys()))  # type: ignore
         df = utils.update_timezone(df, tz)
 
         return utils.separate_coords(df)
 
     def fetch_from_db(
-            self, mode:str="last_24h", with_nested_items:bool=False, epoch:int | None=None, between:tuple | None=None
+        self,
+        mode: str = "last_24h",
+        with_nested_items: bool = False,
+        epoch: int | None = None,
+        between: tuple | None = None,
     ):
         data = self.get_all_from_db(mode=mode, epoch=epoch, between=between)
 
@@ -291,7 +296,7 @@ class Events:
             self.fetch_nested_items()
 
     @db_connection
-    def fetch_nested_items(self):
+    def fetch_nested_items(self) -> None:
         sqls = []
         if self.table_name == "alerts":
             sql = (
@@ -317,7 +322,7 @@ class Events:
         records = []
 
         assert isinstance(self.db, connection), "Error in db connection"
-        
+
         cur = self.db.cursor()
         for sql in sqls:
             cur.execute(sql)
@@ -364,7 +369,10 @@ class Events:
 
     @db_connection
     def get_all_from_db(
-        self, mode: str = "last_24h", epoch: int | None = None, between: tuple | None = None
+        self,
+        mode: str = "last_24h",
+        epoch: int | None = None,
+        between: tuple | None = None,
     ):
         if self.table_name is None:
             return
@@ -412,12 +420,12 @@ class Events:
             events = cur.fetchall()
 
         cur.close()
-       
+
         data = Events.format_data(events, self.table_name)
         return data
 
     @db_connection
-    def insert_to_db(self, review_mode:str="last_24h")->None:
+    def insert_to_db(self, review_mode: str = "last_24h") -> None:
         if self.table_name is None:
             return
         only_review_not_ended = "not_ended" in review_mode
@@ -540,7 +548,7 @@ class Events:
         cur.close()
 
     @db_connection
-    def update_endreport_to_db(self, endreport:int, uuid:str)->None:
+    def update_endreport_to_db(self, endreport: int, uuid: str) -> None:
         if self.table_name is None:
             return
         cur = None
@@ -560,9 +568,8 @@ class Events:
             if cur is not None:
                 cur.close()
 
-
     @db_connection
-    def update_endreports_to_db(self, from_new_data:bool=False)->int:
+    def update_endreports_to_db(self, from_new_data: bool = False) -> int:
         if self.table_name is None:
             return 0
 
@@ -607,7 +614,7 @@ class Events:
         return len(elements)
 
     @db_connection
-    def update_endreports_to_db_from_file(self, filename=None):
+    def update_endreports_to_db_from_file(self, filename=None) -> None:
         if filename is None and self.filename is None:
             raise ValueError("Se requiere una ruta para leer el archivo")
 

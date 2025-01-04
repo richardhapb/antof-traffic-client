@@ -1,4 +1,9 @@
 .venv
+.env
+mlflow.db
+standalone_admin_password.txt
+airflow/logs
+.venv_waze
 antofTraffic
 .DS_Store
 __pycache__
@@ -12,11 +17,8 @@ graph
 *.xlsx
 t.py
 exceptions.txt
-config.py
 v.py
 sql.json
 backup_waze.sql
-.env
+airflow.db
 airflow.cfg
-airflow
-mlflow.db

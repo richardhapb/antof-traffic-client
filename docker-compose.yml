@@ -1,0 +1,45 @@
+
+services:
+  mlflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.mlflow
+    container_name: mlflow
+    image: waze-mlflow
+    environment:
+      - MLFLOW_TRACKING_URI=http://0.0.0.0:8080
+      - TZ=America/Santiago
+    ports:
+      - "8080:8080"
+    volumes:
+      - mlflow_data:/mlflow/mlruns
+
+  antoftraffic:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    container_name: antofTraffic
+    image: waze-dash
+    deploy:
+      resources:
+        limits:
+          memory: 3g
+    memswap_limit: 4g
+    depends_on:
+      - mlflow
+    volumes:
+      - .:/app
+    command: "gunicorn --workers 3 --bind 0.0.0.0:8050 --chdir /app/dashboard index:server"
+    environment:
+      - PYTHONPATH=/app
+      - MLFLOW_TRACKING_URI=http://mlflow:8080
+      - DB_HOST=host.docker.internal
+      - TZ=America/Santiago
+    env_file:
+      - path: .env
+        required: true
+    ports:
+      - "8050:8050"
+volumes:
+  mlflow_data:
+
