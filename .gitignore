@@ -17,3 +17,7 @@ mlartifacts
 mlruns
 sql.json
 backup_waze.sql
+airflow.cfg
+.env
+airflow
+mlflow.db
