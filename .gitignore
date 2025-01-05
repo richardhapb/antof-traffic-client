@@ -21,3 +21,6 @@ airflow.cfg
 .env
 airflow
 mlflow.db
+*.log
+*.aux
+*.out
