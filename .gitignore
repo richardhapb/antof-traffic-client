@@ -29,3 +29,7 @@ mlflow.db
 *.log
 *.aux
 *.out
+*.bbl
+*.blg
+*.bcf
+*.run.xml
