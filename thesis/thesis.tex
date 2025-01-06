@@ -53,16 +53,22 @@
 
 % Fuente
 \usepackage{times}
+\usepackage{csquotes}
 
 \renewcommand{\baselinestretch}{1.5}
 
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{float}
+\usepackage{parskip}
+
+
+\usepackage[backend=biber,style=apa]{biblatex}
+\bibliography{biblio}
 
 \begin{document}
 
-\title{Inteligencia en el control de tráfico en Antofagasta, usando técnicas de Machine Learning}
+\title{Análisis Descriptivo y Predictivo Basado en Datos del Tráfico Vehicular en Antofagasta: Un Enfoque a partir de Reportes de Conductores}
 \author{Richard Peña Bonifaz}
 \date{\today}
 \maketitle
@@ -76,21 +82,46 @@ A mí.
 
 \section*{Resumen}
 
+Este proyecto tiene como objetivo analizar el comportamiento del tráfico vehicular en la ciudad de Antofagasta utilizando datos de la plataforma Waze Cities. Waze, a través de su comunidad de usuarios, ofrece información en tiempo real que permite obtener una visión detallada de los eventos de tráfico que ocurren en la ciudad. Esta investigación busca generar información relevante que contribuya a la gestión del tráfico, apoyando la toma de decisiones por parte de las autoridades locales para mejorar la seguridad vial y la eficiencia del flujo vehicular. A través del análisis de estos datos, se podrán identificar patrones y tendencias que, cuando se integren en la planificación urbana, ayudarán a optimizar las rutas críticas de la ciudad, reducir la congestión y disminuir la probabilidad de accidentes.
 
-% \chapter{Introducción}
-% \section{Generalidades}
-% \section{Descripción de la empresa u organización}
-% \section{Descripción del tema}
-% \section{Objetivo general y objetivos específicos}
-% \chapter{Marco teórico}
+En este estudio se aplicarán técnicas de análisis de datos y geoespaciales con GeoPandas y series temporales, proporcionando una visualización clara y comprensible para las autoridades de gestión vial. Asimismo, se explorará la viabilidad de aplicar técnicas de aprendizaje automático para realizar predicciones de tráfico, con el fin de anticiparse a problemas y contribuir a un desarrollo urbano más eficiente y seguro \parencite{barcelo2005}.
+
+\section{Introducción}
+\subsection{Descripción del problema}
+
+Antofagasta, una ciudad con más de 106,000 vehículos en circulación \parencite{comision2023}, enfrenta serios desafíos en la gestión de su tráfico vehicular. En el año 2023, se registraron 1,715 accidentes, resultando en 31 fallecidos y 102 heridos graves \parencite{comision2023}. La infraestructura vial limitada de la ciudad y la concentración de vehículos en pocas arterias principales agravan la situación, generando congestiones y aumentando el riesgo de accidentes. A pesar de la magnitud de estos problemas, actualmente no existen sistemas de monitoreo en tiempo real que permitan gestionar de manera proactiva el tráfico en la ciudad. Por tanto, se requiere aprovechar fuentes de datos alternativas, como Waze, para recolectar información y mejorar la toma de decisiones relacionadas con el tráfico \parencite{chen2015}.
+
+\subsection{Objetivo general}
+
+Desarrollar un análisis exhaustivo del comportamiento del tráfico en la ciudad de Antofagasta basado en los eventos reportados por conductores en la plataforma Waze. El objetivo final es proporcionar información relevante para la gestión del tráfico, optimizando la toma de decisiones en términos de seguridad vial y eficiencia en el flujo vehicular.
+
+\subsection{Objetivos específicos}
+
+\begin{itemize}
+    \item Obtener datos suficientes y representativos sobre los eventos de tráfico en la ciudad de Antofagasta mediante la API de Waze Cities.
+    \item Realizar un análisis descriptivo de los datos obtenidos para identificar patrones y tendencias relevantes que afecten el comportamiento del tráfico.
+    \item Determinar los factores clave que inciden en la seguridad vial y la eficiencia del tráfico en la ciudad.
+    \item Proporcionar información útil y visualmente comprensible para las autoridades encargadas de la gestión vial, que facilite la implementación de políticas y acciones basadas en datos \parencite{auld2009}.
+\end{itemize}
+
+\section{Marco teórico}
+
+El tráfico vehicular en áreas urbanas presenta un comportamiento complejo e impredecible, lo que dificulta su gestión efectiva. Sin embargo, el avance de las tecnologías móviles y la proliferación de aplicaciones como Waze permiten contar con datos en tiempo real generados por los mismos usuarios. Este proyecto se apoyará en técnicas de análisis de datos para transformar esta información en herramientas útiles para la gestión vial. El uso de datos geoespaciales y la capacidad de automatizar los procesos de recolección, análisis y visualización de datos ofrecen una solución costo-efectiva para mejorar la planificación del tráfico \parencite{barcelo2005}.
+
+\subsection{Metodología}
+
+Una de las principales dificultades a la hora de analizar el comportamiento de determinados fenómenos es la ausencia de datos. Por lo que se planteará una estrategia de recolección de datos que permita obtener conclusiones con un determinado grado de certeza. Se recopilarán datos de la API de Waze Cities, que proporciona información de los eventos activos al momento de la consulta, por lo que para poder obtener una cantidad relevante de datos se implementará un servidor que recopile y almacene información para el análisis. 
+
+Se desarrollará un análisis de los datos con la capacidad de poder recalcularse a medida que se continuen agregando nuevos elementos a la base de datos. Se llevará a cabo un análisis geoespacial que permita identificar puntos de interés, como las vías principales, las calles principales y las zonas de tráfico. Este análisis se realizará utilizando el paquete geopandas de Python, que permite realizar operaciones de análisis geoespaciales. Se analizarán series temporales de datos para identificar patrones y tendencias en el comportamiento del tráfico, y se utilizarán técnicas de visualización para presentar los resultados para identificar estacionalidades de comportamiento. 
+
+Se implementará un pipeline de datos para poder realizar el análisis, que incluirá la recolección de datos, la limpieza y transformación, la visualización y análisis descriptivo. Se evaluará la posibilidad de utilizar técnicas de aprendizaje automático (machine learning) para predecir el comportamiento del tráfico en el futuro y poder tomar decisiones en consecuencia.
 % \chapter{Desarrollo}
 % \chapter{Resultados}
 % \chapter{Discusión}
 % \chapter{Conclusiones}
 % \chapter{Recomendaciones}
-% \chapter{Bibliografía}
-% \chapter{Anexos}
 
+\printbibliography
 
 \end{document}
 
