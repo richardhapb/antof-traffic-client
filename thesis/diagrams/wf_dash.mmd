@@ -1,0 +1,8 @@
+sequenceDiagram
+    participant B as Servidor aplicación 
+    participant C as Dashboard (Dash)
+    participant D as Usuario final
+    B->>C: Datos transformados y filtrados
+    C->>D: Información
+    D->>C: Interacción con datos
+    C->>B: Actualiza filtros

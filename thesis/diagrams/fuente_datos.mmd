@@ -1,0 +1,17 @@
+flowchart TD
+        subgraph Waze
+            direction LR
+            A[Usuario Waze] --> B[Alertas] --> C[Base de Datos Waze] --> API[API Waze Cities]
+        end
+
+        subgraph Aplicación
+            direction LR
+            S[Servidor] --> D[Base de datos] --> E[Dashboard] --> F[Usuario final]
+        end
+
+        Waze --> Aplicación
+
+    classDef waze fill:#fff0,stroke:#333,stroke-width:0.5px,stroke-dasharray: 5,5;
+
+    class Waze waze;
+    class Aplicación waze;
