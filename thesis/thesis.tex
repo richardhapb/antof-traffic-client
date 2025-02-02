@@ -88,6 +88,22 @@ Para la gestión del modelo, en cuanto a su implementación, mantenimiento y act
 
 En la parte de backend, para las diferentes solicitudes y eventos que se generan en la aplicación, se utilizó Flask, un framework de Python que permite crear APIs sencillas, con esto se generó la capacidad de poder responder a eventos generados desde Airflow para la actualización de los datos, renderizado, y actualización de los modelos.
 
+La perspectiva general del flujo de datos se muestra en la \autoref{fig:fuente}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{diagrams/fuente_datos.png}
+    \caption{Pipeline general de datos}
+    \label{fig:fuente}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{diagrams/wf_dash.png}
+    \caption{Flujo de trabajo de dashboard}
+    \label{fig:wf_dash}
+\end{figure}
+
 % \section{Resultados}
 % \section{Discusión}
 % \section{Conclusiones}
