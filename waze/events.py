@@ -445,7 +445,7 @@ class Events:
             not_ended = set()
 
         # Lista de uuids que no se encuentran en la base de datos
-        data = [self.data[i] for d, i in self.index_map.items() if d not in not_ended]
+        data = [self.data[i] for d, i in self.index_map.items() if d not in not_ended and d not in self.pending_endreports]
 
         for record in data:
             # Identificar si estamos en el caso de `alerts` o `jams`
@@ -621,3 +621,4 @@ class Events:
 
         except psycopg2.Error as e:
             raise ValueError(f"Error updating data to database: {e}")
+
