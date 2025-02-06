@@ -1,18 +1,21 @@
-from geopandas.geodataframe import GeoDataFrame
-from waze.events import Events
-import pandas as pd
-import numpy as np
-import geopandas as gpd
-from shapely.geometry import Point
-import contextily as cx
-import matplotlib.pyplot as plt
-from scipy.spatial import cKDTree
-import requests
 import json
 import warnings
+from datetime import datetime
 from typing import List
-from matplotlib.figure import Figure
+
+import contextily as cx
+import geopandas as gpd
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import requests
+from geopandas.geodataframe import GeoDataFrame
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
+from scipy.spatial import cKDTree
+from shapely.geometry import Point
+
+from waze.events import Events
 
 # Deshabilitar SettingWithCopyWarning
 warnings.simplefilter(action="ignore", category=pd.errors.SettingWithCopyWarning)
@@ -26,7 +29,7 @@ PERIM_AFTA = gpd.GeoDataFrame(geometry=gpd.points_from_xy(PERIM_X, PERIM_Y))
 PERIM_AFTA.crs = "EPSG:4326"
 PERIM_AFTA = PERIM_AFTA.to_crs("EPSG:3857")
 
-API_FERIADOS = "https://api.boostr.cl/holidays.json"
+API_FERIADOS = "https://api.boostr.cl/holidays/{year}.json"
 
 
 def load_data(
@@ -416,9 +419,13 @@ def plot_map(
 
 
 def get_holidays()->List:
-    feriados = requests.get(API_FERIADOS).json()
+    years = [year for year in range(2024, datetime.now().year + 1)]
+    feriados = []
+    for year in years:
+        url = API_FERIADOS.format(year=year)
+        response = requests.get(url, timeout=10).json()['data']
+        feriados.extend(response)
 
-    feriados = feriados["data"]
     feriados = [f["date"] for f in feriados]
 
     return feriados
