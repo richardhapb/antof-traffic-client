@@ -434,12 +434,12 @@ class Events:
             not_ended = {d[0] for d in cur.fetchall()}
         elif only_review_last_24h:
             cur.execute(
-                "SELECT uuid FROM " + self.table_name + " WHERE pub_millis > %s AND end_pub_millis IS NULL",
+                "SELECT uuid FROM " + self.table_name + " WHERE pub_millis > %s",
                 (int((datetime.now(tz=pytz.utc).timestamp() - (24 * 60 * 60)) * 1000),),
             )
             not_ended = {d[0] for d in cur.fetchall()}
         elif review_all:
-            cur.execute("SELECT uuid FROM " + self.table_name + " WHERE end_pub_millis IS NULL")
+            cur.execute("SELECT uuid FROM " + self.table_name)
             not_ended = {d[0] for d in cur.fetchall()}
         else:
             not_ended = set()

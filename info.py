@@ -23,7 +23,7 @@ def main():
                 # 4. Obtener nuevas alertas
                 new_alerts = alerts_api - alerts_not_ended_db
                 # 5. Insertar nuevas alertas en db
-                new_alerts.insert_to_db()
+                new_alerts.insert_to_db("all")
                 # 6. Actualizar en db las alertas terminadas
                 new_alerts.update_endreports_to_db(from_new_data=True)
                 print(f"Nuevas alertas: {len(new_alerts.data)}")
@@ -39,7 +39,7 @@ def main():
                 # 4. Obtener nuevos eventos de congestión
                 new_jams = jams_api - jams_not_ended_db
                 # 5. Insertar nuevos eventos de congestión en db
-                new_jams.insert_to_db()
+                new_jams.insert_to_db("all")
                 # 6. Actualizar en db los eventos de congestión terminados
                 new_jams.update_endreports_to_db(from_new_data=True)
                 print(f"Nuevos eventos de congestión: {len(new_jams.data)}")
