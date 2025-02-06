@@ -44,10 +44,11 @@ def main():
                 new_jams.update_endreports_to_db(from_new_data=True)
                 print(f"Nuevos eventos de congestión: {len(new_jams.data)}")
 
+            print("Actualizado.\n")
+
         except Exception as e:
             print(f"Error actualizando: {e}")
 
-        print("Actualizado.\n")
         time.sleep(60 * 5)
 
 

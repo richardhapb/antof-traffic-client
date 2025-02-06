@@ -434,19 +434,19 @@ class Events:
             not_ended = {d[0] for d in cur.fetchall()}
         elif only_review_last_24h:
             cur.execute(
-                "SELECT uuid FROM " + self.table_name + " WHERE pub_millis > %s",
+                "SELECT uuid FROM " + self.table_name + " WHERE pub_millis > %s AND end_pub_millis IS NULL",
                 (int((datetime.now(tz=pytz.utc).timestamp() - (24 * 60 * 60)) * 1000),),
             )
             not_ended = {d[0] for d in cur.fetchall()}
         elif review_all:
-            cur.execute("SELECT uuid FROM " + self.table_name)
+            cur.execute("SELECT uuid FROM " + self.table_name + " WHERE end_pub_millis IS NULL")
             not_ended = {d[0] for d in cur.fetchall()}
         else:
             not_ended = set()
 
         # Lista de uuids que no se encuentran en la base de datos
-        data = [self.data[i] for d, i in self.index_map.items() if d not in not_ended and d not in self.pending_endreports]
-
+        data = [self.data[i] for d, i in self.index_map.items() if d not in not_ended]
+        print(f"Insertando {len(data)} elementos en {self.table_name}")
         for record in data:
             # Identificar si estamos en el caso de `alerts` o `jams`
             if self.table_name == "alerts":
