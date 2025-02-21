@@ -3,6 +3,7 @@ antofTraffic
 .DS_Store
 __pycache__
 data
+**/.ipynb_checkpoints
 v.ipynb
 antof.ipynb
 graph

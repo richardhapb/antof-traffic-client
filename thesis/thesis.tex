@@ -90,19 +90,33 @@ En la parte de backend, para las diferentes solicitudes y eventos que se generan
 
 La perspectiva general del flujo de datos se muestra en la \autoref{fig:fuente}.
 
-\begin{figure}[H]
+\begin{figure}[h]
     \centering
     \includegraphics[width=0.8\textwidth]{diagrams/fuente_datos.png}
     \caption{Pipeline general de datos}
     \label{fig:fuente}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[h]
     \centering
     \includegraphics[width=0.8\textwidth]{diagrams/wf_dash.png}
-    \caption{Flujo de trabajo de dashboard}
+    \caption{Flujo de información en dashboard}
     \label{fig:wf_dash}
 \end{figure}
+
+\section{Desarrollo}
+
+Para obtener los datos necesarios para el análisis, fue necesario generar un mecanismo para recolectar y almacenar la información de Waze Cities. Se implementó un servidor que se encarga de realizar peticiones a la API de Waze, recolectar los eventos de tráfico y almacenarlos en una base de datos PostgreSQL. Este servidor se ejecutaba de manera continua, actualizando la información cada 5 minutos. La estructura de la base de datos se muestra en la \autoref{fig:db_diagram}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/db_diagram.png}
+    \caption{Diagrama de la base de datos}
+    \label{fig:db_diagram}
+\end{figure}
+
+Existen dos estructuras principales, las alertas (alerts) y las congestiones (jams), el primero registra todos los eventos reportados por usuarios, tales como peligros, accidentes, congestión o rutas cerradas. En el caso de los eventos de congestión, son datos generados automáticamente por Waze, los cuales a través de la geolocalización, se estiman congestiones en diferentes puntos de la ciudad. Para este proyecto, se utilizó la información de las alertas. Sin embargo, se almacenaron los datos de congestión, para un posterior análisis, que está fuera del alcance de este estudio. Esta estructura se definió con base en los datos relevantes y completos que proporciona la API, la totalidad de los datos puede ser consultada en la documentación de Waze \parencite{waze2024}.
+
 
 % \section{Resultados}
 % \section{Discusión}

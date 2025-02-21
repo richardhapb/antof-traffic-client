@@ -1,0 +1,4 @@
+- [ ] Gernerate graph from RPI data
+- [ ] Verify period of time for current available graphics
+- [ ] Evaluate factibility of updating graphics
+- [ ] Include statistics data
