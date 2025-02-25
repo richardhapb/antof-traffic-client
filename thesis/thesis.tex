@@ -88,7 +88,7 @@ Para la gestión del modelo, en cuanto a su implementación, mantenimiento y act
 
 En la parte de backend, para las diferentes solicitudes y eventos que se generan en la aplicación, se utilizó Flask, un framework de Python que permite crear APIs sencillas, con esto se generó la capacidad de poder responder a eventos generados desde Airflow para la actualización de los datos, renderizado, y actualización de los modelos.
 
-La perspectiva general del flujo de datos se muestra en la \autoref{fig:fuente}.
+La perspectiva general del flujo de datos se muestra en la \autoref{fig:fuente} y el flujo desde la API de Waze hasta el dashboard se puede observar en la \autoref{fig:wf_dash}
 
 \begin{figure}[h]
     \centering
@@ -115,8 +115,9 @@ Para obtener los datos necesarios para el análisis, fue necesario generar un me
     \label{fig:db_diagram}
 \end{figure}
 
-Existen dos estructuras principales, las alertas (alerts) y las congestiones (jams), el primero registra todos los eventos reportados por usuarios, tales como peligros, accidentes, congestión o rutas cerradas. En el caso de los eventos de congestión, son datos generados automáticamente por Waze, los cuales a través de la geolocalización, se estiman congestiones en diferentes puntos de la ciudad. Para este proyecto, se utilizó la información de las alertas. Sin embargo, se almacenaron los datos de congestión, para un posterior análisis, que está fuera del alcance de este estudio. Esta estructura se definió con base en los datos relevantes y completos que proporciona la API, la totalidad de los datos puede ser consultada en la documentación de Waze \parencite{waze2024}.
+Existen dos estructuras principales, las alertas (alerts) y las congestiones (jams), el primero registra todos los eventos reportados por usuarios, tales como peligros, accidentes, congestión o rutas cerradas. En el caso de los eventos de congestión, son datos generados automáticamente por Waze, los cuales usando la geolocalización, estiman congestiones en diferentes puntos de la ciudad. Para este proyecto, se utilizó la información de las alertas. Sin embargo, se almacenaron los datos de congestión, para un posterior análisis, que está fuera del alcance de este estudio. Esta estructura se definió con base en los datos relevantes y completos que proporciona la API, los tipos de datos disponibles pueden ser consultados en la documentación de Waze \parencite{waze2024}.
 
+Una vez capturados datos desde octubre hasta noviembre, se da inicio a la fase de análisis exploratorio, para lograr obtener información relevante de los datos.
 
 % \section{Resultados}
 % \section{Discusión}
