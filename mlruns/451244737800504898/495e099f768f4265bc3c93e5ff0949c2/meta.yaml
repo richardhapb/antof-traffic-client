@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/451244737800504898/495e099f768f4265bc3c93e5ff0949c2/artifacts
+end_time: 1737208412645
+entry_point_name: ''
+experiment_id: '451244737800504898'
+lifecycle_stage: active
+run_id: 495e099f768f4265bc3c93e5ff0949c2
+run_name: polite-cat-228
+run_uuid: 495e099f768f4265bc3c93e5ff0949c2
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1737208364067
+status: 3
+tags: []
+user_id: richard

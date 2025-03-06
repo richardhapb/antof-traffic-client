@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/451244737800504898/9ebd592b130b44d7896052ee2b01aaf8/artifacts
+end_time: 1731990579587
+entry_point_name: ''
+experiment_id: '451244737800504898'
+lifecycle_stage: active
+run_id: 9ebd592b130b44d7896052ee2b01aaf8
+run_name: bald-moose-850
+run_uuid: 9ebd592b130b44d7896052ee2b01aaf8
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1731990525056
+status: 3
+tags: []
+user_id: richard

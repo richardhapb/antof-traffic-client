@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1731990529070
+current_stage: None
+description: ''
+last_updated_timestamp: 1731990529070
+name: XGBClassifier
+run_id: 9ebd592b130b44d7896052ee2b01aaf8
+run_link: ''
+source: mlflow-artifacts:/451244737800504898/9ebd592b130b44d7896052ee2b01aaf8/artifacts/waze_data
+status: READY
+status_message: null
+storage_location: mlflow-artifacts:/451244737800504898/9ebd592b130b44d7896052ee2b01aaf8/artifacts/waze_data
+user_id: null
+version: 1

@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/451244737800504898/30a7cb96056e49838cf7710d3445cef5/artifacts
+end_time: 1737208412945
+entry_point_name: ''
+experiment_id: '451244737800504898'
+lifecycle_stage: active
+run_id: 30a7cb96056e49838cf7710d3445cef5
+run_name: smiling-hen-656
+run_uuid: 30a7cb96056e49838cf7710d3445cef5
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1737208364157
+status: 3
+tags: []
+user_id: richard

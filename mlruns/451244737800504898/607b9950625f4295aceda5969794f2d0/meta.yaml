@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/451244737800504898/607b9950625f4295aceda5969794f2d0/artifacts
+end_time: 1733710487599
+entry_point_name: ''
+experiment_id: '451244737800504898'
+lifecycle_stage: active
+run_id: 607b9950625f4295aceda5969794f2d0
+run_name: overjoyed-quail-450
+run_uuid: 607b9950625f4295aceda5969794f2d0
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733710477205
+status: 3
+tags: []
+user_id: richard
