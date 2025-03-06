@@ -3,7 +3,6 @@ antofTraffic
 .DS_Store
 __pycache__
 data
-mlartifacts
 v.ipynb
 antof.ipynb
 graph
