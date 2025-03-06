@@ -8,11 +8,8 @@ import pandas as pd
 import numpy as np
 import geopandas as gpd
 from shapely.geometry import Point
-import contextily as cx
-import matplotlib.pyplot as plt
 from scipy.spatial import cKDTree
 import requests
-from matplotlib.figure import Figure
 
 from waze.events import Events
 
@@ -88,6 +85,7 @@ def freq_nearby(gdf: gpd.GeoDataFrame, nearby_meters=200) -> gpd.GeoDataFrame:
     - GeoDataFrame con una columna adicional 'freq'.
     """
     gdf2 = gdf.copy()
+    assert gdf2.crs is not None and not gdf2.empty, "GeoDataFrame vacío"
     # Asegura que el GeoDataFrame esté en un CRS proyectado con unidades en metros
     if gdf2.crs.is_geographic:
         gdf2 = gdf2.to_crs(epsg=3857)
