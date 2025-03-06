@@ -8,6 +8,7 @@ antof.ipynb
 graph
 *.csv
 *.png
+!dashboard/**/*.png
 *.xlsx
 t.py
 exceptions.txt
