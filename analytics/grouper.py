@@ -15,7 +15,7 @@ class Grouper:
         "ALL": "Eventos",
     }
 
-    def __init__(self, data: gpd.GeoDataFrame | pd.DataFrame)->None:
+    def __init__(self, data: gpd.GeoDataFrame)->None:
         self.data = data.copy()
         self.grid:Tuple[np.ndarray[Any, Any], ...] | None = None
         self.type:str | None = None

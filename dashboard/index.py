@@ -771,7 +771,7 @@ def update_graphs(kind, start_date, end_date, active_cell):
     table_data = streets_data.to_dict("records")
 
     if active_cell is not None:
-        filtered_alerts = filtered_alerts.data.loc[
+        filtered_alerts.data = filtered_alerts.data.loc[
             filtered_alerts.data["street"] == streets_data.iloc[active_cell["row"]]["Calle"]
         ]
 
@@ -805,7 +805,7 @@ def update_graphs(kind, start_date, end_date, active_cell):
 
     if kind != "all":
         map_data = copy.deepcopy(filtered_alerts)
-        map_data = map_data.data[map_data.data["type"] == kind]
+        map_data.data = map_data.data[map_data.data["type"] == kind]
     else:
         map_data = copy.deepcopy(filtered_alerts)
     map_data.data = utils.freq_nearby(map_data.data, nearby_meters=200)
