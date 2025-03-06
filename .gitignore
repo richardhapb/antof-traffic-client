@@ -13,7 +13,6 @@ t.py
 exceptions.txt
 config.py
 v.py
-mlartifacts
 mlruns
 sql.json
 backup_waze.sql
