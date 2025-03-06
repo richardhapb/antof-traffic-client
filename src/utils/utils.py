@@ -342,3 +342,4 @@ def daily_group(
     daily_reports["f"] /= months
     daily_reports["s"] /= months
     return daily_reports
+
