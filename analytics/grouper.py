@@ -1,4 +1,4 @@
-from typing import Dict, List, Any, Tuple
+from typing import Dict, Any, Tuple
 import matplotlib.pyplot as plt
 import pandas as pd
 import geopandas as gpd
@@ -252,6 +252,8 @@ class Grouper:
                 j += 1
             i += 1
             j = 0
+
+        assert self.data.crs is not None, "CRS is None"
 
         cx.add_basemap(
             ax,

@@ -9,20 +9,23 @@ import plotly.express as px
 import plotly.graph_objs as go
 import pytz
 
+from typing import cast
+from apscheduler.schedulers.background import BackgroundScheduler
+
 from dash import Dash, Input, Output, dcc, html
-from flask import Flask, jsonify
 from shapely.geometry import Point, Polygon
 
 from dashboard.components import graphs, header, maps, metadata, ml_params, tables
 from dashboard.init import init_app
 from dashboard.models import Alerts, Model
-from dashboard.train import train
 
 from dashboard.update_data import update_data
 from dashboard.update_model import load_model
+from dashboard.train import train
+
+from analytics.grouper import Grouper
 
 from utils import utils
-from waze.info import main as fetch_data
 
 TZ = os.getenv("TZ", "America/Santiago")
 
@@ -30,6 +33,13 @@ model = Model()
 alerts = Alerts()
 
 time_range = init_app(model, alerts)
+
+# Train and Load the model dinamically
+scheduler = BackgroundScheduler()
+scheduler.add_job(update_data, 'interval', args=[time_range, alerts], minutes=5)
+scheduler.add_job(train, 'interval', days=30)
+scheduler.add_job(load_model, 'interval', args=[model], days=30, minutes=5)
+scheduler.start()
 
 names = {
     "all": "Evento",
@@ -39,42 +49,18 @@ names = {
     "ROAD_CLOSED": "Camino cerrado",
 }
 
-server = Flask("waze_dash")
-
-
-@server.route("/update_data")
-def dash_update_data():
-    update_data(time_range, alerts)
-    return (jsonify({"msg": "Success"}), 200)
-
-
-@server.route("/update_model")
-def dash_update_model():
-    load_model(model)
-    return (jsonify({"msg": "Success"}), 200)
-
-
-@server.route("/train")
-def dash_train():
-    train()
-    return (jsonify({"msg": "Model trained"}), 200)
-
-
-@server.route("/fetch_data")
-def dash_fetch_data():
-    fetch_data()
-    return (jsonify({"msg": "Data fetched"}), 200)
-
+update_data(time_range, alerts)
+load_model(model)
 
 app = Dash(
     __name__,
-    server=server,
     update_title="",
     meta_tags=metadata.meta_tags,
 )
 app._favicon = "favicon.png"
 app.title = "Gestión del tráfico en Antofagasta"
 
+server = app.server
 app.layout = html.Div(
     [
         header.get_header(time_range),
@@ -327,9 +313,11 @@ def update_graphs(kind, start_date, end_date, active_cell, _):
     if filtered_alerts is None or filtered_alerts.data.shape[0] == 0:
         return STANDARD_RETURN
 
-    filtered_alerts.data = filtered_alerts.data[
+    assert isinstance(filtered_alerts, Grouper), "Error: data must be a Grouper"
+
+    filtered_alerts.data = cast(gpd.GeoDataFrame, filtered_alerts.data[
         (filtered_alerts.data["pubMillis"] >= start) & (filtered_alerts.data["pubMillis"] <= end)
-    ]
+    ])
 
     scatter_data_acc = utils.extract_event(
         filtered_alerts.data,
