@@ -1,35 +1,27 @@
-# system
+import copy
+
+import datetime
 import os
 
-# Time
-import datetime
-import pytz
-
-# DASH / PLOTLY
-from dash import Dash, html, dcc, Input, Output
-import plotly.express as px
-import plotly.graph_objs as go
-from flask import Flask, jsonify
-
-# Analytics / ML
 import geopandas as gpd
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objs as go
+import pytz
+
+from dash import Dash, Input, Output, dcc, html
+from flask import Flask, jsonify
 from shapely.geometry import Point, Polygon
 
-# UTILS
-from utils import utils
-
-
-from dashboard.models import Model, Alerts
+from dashboard.components import graphs, header, maps, metadata, ml_params, tables
 from dashboard.init import init_app
+from dashboard.models import Alerts, Model
+from dashboard.train import train
 
-# Components
-from dashboard.components import metadata, graphs, tables, maps, header, ml_params
-
-# API
 from dashboard.update_data import update_data
 from dashboard.update_model import load_model
-from dashboard.train import train
+
+from utils import utils
 from waze.info import main as fetch_data
 
 TZ = os.getenv("TZ", "America/Santiago")
@@ -330,20 +322,17 @@ def update_graphs(kind, start_date, end_date, active_cell, _):
     if end <= start:
         end = start.timestamp() + (23 * 60 * 60 + 60**2 * 59) * 1000
 
-    if alerts.data is None:
+    filtered_alerts = copy.deepcopy(alerts.data)
+
+    if filtered_alerts is None or filtered_alerts.data.shape[0] == 0:
         return STANDARD_RETURN
 
-    filtered_alerts = gpd.GeoDataFrame(
-        alerts.data.data[
-            (alerts.data.data["pubMillis"] >= start) & (alerts.data.data["pubMillis"] <= end)
-        ]
-    )
-
-    if filtered_alerts is None or filtered_alerts.shape[0] == 0:
-        return STANDARD_RETURN
+    filtered_alerts.data = filtered_alerts.data[
+        (filtered_alerts.data["pubMillis"] >= start) & (filtered_alerts.data["pubMillis"] <= end)
+    ]
 
     scatter_data_acc = utils.extract_event(
-        filtered_alerts,
+        filtered_alerts.data,
         ["ACCIDENT"],
         extra_col=extra_cols,
     )
@@ -351,7 +340,7 @@ def update_graphs(kind, start_date, end_date, active_cell, _):
     scatter_data_acc = utils.hourly_group(scatter_data_acc, do_sum=True)
 
     scatter_data_jam = utils.extract_event(
-        filtered_alerts,
+        filtered_alerts.data,
         ["JAM"],
         extra_col=extra_cols,
     )
@@ -360,13 +349,13 @@ def update_graphs(kind, start_date, end_date, active_cell, _):
 
     if kind is not None and kind != "all":
         streets_data = (
-            filtered_alerts[filtered_alerts["type"] == kind]
+            filtered_alerts.data[filtered_alerts.data["type"] == kind]
             .groupby("street")["type"]
             .count()
             .reset_index()
         )
     else:
-        streets_data = filtered_alerts.groupby("street")["type"].count().reset_index()
+        streets_data = filtered_alerts.data.groupby("street")["type"].count().reset_index()
 
     streets_data = streets_data.rename(columns={"street": "Calle", "type": "Eventos"})
     streets_data = streets_data.sort_values(by="Eventos", ascending=False)
@@ -374,18 +363,18 @@ def update_graphs(kind, start_date, end_date, active_cell, _):
     table_data = streets_data.to_dict("records")
 
     if active_cell is not None:
-        filtered_alerts = filtered_alerts.loc[
-            filtered_alerts["street"] == streets_data.iloc[active_cell["row"]]["Calle"]
+        filtered_alerts.data = filtered_alerts.data.loc[
+            filtered_alerts.data["street"] == streets_data.iloc[active_cell["row"]]["Calle"]
         ]
 
     if kind == "all":
         events = utils.extract_event(
-            filtered_alerts,
+            filtered_alerts.data,
             ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"],
             extra_cols,
         )
     else:
-        events = utils.extract_event(filtered_alerts, [kind], extra_cols)
+        events = utils.extract_event(filtered_alerts.data, [kind], extra_cols)
 
     hourly = utils.hourly_group(events).reset_index().copy()
     hourly = pd.melt(
@@ -406,22 +395,22 @@ def update_graphs(kind, start_date, end_date, active_cell, _):
     )
 
     if kind != "all":
-        map_data = filtered_alerts[filtered_alerts["type"] == kind].copy()
+        map_data = copy.deepcopy(filtered_alerts)
     else:
-        map_data = filtered_alerts.copy()
-    map_data = utils.freq_nearby(map_data, nearby_meters=200)
-    if map_data is None:
+        map_data = copy.deepcopy(filtered_alerts)
+    map_data.data = utils.freq_nearby(map_data.data, nearby_meters=200)
+    if map_data.data is None:
         raise ValueError("Map data is None")
-    map_data["freq"] = map_data.apply(lambda x: x["freq"] if x["freq"] > 0 else 1, axis=1)
+    map_data.data["freq"] = map_data.data.apply(lambda x: x["freq"] if x["freq"] > 0 else 1, axis=1)
 
-    map_data["time"] = map_data.pubMillis.apply(lambda x: x.strftime("%H:%M:%S"))
-    map_data["date"] = map_data.pubMillis.apply(lambda x: x.strftime("%d-%m-%Y"))
+    map_data.data["time"] = map_data.data.pubMillis.apply(lambda x: x.strftime("%H:%M:%S"))
+    map_data.data["date"] = map_data.data.pubMillis.apply(lambda x: x.strftime("%d-%m-%Y"))
 
-    map_data["type"] = map_data["type"].map(names)
+    map_data.data["type"] = map_data.data["type"].map(names)
 
     map_fig = go.Figure(
         px.scatter_map(
-            map_data,
+            map_data.data,
             lat="y",
             lon="x",
             color="type",
@@ -765,15 +754,9 @@ def update_last_events(kind, _):
     return last_events.to_dict("records"), datetime.datetime.now(pytz.timezone(TZ))
 
 
-@app.callback(
-    [Output("time_range", "end_data"), Output("model_version", "children")],
-    Input("ml_update", "n_intervals"),
-)
+@app.callback(Output("model_version", "children"), Input("ml_update", "n_intervals"))
 def update_model_version(_):
-    return (
-        datetime.datetime.now(pytz.timezone(TZ)),
-        f"Versión del modelo: {model.last_model}",
-    )
+    return (f"Versión del modelo: {model.last_model}",)
 
 
 # Clear filter in table selections
@@ -803,4 +786,3 @@ app.clientside_callback(
     Output("instructions", "className"),
     Input("toggle_instructions", "n_clicks"),
 )
-

@@ -21,6 +21,7 @@ databricks-sdk==0.38.0
 Deprecated==1.2.15
 dill==0.3.9
 docker==7.1.0
+dotenv==0.9.9
 Flask==3.0.3
 fonttools==4.55.0
 geographiclib==2.0

@@ -85,7 +85,7 @@ def freq_nearby(gdf: gpd.GeoDataFrame, nearby_meters=200) -> gpd.GeoDataFrame:
     - GeoDataFrame con una columna adicional 'freq'.
     """
     gdf2 = gdf.copy()
-    assert gdf2.crs is not None and not gdf2.empty, "GeoDataFrame vacío"
+    assert gdf2.crs is not None, "GeoDataFrame vacío"
     # Asegura que el GeoDataFrame esté en un CRS proyectado con unidades en metros
     if gdf2.crs.is_geographic:
         gdf2 = gdf2.to_crs(epsg=3857)
