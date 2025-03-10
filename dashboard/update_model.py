@@ -7,7 +7,7 @@ from dashboard.dash_config import MODEL_NAME
 
 def load_model(model_obj: Model):
     model_name = MODEL_NAME
-    model_obj.last_model = ML.get_last_model(model_name)
+    model_obj.last_model = 6 # ML.get_last_model(model_name)
     model_obj.model = mlflow.sklearn.load_model(
         f"models:/{model_name}/{model_obj.last_model}"
     )
