@@ -271,7 +271,7 @@ class Events:
 
         if len(self.data) == 0:
             return gpd.GeoDataFrame()
-        df = pd.DataFrame(self.data, columns=list(self.data[0].keys()))  # type: ignore
+        df = pd.DataFrame(self.data, columns=list(self.data[0].keys()))
         df = utils.update_timezone(df, tz)
 
         return utils.separate_coords(df)

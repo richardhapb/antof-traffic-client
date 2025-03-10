@@ -1,14 +1,11 @@
-import os
 import datetime
-import pytz
 from dash import html, dcc
-from dashboard.models import TimeRange
 
-TZ = os.getenv("TZ", "America/Santiago")
+today = datetime.datetime.today()
 
+MIN_DATE = datetime.datetime(year=2024, month=10, day=1)
 
-def get_header(time_range: TimeRange):
-
+def get_header():
     header = html.Div(
         [
             html.H1("Inteligencia de Tráfico para la Gestión Urbana en Antofagasta"),
@@ -67,21 +64,13 @@ def get_header(time_range: TimeRange):
                         start_date_placeholder_text="Desde",
                         end_date_placeholder_text="Hasta",
                         id="date_range",
-                        min_date_allowed=datetime.datetime.fromtimestamp(
-                            time_range.init_time / 1000, pytz.timezone(TZ)
-                        ),
-                        max_date_allowed=datetime.datetime.now(pytz.timezone(TZ)),
-                        initial_visible_month=datetime.datetime.fromtimestamp(
-                            time_range.selected_time / 1000, pytz.timezone(TZ)
-                        ),
+                        min_date_allowed=MIN_DATE,
+                        max_date_allowed=today,
+                        initial_visible_month=today,
                         display_format="DD-MM-YYYY",
                         calendar_orientation="vertical",
-                        start_date=datetime.datetime.fromtimestamp(
-                            time_range.selected_time / 1000, pytz.timezone(TZ)
-                        ),
-                        end_date=datetime.datetime.fromtimestamp(
-                            time_range.end_time / 1000, pytz.timezone(TZ)
-                        ),
+                        start_date=today - datetime.timedelta(days=30),
+                        end_date=today,
                         first_day_of_week=1,
                     ),
                 ],

@@ -12,7 +12,7 @@ import pytz
 from typing import cast
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from dash import Dash, Input, Output, dcc, html
+from dash import Dash, Input, Output, html
 from shapely.geometry import Point, Polygon
 
 from dashboard.components import graphs, header, maps, metadata, ml_params, tables
@@ -36,9 +36,9 @@ time_range = init_app(model, alerts)
 
 # Train and Load the model dinamically
 scheduler = BackgroundScheduler()
-scheduler.add_job(update_data, 'interval', args=[time_range, alerts], minutes=5)
-scheduler.add_job(train, 'interval', days=30)
-scheduler.add_job(load_model, 'interval', args=[model], days=30, minutes=5)
+scheduler.add_job(update_data, "interval", args=[time_range, alerts], minutes=5)
+scheduler.add_job(train, "interval", days=30)
+scheduler.add_job(load_model, "interval", args=[model], days=30, minutes=5)
 scheduler.start()
 
 names = {
@@ -63,13 +63,7 @@ app.title = "Gestión del tráfico en Antofagasta"
 server = app.server
 app.layout = html.Div(
     [
-        header.get_header(time_range),
-        dcc.Interval(
-            id="live_update", interval=5 * 60 * 1000, n_intervals=0
-        ),  # Update data each 5 minutes
-        dcc.Interval(
-            id="ml_update", interval=24 * 60**2 * 1000, n_intervals=0
-        ),  # Update ML model each 24 hours
+        header.get_header(),
         html.Div(
             [maps.main_map, tables.street_table],
             className="row",
@@ -277,10 +271,9 @@ def update_ML(
         Input("date_range", "start_date"),
         Input("date_range", "end_date"),
         Input("table", "active_cell"),
-        Input("live_update", "n_intervals"),
     ],
 )
-def update_graphs(kind, start_date, end_date, active_cell, _):
+def update_graphs(kind, start_date, end_date, active_cell):
     STANDARD_RETURN = (
         go.Figure(),
         go.Figure(),
@@ -315,9 +308,13 @@ def update_graphs(kind, start_date, end_date, active_cell, _):
 
     assert isinstance(filtered_alerts, Grouper), "Error: data must be a Grouper"
 
-    filtered_alerts.data = cast(gpd.GeoDataFrame, filtered_alerts.data[
-        (filtered_alerts.data["pubMillis"] >= start) & (filtered_alerts.data["pubMillis"] <= end)
-    ])
+    filtered_alerts.data = cast(
+        gpd.GeoDataFrame,
+        filtered_alerts.data[
+            (filtered_alerts.data["pubMillis"] >= start)
+            & (filtered_alerts.data["pubMillis"] <= end)
+        ],
+    )
 
     scatter_data_acc = utils.extract_event(
         filtered_alerts.data,
@@ -658,8 +655,6 @@ def update_graphs(kind, start_date, end_date, active_cell, _):
         ),
     )
 
-    end = datetime.datetime.fromtimestamp(time_range.end_time / 1000, pytz.timezone(TZ))
-
     return map_fig, hourly_fig, table_data, daily_fig, scatter_fig, end
 
 
@@ -699,9 +694,9 @@ def update_ml_graphs(kind, date_value, hour, active_cell, table_data, page_curre
 
 @app.callback(
     [Output("table_last", "data"), Output("date_range", "max_date_allowed")],
-    [Input("dd_type", "value"), Input("live_update", "n_intervals")],
+    Input("dd_type", "value"),
 )
-def update_last_events(kind, _):
+def update_last_events(kind):
     if alerts.data is None:
         return [], datetime.datetime.now(pytz.timezone(TZ))
     last_events = alerts.data.data.sort_values(by="pubMillis", ascending=False)
@@ -740,11 +735,6 @@ def update_last_events(kind, _):
     )
 
     return last_events.to_dict("records"), datetime.datetime.now(pytz.timezone(TZ))
-
-
-@app.callback(Output("model_version", "children"), Input("ml_update", "n_intervals"))
-def update_model_version(_):
-    return (f"Versión del modelo: {model.last_model}",)
 
 
 # Clear filter in table selections

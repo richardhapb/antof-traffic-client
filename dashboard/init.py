@@ -26,8 +26,8 @@ def init_app(model_obj: Model, alerts_obj: Alerts) -> TimeRange:
         * 1000
     )
 
-    selected_time = int(datetime.datetime.now().timestamp()) * 1000
-    time_range_obj = TimeRange(since, selected_time, selected_time)
+    end_time = int(datetime.datetime.now().timestamp()) * 1000
+    time_range_obj = TimeRange(since, end_time)
 
     update_data(time_range_obj, alerts_obj)
 
