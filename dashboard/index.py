@@ -49,9 +49,6 @@ names = {
     "ROAD_CLOSED": "Camino cerrado",
 }
 
-update_data(time_range, alerts)
-load_model(model)
-
 app = Dash(
     __name__,
     update_title="",
@@ -379,10 +376,7 @@ def update_graphs(kind, start_date, end_date, active_cell):
         value_name="events",
     )
 
-    if kind != "all":
-        map_data = copy.deepcopy(filtered_alerts)
-    else:
-        map_data = copy.deepcopy(filtered_alerts)
+    map_data = copy.deepcopy(filtered_alerts)
     map_data.data = utils.freq_nearby(map_data.data, nearby_meters=200)
     if map_data.data is None:
         raise ValueError("Map data is None")
