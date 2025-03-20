@@ -8,6 +8,8 @@ import pytz
 def main():
     tz = "America/Santiago"
 
+    extra_cols = ["day_type", "week_day", "day", "hour", "minute", "geometry"]
+
     since = int(
         (
             datetime.datetime.now(pytz.timezone(tz)).replace(
@@ -29,7 +31,7 @@ def main():
     )
     fig.savefig("graph/alerts_heat_map.png")
 
-    events = utils.extract_event(alerts.to_gdf(tz=tz), ["ACCIDENT"])
+    events = utils.extract_event(alerts.to_gdf(tz=tz), ["ACCIDENT"], extra_cols)
 
     fig = plot.heat_map(events)
     fig.suptitle(
