@@ -14,8 +14,9 @@ class AlertType(Enum):
 
 
 class Alerts:
-    def __init__(self, data: dict, alert_type: AlertType = AlertType.ALL) -> None:
+    def __init__(self, data: list, alert_type: AlertType = AlertType.ALL) -> None:
         df = pd.DataFrame(data)
+
         self.data = utils.separate_coords(df)
         self.data = utils.update_timezone(self.data, utils.TZ)
         self.alert_type = alert_type
@@ -25,6 +26,10 @@ class Alerts:
             self.data = pd.concat((self.data, other.data), axis=0)
 
         return self.data
+
+    @property
+    def is_empty(self) -> bool:
+         return not hasattr(self.data, "pub_millis")
 
     def filter_by_group_time(
         self, timedelta_min: int, inplace: bool = False
@@ -70,7 +75,7 @@ class Alerts:
             pd.DataFrame({
                 "group": self.data.group.value_counts().keys(),
                 "qty/day": self.data.group.value_counts().values
-                / (self.data["inicio"].max() - self.data["inicio"].min()).days,
+                / (self.data["pub_millis"].max() - self.data["pub_millis"].min()).days,
             })
         ).sort_values(ascending=False, by="qty/day")
 

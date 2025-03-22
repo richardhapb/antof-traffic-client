@@ -45,12 +45,12 @@ def test_update_timezone():
     assert curr_time.tzname() is None
     assert future_time.tzname() is None
 
-    df = pd.DataFrame({"pub_millis": [curr_time], "endreport": [future_time]})
+    df = pd.DataFrame({"pub_millis": [curr_time], "end_pub_millis": [future_time]})
 
     df2 = utils.update_timezone(df, "America/Santiago")
 
     assert str(df2["pub_millis"].dt.tz) == "America/Santiago"
-    assert str(df2["endreport"].dt.tz) == "America/Santiago"
+    assert str(df2["end_pub_millis"].dt.tz) == "America/Santiago"
 
 
 def test_get_holidays():
@@ -89,7 +89,7 @@ def test_extract_event():
     future_time = curr_time + datetime.timedelta(hours=2)
 
     freq_df["pub_millis"] = [curr_time] * n
-    freq_df["endreport"] = [future_time] * n
+    freq_df["end_pub_millis"] = [future_time] * n
 
     df2 = utils.update_timezone(freq_df, "America/Santiago")
     df2["type"] = ["ACCIDENT"] * n
@@ -98,7 +98,7 @@ def test_extract_event():
     df3 = utils.extract_event(df2, ["ACCIDENT"], extra_cols)
 
     for c in df3.columns:
-        assert c in extra_cols + ["inicio", "fin"]
+        assert c in extra_cols + ["pub_millis", "end_pub_millis"]
 
 
 def test_hourly_group():
@@ -112,7 +112,7 @@ def test_hourly_group():
     future_time = curr_time + datetime.timedelta(hours=2)
 
     freq_df["pub_millis"] = [curr_time] * n
-    freq_df["endreport"] = [future_time] * n
+    freq_df["end_pub_millis"] = [future_time] * n
 
     df2 = utils.update_timezone(freq_df, "America/Santiago")
     df2["type"] = ["ACCIDENT"] * n
@@ -136,7 +136,7 @@ def test_daily_group():
     future_time = curr_time + datetime.timedelta(hours=2)
 
     freq_df["pub_millis"] = [curr_time] * n
-    freq_df["endreport"] = [future_time] * n
+    freq_df["end_pub_millis"] = [future_time] * n
 
     df2 = utils.update_timezone(freq_df, "America/Santiago")
     df2["type"] = ["ACCIDENT"] * n

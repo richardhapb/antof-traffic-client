@@ -30,7 +30,7 @@ for _ in range(N_ELEMENTS):
                 uuid += 1
             elif k == "pub_millis":
                 element.append(np.random.choice([today, another_day]))
-            elif k == "endreport":
+            elif k == "end_pub_millis":
                 element.append(
                     np.random.choice([element[-1] + 60**2] + [None])
                 )  # 1 hour
@@ -55,7 +55,7 @@ for _ in range(N_ELEMENTS):
                 uuid += 1
             elif k == "pub_millis":
                 element.append(np.random.choice([today, another_day]))
-            elif k == "endreport":
+            elif k == "end_pub_millis":
                 element.append(
                     np.random.choice([element[-1] + 60**2] + [None])
                 )  # 1 hour
@@ -129,11 +129,11 @@ def test_fetch_from_db(mock_connect, mock_db_connection_alerts):
     assert len(events.data) == N_ELEMENTS
     assert isinstance(events.data, list)
     assert events.data[0].keys() == ALERTS_STRUCTURE.keys()
-    assert events.pending_endreports == {
+    assert events.pending_end_pub_milliss == {
         e["uuid"]
         for e in events.data
         for k, v in e.items()
-        if k == "endreport" and v is None
+        if k == "end_pub_millis" and v is None
     }
     assert events.index_map.keys() == {e["uuid"] for e in events.data}
 

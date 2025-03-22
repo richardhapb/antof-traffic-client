@@ -7,6 +7,8 @@ import numpy as np
 import pandas as pd
 from matplotlib.figure import Figure
 
+from utils.utils import TZ
+
 XMIN = -70.43627
 XMAX = -70.36259
 
@@ -23,26 +25,27 @@ class Grouper:
         "ALL": "Eventos",
     }
 
-    def __init__(self, grid_dim: tuple[int, int]) -> None:
+    def __init__(self, data: gpd.GeoDataFrame, grid_dim: tuple[int, int]) -> None:
         self.grid: tuple[np.ndarray[Any, Any], ...] | None = None
         self.type: str | None = None
         self.x_grid: np.ndarray | None = None
         self.y_grid: np.ndarray | None = None
 
-        self.get_grid(*grid_dim)
+        self.get_grid(data, *grid_dim)
 
-    def get_grid(self, n_x_div: int, n_y_div: int) -> tuple[np.ndarray[Any, Any], ...]:
+    def get_grid(self, data: gpd.GeoDataFrame, n_x_div: int, n_y_div: int) -> tuple[np.ndarray[Any, Any], ...]:
+        geometry = data.geometry
         bounds_x = np.array(
             np.linspace(
-                XMIN,
-                XMAX,
+                geometry.to_crs(epsg=3857).geometry.x.min(),
+                geometry.to_crs(epsg=3857).geometry.x.max(),
                 n_x_div,
             )
         )
         bounds_y = np.array(
             np.linspace(
-                YMIN,
-                YMAX,
+                geometry.to_crs(epsg=3857).geometry.y.min(),
+                geometry.to_crs(epsg=3857).geometry.y.max(),
                 n_y_div,
             )
         )
@@ -125,24 +128,24 @@ class Grouper:
     def filter_by_group_time(
         data: gpd.GeoDataFrame, timedelta_min: int, inplace: bool = False
     ) -> gpd.GeoDataFrame | pd.DataFrame:
-        if data is None or "pubMillis" not in data.columns:
+        if data is None or "pub_millis" not in data.columns:
             return pd.DataFrame()
         if not inplace:
             data = data.copy()
 
-        if not isinstance(data["pubMillis"].iloc[0], np.integer):
-            data["pubMillis"] = round(
-                data["pubMillis"].astype(np.int64, errors="ignore") / 1_000_000
+        if not isinstance(data["pub_millis"].iloc[0], np.integer):
+            data["pub_millis"] = round(
+                data["pub_millis"].astype(np.int64, errors="ignore") / 1_000_000
             ).astype(np.int64)
 
         step = np.int64(60_000 * timedelta_min)  # step en milisegundos
 
-        # Calcular intervalos ajustando 'pubMillis' al múltiplo más cercano de 'step'
-        data["interval_start"] = ((data["pubMillis"]).to_numpy() // step) * step
+        # Calcular intervalos ajustando 'pub_millis' al múltiplo más cercano de 'step'
+        data["interval_start"] = ((data["pub_millis"]).to_numpy() // step) * step
 
         # Convertir 'interval_start' a datetime
         data["interval_start"] = pd.to_datetime(data["interval_start"], unit="ms", utc=True)
-        data["interval_start"] = data["interval_start"].dt.tz_convert("America/Santiago")
+        data["interval_start"] = data["interval_start"].dt.tz_convert(TZ)
 
         # Asegurar tipos consistentes
         data["group"] = data["group"].astype(np.int16)
@@ -154,8 +157,8 @@ class Grouper:
 
         result = grouped_events.reset_index(drop=True)
 
-        result["pubMillis"] = pd.to_datetime(result["pubMillis"], unit="ms", utc=True)
-        result["pubMillis"] = result["pubMillis"].dt.tz_convert("America/Santiago")
+        result["pub_millis"] = pd.to_datetime(result["pub_millis"], unit="ms", utc=True)
+        result["pub_millis"] = result["pub_millis"].dt.tz_convert(TZ)
 
         return result
 
@@ -165,7 +168,7 @@ class Grouper:
             pd.DataFrame({
                 "group": data.group.value_counts().keys(),
                 "qty/day": data.group.value_counts().values
-                / (data["inicio"].max() - data["inicio"].min()).days,
+                / (data["pub_millis"].max() - data["pub_millis"].min()).days,
             })
         ).sort_values(ascending=False, by="qty/day")
 

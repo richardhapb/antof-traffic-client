@@ -95,13 +95,13 @@ def update_ML(
     kind: str,
     higlighted_segment: int | None = None,
 ):
-    g = Grouper((10, 20))
-
     if model is None or model.model is None:
         return go.Figure()
 
-    if alerts is None:
+    if alerts.is_empty:
         return go.Figure()
+
+    g = Grouper(alerts.data, (10, 20))
 
     x_var = pd.DataFrame(
         {
@@ -267,12 +267,15 @@ def update_graphs(kind, start_date, end_date, active_cell):
     STANDARD_RETURN = (
         go.Figure(),
         go.Figure(),
-        {},
+        [],
         None,
         go.Figure(),
         datetime.datetime.now(pytz.timezone(TZ)),
     )
     if start_date is None or end_date is None:
+        return STANDARD_RETURN
+
+    if alerts.is_empty:
         return STANDARD_RETURN
 
     start = (
@@ -290,9 +293,6 @@ def update_graphs(kind, start_date, end_date, active_cell):
         end = start.timestamp() + (23 * 60 * 60 + 60**2 * 59) * 1000
 
     filtered_alerts = copy.deepcopy(alerts.data)
-
-    if filtered_alerts is None or filtered_alerts.shape[0] == 0:
-        return STANDARD_RETURN
 
     filtered_alerts = filtered_alerts[
         (filtered_alerts["pub_millis"] >= start) & (filtered_alerts["pub_millis"] <= end)
@@ -350,7 +350,7 @@ def update_graphs(kind, start_date, end_date, active_cell):
     map_data = copy.deepcopy(filtered_alerts)
     map_data = utils.freq_nearby(map_data, nearby_meters=200)
     if map_data is None:
-        raise ValueError("Map data is None")
+        raise ValueError("Map data is empty")
     map_data["freq"] = map_data.apply(lambda x: x["freq"] if x["freq"] > 0 else 1, axis=1)
 
     map_data["time"] = map_data.pub_millis.apply(lambda x: x.strftime("%H:%M:%S"))
@@ -636,6 +636,8 @@ def update_graphs(kind, start_date, end_date, active_cell):
     ],
 )
 def update_ml_graphs(kind, date_value, hour, active_cell, table_data, page_current, page_size):
+    if alerts.is_empty:
+        return go.Figure(), []
     if kind is None:
         kind = "ACCIDENT"
     if date_value is None:
@@ -662,7 +664,7 @@ def update_ml_graphs(kind, date_value, hour, active_cell, table_data, page_curre
     Input("dd_type", "value"),
 )
 def update_last_events(kind):
-    if alerts.data is None:
+    if alerts.is_empty:
         return [], datetime.datetime.now(pytz.timezone(TZ))
     last_events = alerts.data.sort_values(by="pub_millis", ascending=False)
 
@@ -681,9 +683,10 @@ def update_last_events(kind):
         lambda row: f"{int(row['hour']):02}:{int(row['minute']):02}", axis=1
     )
 
-    last_events["date"] = last_events.inicio.dt.strftime("%d/%m/%Y")
-
+    last_events["date"] = last_events.pub_millis.dt.strftime("%d/%m/%Y")
     last_events["type"] = last_events.type.map(names)
+
+    last_events = last_events[["type", "group", "hour", "date", "street"]]
 
     last_events = last_events.rename(
         columns={

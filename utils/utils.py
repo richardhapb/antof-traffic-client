@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 import logging
 import warnings
 
@@ -31,8 +31,8 @@ PERIM_AFTA.crs = "EPSG:4326"
 PERIM_AFTA = PERIM_AFTA.to_crs("EPSG:3857")
 
 logging.basicConfig(format=LOGGER_FORMAT, level=logging.INFO)
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger("antof_traffic")
 
 def get_data(
     since: int | None = None,
@@ -55,8 +55,7 @@ def get_data(
 
     try:
         response = requests.get(url, timeout=10).json()
-        alerts = Alerts(response)
-        alerts.data = update_timezone(alerts.data)
+        alerts = Alerts(response.get("alerts", []))
 
         return alerts
     except requests.JSONDecodeError as e:
@@ -97,27 +96,28 @@ def generate_aggregate_data(
     raise requests.ConnectionError("Error requesting data from server")
 
 
-def update_timezone(data: pd.DataFrame, tz: str = TZ) -> gpd.GeoDataFrame:
+def update_timezone(data: gpd.GeoDataFrame, tz: str = TZ) -> gpd.GeoDataFrame:
     """
     Updates the timezone of event data
     """
 
-    data_copy = data.copy()
+    if not hasattr(data, "pub_millis"):
+        return data
 
-    data_copy["pubMillis"] = pd.to_datetime(data_copy["pubMillis"], unit="ms", utc=True)
-    data_copy["pubMillis"] = data_copy["pubMillis"].dt.tz_convert(tz)
-    data_copy["endreport"] = pd.to_datetime(data_copy["endreport"], unit="ms", utc=True)
-    data_copy["endreport"] = data_copy["endreport"].dt.tz_convert(tz)
+    data["pub_millis"] = pd.to_datetime(data["pub_millis"], unit="ms", utc=True)
+    data["pub_millis"] = data["pub_millis"].dt.tz_convert(tz)
+    data["end_pub_millis"] = pd.to_datetime(data["end_pub_millis"], unit="ms", utc=True)
+    data["end_pub_millis"] = data["end_pub_millis"].dt.tz_convert(tz)
 
-    return data_copy
+    return data
 
-def convert_timestamp_tz(utc_timestamp: int, from_tz: pytz.timezone = pytz.UTC, to_tz: pytz.timezone = pytz.timezone(TZ)) -> int:
+def convert_timestamp_tz(utc_timestamp: int, from_tz: pytz.BaseTzInfo = pytz.UTC, to_tz: pytz.BaseTzInfo = pytz.timezone(TZ)) -> int:
     """
     Updates the timezone of a timestamp
     """
 
-    date = datetime.fromtimestamp(utc_timestamp / 1000, from_tz)
-    date = datetime.astimezone(date, pytz.timezone(to_tz))
+    date = datetime.datetime.fromtimestamp(utc_timestamp / 1000, from_tz)
+    date = datetime.datetime.astimezone(date, to_tz)
 
     return int(date.timestamp()) * 1000
 
@@ -163,6 +163,11 @@ def separate_coords(df: pd.DataFrame) -> GeoDataFrame:
     """
     Separate coordinates from a DataFrame into two columns, returning a GeoDataFrame
     """
+
+    if not hasattr(df, "location"):
+        logger.info("Received empty dataframe, returning the same data")
+        return gpd.GeoDataFrame(df)
+
     df2 = df.copy()
     df2["x"] = df2["location"].apply(lambda x: x["x"])
     df2["y"] = df2["location"].apply(lambda y: y["y"])
