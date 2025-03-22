@@ -1,11 +1,13 @@
 import time
 
+import pytz
 import requests
 
 from dashboard.models import TimeRange
 from utils import utils
 from utils.utils import logger
 from waze.alerts import Alerts
+import config
 
 
 def update_data(time_range_obj: TimeRange, alerts_obj: Alerts) -> None:
@@ -22,13 +24,17 @@ def update_data(time_range_obj: TimeRange, alerts_obj: Alerts) -> None:
 
     perf_init = time.perf_counter()
 
-    since_request: int = time_range_obj.init_time
-    until_request: int | None = time_range_obj.end_time
+    since_request: int = utils.convert_timestamp_tz(
+        time_range_obj.init_time, pytz.timezone(utils.TZ), pytz.UTC
+    )
+    until_request: int | None = utils.convert_timestamp_tz(
+        time_range_obj.end_time, pytz.timezone(utils.TZ), pytz.UTC
+    )
 
     if alerts_obj.data.shape[0] > 0:
-        min_timestamp = utils.convert_timestamp_tz(alerts_obj.data["pub_millis"].min())
+        min_timestamp = int(alerts_obj.data["pub_millis"].min().timestamp() * 1000)
         if min_timestamp >= time_range_obj.init_time:
-            since_request = time_range_obj.end_time
+            since_request = until_request or since_request
             until_request = None
 
     logger.info("Getting data from server")
@@ -48,3 +54,23 @@ def update_data(time_range_obj: TimeRange, alerts_obj: Alerts) -> None:
     logger.info("Process time -> %.3fs", time.perf_counter() - perf_init)
 
 
+def update_data_from_api() -> None:
+    if not config.SERVER_URL:
+        logger.error("Server is not available for update data from API")
+
+    perf_init = time.perf_counter()
+
+    url = f"{config.SERVER_URL}/update-data"
+
+    try:
+        requests.get(url, timeout=10).json()
+
+        logger.info("Data retrieved from API sucessfully")
+        logger.info("Process time -> %.3fs", time.perf_counter() - perf_init)
+
+    except requests.JSONDecodeError as e:
+        logger.error("Error decoding JSON from request: %s", e)
+    except requests.ConnectTimeout:
+        logger.error("Server not respond")
+    except requests.ConnectionError as e:
+        logger.error("Error requesting the data, ensure that server is running: %s", e)

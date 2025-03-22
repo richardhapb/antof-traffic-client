@@ -15,20 +15,21 @@ from dashboard.components import graphs, header, maps, metadata, ml_params, tabl
 from dashboard.init import init_app
 from dashboard.models import Model
 from dashboard.train import train
-from dashboard.update_data import update_data
+from dashboard.update_data import update_data, update_data_from_api
 from dashboard.update_model import load_model
 from utils import utils
 from utils.utils import TZ
 from waze.alerts import Alerts
 
 model = Model()
-alerts = Alerts({})
+alerts = Alerts([])
 
 time_range = init_app(model, alerts)
 
 # Train and Load the model dinamically
 scheduler = BackgroundScheduler()
 scheduler.add_job(update_data, "interval", args=[time_range, alerts], minutes=5)
+scheduler.add_job(update_data_from_api, "interval", minutes=2)
 scheduler.add_job(train, "interval", days=30)
 scheduler.add_job(load_model, "interval", args=[model], days=30, minutes=5)
 scheduler.start()

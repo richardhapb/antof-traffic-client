@@ -21,6 +21,7 @@ from xgboost import XGBClassifier
 import mlflow
 from mlflow.models import infer_signature
 from utils import utils
+from utils.utils import logger
 
 
 MODEL_NAME = "XGBClassifier"
@@ -152,8 +153,8 @@ class ML:
         ):
             raise ValueError("There are not day type data in dataset")
 
-        print(self.data.day_type.value_counts())
-        print(self.total_events.day_type.value_counts())
+        logger.info(self.data.day_type.value_counts())
+        logger.info(self.total_events.day_type.value_counts())
 
         days0 = self.data[(self.data.day_type == "f") | (self.data.day_type == 0)]
         days1 = self.data[(self.data.day_type == "s") | (self.data.day_type == 1)]

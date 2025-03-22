@@ -24,6 +24,7 @@ class Alerts:
     def __add__(self, other: "Alerts") -> gpd.GeoDataFrame:
         if other.data is not None and len(other.data) > 0:
             self.data = pd.concat((self.data, other.data), axis=0)
+            self.data.drop_duplicates(("uuid"), inplace=True)
 
         return self.data
 

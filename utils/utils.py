@@ -30,9 +30,10 @@ PERIM_AFTA = gpd.GeoDataFrame(geometry=gpd.points_from_xy(PERIM_X, PERIM_Y))
 PERIM_AFTA.crs = "EPSG:4326"
 PERIM_AFTA = PERIM_AFTA.to_crs("EPSG:3857")
 
-logging.basicConfig(format=LOGGER_FORMAT, level=logging.INFO)
+logging.basicConfig(format=LOGGER_FORMAT)
 
 logger = logging.getLogger("antof_traffic")
+logger.setLevel(logging.INFO)
 
 def get_data(
     since: int | None = None,
