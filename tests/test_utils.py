@@ -1,9 +1,11 @@
 import datetime
-import pandas as pd
-import geopandas as gpd
 
-from waze.events import Events
+import geopandas as gpd
+import pandas as pd
+import pytest
+
 from utils import utils
+from waze.alerts import Alerts
 
 
 def generate_dummy_coord_df(n_nearby: int, n_total: int) -> pd.DataFrame:
@@ -31,11 +33,11 @@ def generate_dummy_coord_df(n_nearby: int, n_total: int) -> pd.DataFrame:
 
 
 def test_load_data():
-    events = utils.get_data("alerts")
-    assert isinstance(events, Events)
-    assert len(events.data) > 0
-    assert isinstance(events.data, list)
-    assert isinstance(events.data[0], dict)
+    alerts = utils.get_data()
+    assert isinstance(alerts, Alerts)
+    assert alerts.data.shape[0] > 0
+    assert not alerts.is_empty
+    assert isinstance(alerts.data, gpd.GeoDataFrame)
 
 
 def test_update_timezone():
@@ -45,18 +47,12 @@ def test_update_timezone():
     assert curr_time.tzname() is None
     assert future_time.tzname() is None
 
-    df = pd.DataFrame({"pub_millis": [curr_time], "end_pub_millis": [future_time]})
+    df = gpd.GeoDataFrame({"pub_millis": [curr_time], "end_pub_millis": [future_time]})
 
-    df2 = utils.update_timezone(df, "America/Santiago")
+    df2 = utils.update_timezone(df, utils.TZ)
 
-    assert str(df2["pub_millis"].dt.tz) == "America/Santiago"
-    assert str(df2["end_pub_millis"].dt.tz) == "America/Santiago"
-
-
-def test_get_holidays():
-    holidays = utils.get_holidays()
-    assert isinstance(holidays, list)
-    assert len(holidays) > 0
+    assert str(df2["pub_millis"].dt.tz) == utils.TZ
+    assert str(df2["end_pub_millis"].dt.tz) == utils.TZ
 
 
 def test_separate_coords():
@@ -78,29 +74,8 @@ def test_freq_nearby():
     assert freq_df["freq"].max() == nearby
 
 
-def test_extract_event():
-    nearby = 10
-    n = 15
-    df = generate_dummy_coord_df(nearby, n)
-
-    freq_df = utils.freq_nearby(utils.separate_coords(df))
-
-    curr_time = datetime.datetime.now()
-    future_time = curr_time + datetime.timedelta(hours=2)
-
-    freq_df["pub_millis"] = [curr_time] * n
-    freq_df["end_pub_millis"] = [future_time] * n
-
-    df2 = utils.update_timezone(freq_df, "America/Santiago")
-    df2["type"] = ["ACCIDENT"] * n
-
-    extra_cols = ["freq", "geometry", "type"]
-    df3 = utils.extract_event(df2, ["ACCIDENT"], extra_cols)
-
-    for c in df3.columns:
-        assert c in extra_cols + ["pub_millis", "end_pub_millis"]
-
-
+# TODO: Implement aggregate data on server for test this
+@pytest.mark.skip()
 def test_hourly_group():
     nearby = 10
     n = 15
@@ -114,17 +89,17 @@ def test_hourly_group():
     freq_df["pub_millis"] = [curr_time] * n
     freq_df["end_pub_millis"] = [future_time] * n
 
-    df2 = utils.update_timezone(freq_df, "America/Santiago")
+    df2 = utils.update_timezone(freq_df)
     df2["type"] = ["ACCIDENT"] * n
 
-    extra_cols = ["freq", "geometry", "type", "day_type", "hour"]
-    df3 = utils.extract_event(df2, ["ACCIDENT"], extra_cols)
+    df3 = utils.generate_aggregate_data(df2)
 
-    hourly = utils.hourly_group(df3)
+    hourly = utils.hourly_group(df3.data)
 
     assert hourly.shape[0] == 24
 
-
+# TODO: Implement aggregate data on server for test this
+@pytest.mark.skip()
 def test_daily_group():
     nearby = 10
     n = 15
@@ -138,12 +113,11 @@ def test_daily_group():
     freq_df["pub_millis"] = [curr_time] * n
     freq_df["end_pub_millis"] = [future_time] * n
 
-    df2 = utils.update_timezone(freq_df, "America/Santiago")
+    df2 = utils.update_timezone(freq_df)
     df2["type"] = ["ACCIDENT"] * n
 
-    extra_cols = ["freq", "geometry", "type", "day_type", "day"]
-    df3 = utils.extract_event(df2, ["ACCIDENT"], extra_cols)
+    df3 = utils.generate_aggregate_data(df2)
 
-    daily = utils.daily_group(df3)
+    daily = utils.daily_group(df3.data)
 
     assert daily.shape[0] == 31

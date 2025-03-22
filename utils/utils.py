@@ -166,7 +166,7 @@ def separate_coords(df: pd.DataFrame) -> GeoDataFrame:
     """
 
     if not hasattr(df, "location"):
-        logger.info("Received empty dataframe, returning the same data")
+        logger.debug("Received empty dataframe, returning the same data")
         return gpd.GeoDataFrame(df)
 
     df2 = df.copy()

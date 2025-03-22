@@ -1,5 +1,6 @@
 import copy
 import datetime
+import time
 
 import geopandas as gpd
 import pandas as pd
@@ -9,8 +10,8 @@ import pytz
 from apscheduler.schedulers.background import BackgroundScheduler
 from dash import Dash, Input, Output, html
 from shapely.geometry import Point, Polygon
-from analytics.grouper import Grouper
 
+from analytics.grouper import Grouper
 from dashboard.components import graphs, header, maps, metadata, ml_params, tables
 from dashboard.init import init_app
 from dashboard.models import Model
@@ -18,6 +19,7 @@ from dashboard.train import train
 from dashboard.update_data import update_data, update_data_from_api
 from dashboard.update_model import load_model
 from utils import utils
+from utils.utils import logger
 from utils.utils import TZ
 from waze.alerts import Alerts
 
@@ -28,10 +30,10 @@ time_range = init_app(model, alerts)
 
 # Train and Load the model dinamically
 scheduler = BackgroundScheduler()
-scheduler.add_job(update_data, "interval", args=[time_range, alerts], minutes=5)
-scheduler.add_job(update_data_from_api, "interval", minutes=2)
-scheduler.add_job(train, "interval", days=30)
-scheduler.add_job(load_model, "interval", args=[model], days=30, minutes=5)
+scheduler.add_job(update_data, "interval", args=[time_range, alerts], minutes=5, id="update-data", replace_existing=True)
+scheduler.add_job(update_data_from_api, "interval", minutes=2, id="update-data-API", replace_existing=True)
+scheduler.add_job(train, "interval", days=30, id="train-model", replace_existing=True)
+scheduler.add_job(load_model, "interval", args=[model], days=30, minutes=5, id="load-model", replace_existing=True)
 scheduler.start()
 
 names = {
@@ -278,6 +280,8 @@ def update_graphs(kind, start_date, end_date, active_cell):
 
     if alerts.is_empty:
         return STANDARD_RETURN
+
+    perf_init = time.perf_counter()
 
     start = (
         (datetime.datetime.fromisoformat(start_date))
@@ -621,6 +625,9 @@ def update_graphs(kind, start_date, end_date, active_cell):
         ),
     )
 
+    logger.info("Update graphs callback completed.")
+    logger.info("Process time -> %.3fs", time.perf_counter() - perf_init)
+
     return map_fig, hourly_fig, table_data, daily_fig, scatter_fig, end
 
 
@@ -646,6 +653,8 @@ def update_ml_graphs(kind, date_value, hour, active_cell, table_data, page_curre
     else:
         date_ml = datetime.date.fromisoformat(date_value)
 
+    perf_init = time.perf_counter()
+
     day = date_ml.day
     week_day = date_ml.weekday()
     day_type = 0 if (date_ml.weekday() >= 5) else 1  # TODO: Introduce holidays here
@@ -656,6 +665,9 @@ def update_ml_graphs(kind, date_value, hour, active_cell, table_data, page_curre
         segment = table_data[global_index]["Segmento"]
 
     group_fig, table_data = update_ML(hour, day_type, week_day, day, kind, segment)
+
+    logger.info("Update ML graphs callback completed.")
+    logger.info("Process time -> %.3fs", time.perf_counter() - perf_init)
 
     return group_fig, table_data
 

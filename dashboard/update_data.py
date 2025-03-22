@@ -1,11 +1,12 @@
 import time
+import datetime
 
 import pytz
 import requests
 
 from dashboard.models import TimeRange
 from utils import utils
-from utils.utils import logger
+from utils.utils import logger, TZ
 from waze.alerts import Alerts
 import config
 
@@ -24,6 +25,10 @@ def update_data(time_range_obj: TimeRange, alerts_obj: Alerts) -> None:
 
     perf_init = time.perf_counter()
 
+    # Update to last time
+    time_range_obj.end_time = int(datetime.datetime.now(pytz.timezone(TZ)).timestamp()) * 1000
+
+    # Convert to UTC for match with the database
     since_request: int = utils.convert_timestamp_tz(
         time_range_obj.init_time, pytz.timezone(utils.TZ), pytz.UTC
     )
@@ -32,7 +37,11 @@ def update_data(time_range_obj: TimeRange, alerts_obj: Alerts) -> None:
     )
 
     if alerts_obj.data.shape[0] > 0:
-        min_timestamp = int(alerts_obj.data["pub_millis"].min().timestamp() * 1000)
+        min_timestamp = utils.convert_timestamp_tz(
+            int(alerts_obj.data["pub_millis"].min().timestamp() * 1000),
+            pytz.timezone(utils.TZ),
+            pytz.UTC,
+        )
         if min_timestamp >= time_range_obj.init_time:
             since_request = until_request or since_request
             until_request = None
@@ -44,7 +53,7 @@ def update_data(time_range_obj: TimeRange, alerts_obj: Alerts) -> None:
 
         alerts_obj.data = alerts_obj + alerts_response
 
-        logger.info("Data retrieved correctly")
+        logger.info("Data retrieved correctly, %i elements", alerts_response.data.shape[0])
     except requests.ConnectionError as e:
         logger.error("Error retrieving data from server: %s", e)
     except Exception as e:
@@ -55,6 +64,11 @@ def update_data(time_range_obj: TimeRange, alerts_obj: Alerts) -> None:
 
 
 def update_data_from_api() -> None:
+    """
+    Send a trigger to server for retrieve data from API in async way. Then
+    de data is retrieved using `update_data` function, that is fastes, because
+    server use cache for send it.
+    """
     if not config.SERVER_URL:
         logger.error("Server is not available for update data from API")
 
