@@ -69,6 +69,7 @@ class Grouper:
                 and point[0] <= self.x_grid[0][xi + 1]
             ):
                 x_pos = xi
+                break
 
         for yi in range(len(self.y_grid)):
             if (
@@ -77,6 +78,7 @@ class Grouper:
                 and point[1] <= self.y_grid[yi + 1][0]
             ):
                 y_pos = yi
+                break
 
         if x_pos < 0 or y_pos < 0:
             raise ValueError(f"El punto {point} no se encuentra en ningún cuadrante")
