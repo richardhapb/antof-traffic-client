@@ -1,6 +1,7 @@
 import copy
 import datetime
 import time
+import os
 
 import geopandas as gpd
 import pandas as pd
@@ -26,15 +27,36 @@ from waze.alerts import Alerts
 model = Model()
 alerts = Alerts([])
 
+app = Dash(
+    __name__,
+    update_title="",
+    meta_tags=metadata.meta_tags,
+)
+
 time_range = init_app(model, alerts)
 
-# Train and Load the model dinamically
-scheduler = BackgroundScheduler()
-scheduler.add_job(update_data, "interval", args=[time_range, alerts], minutes=5, id="update-data", replace_existing=True)
-scheduler.add_job(update_data_from_api, "interval", minutes=2, id="update-data-API", replace_existing=True)
-scheduler.add_job(train, "interval", days=30, id="train-model", replace_existing=True)
-scheduler.add_job(load_model, "interval", args=[model], days=30, minutes=5, id="load-model", replace_existing=True)
-scheduler.start()
+# This function initializes the schedulers
+# and ensure initialize one per worker
+# because in production multi-workes trigger
+# multiple jobs creation
+def initialize_scheduler():
+    scheduler = BackgroundScheduler()
+    worker = int(os.environ.get("APSC", "0"), 0)
+
+    if scheduler.running or worker:
+        logger.info("Scheduler initialized, skiping initialization")
+        return
+
+    logger.info("Initializing scheduler with worker %i", worker)
+
+    scheduler.add_job(update_data, "interval", args=[time_range, alerts], minutes=5, id="update-data", replace_existing=True)
+    scheduler.add_job(update_data_from_api, "interval", minutes=2, id="update-data-API", replace_existing=True)
+    scheduler.add_job(train, "interval", days=30, id="train-model", replace_existing=True)
+    scheduler.add_job(load_model, "interval", args=[model], days=30, minutes=5, id="load-model", replace_existing=True)
+    scheduler.start()
+
+
+initialize_scheduler()
 
 names = {
     "all": "Evento",
@@ -44,11 +66,6 @@ names = {
     "ROAD_CLOSED": "Camino cerrado",
 }
 
-app = Dash(
-    __name__,
-    update_title="",
-    meta_tags=metadata.meta_tags,
-)
 app._favicon = "favicon.png"
 app.title = "Gestión del tráfico en Antofagasta"
 
