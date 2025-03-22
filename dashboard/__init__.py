@@ -1,4 +1,2 @@
-from dashboard import index
-
 
 

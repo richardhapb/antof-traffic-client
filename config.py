@@ -12,3 +12,6 @@ DATABASE_CONFIG = {
     "password": os.getenv("DB_PASSWORD", ""),
     "database": os.getenv("DB_DATABASE", "waze"),
 }
+
+SERVER_URL = os.getenv("SERVER_URL")
+

@@ -1,11 +1,4 @@
 from xgboost import XGBClassifier
-from analytics.grouper import Grouper
-
-
-class Alerts:
-    def __init__(self, data: Grouper | None = None):
-        self.data = data
-
 
 class TimeRange:
     def __init__(self, init_time: int, end_time: int, selected_time: int | None = None):

@@ -31,7 +31,7 @@ def generate_dummy_coord_df(n_nearby: int, n_total: int) -> pd.DataFrame:
 
 
 def test_load_data():
-    events = utils.load_data("alerts")
+    events = utils.get_data("alerts")
     assert isinstance(events, Events)
     assert len(events.data) > 0
     assert isinstance(events.data, list)
@@ -45,11 +45,11 @@ def test_update_timezone():
     assert curr_time.tzname() is None
     assert future_time.tzname() is None
 
-    df = pd.DataFrame({"pubMillis": [curr_time], "endreport": [future_time]})
+    df = pd.DataFrame({"pub_millis": [curr_time], "endreport": [future_time]})
 
     df2 = utils.update_timezone(df, "America/Santiago")
 
-    assert str(df2["pubMillis"].dt.tz) == "America/Santiago"
+    assert str(df2["pub_millis"].dt.tz) == "America/Santiago"
     assert str(df2["endreport"].dt.tz) == "America/Santiago"
 
 
@@ -88,7 +88,7 @@ def test_extract_event():
     curr_time = datetime.datetime.now()
     future_time = curr_time + datetime.timedelta(hours=2)
 
-    freq_df["pubMillis"] = [curr_time] * n
+    freq_df["pub_millis"] = [curr_time] * n
     freq_df["endreport"] = [future_time] * n
 
     df2 = utils.update_timezone(freq_df, "America/Santiago")
@@ -111,7 +111,7 @@ def test_hourly_group():
     curr_time = datetime.datetime.now()
     future_time = curr_time + datetime.timedelta(hours=2)
 
-    freq_df["pubMillis"] = [curr_time] * n
+    freq_df["pub_millis"] = [curr_time] * n
     freq_df["endreport"] = [future_time] * n
 
     df2 = utils.update_timezone(freq_df, "America/Santiago")
@@ -135,7 +135,7 @@ def test_daily_group():
     curr_time = datetime.datetime.now()
     future_time = curr_time + datetime.timedelta(hours=2)
 
-    freq_df["pubMillis"] = [curr_time] * n
+    freq_df["pub_millis"] = [curr_time] * n
     freq_df["endreport"] = [future_time] * n
 
     df2 = utils.update_timezone(freq_df, "America/Santiago")

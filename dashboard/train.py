@@ -1,27 +1,26 @@
-from analytics.ml import ML, init_mlflow
-from analytics.grouper import Grouper
-from utils import utils
-from xgboost import XGBClassifier
 from datetime import datetime
-import pytz
 
-def train():
+import pytz
+import requests
+from xgboost import XGBClassifier
+
+from analytics.ml import ML, init_mlflow
+from utils import utils
+from utils.utils import TZ, logger
+
+
+def train() -> bool:
     init_mlflow()
 
-    print("Extracting data from database")
+    logger.info("Extracting data from database")
 
-    COLS = ["type", "geometry", "hour", "day_type", "week_day", "day"]
+    try:
+        alerts = utils.get_data()
+    except requests.ConnectionError as e:
+        logger.error("Error retrieving data from server %s", e)
+        return False
 
-    alerts_events = utils.load_data("alerts")
-    alerts_gdf = alerts_events.to_gdf()
-    alerts_gdf = utils.extract_event(alerts_gdf,
-                                     ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"],
-                                     COLS
-                                     )
-    alerts = Grouper(alerts_gdf)
-    alerts.group((10, 20))
-
-    print("Data extracted and transformed")
+    logger.info("Data found: %i", alerts.data.shape[1])
 
     model = XGBClassifier(
         learning_rate=0.1,
@@ -38,13 +37,13 @@ def train():
 
     ml = ML(alerts.data, model, y, categories, True)
 
-    print("Training the model")
+    logger.info("Training the model")
 
-    ml.generate_neg_simulated_data(x_vars)
+    ml.generate_neg_simulated_data()
     ml.clean(x_vars, y)
     ml.prepare_train()
 
-    print("Model trained")
+    logger.info("Model trained")
 
 
     ml.log_model_params(
@@ -52,17 +51,18 @@ def train():
         ohe=ml.ohe,
         sample=ml.data.shape,
         ordinal_encoder=False,
-        sample_no_events=ml.no_events.shape if ml.no_events is not None else [],
+        sample_no_events=ml.total_events.shape if ml.total_events is not None else [],
         geodata="group",
         categories=categories,
     )
 
-    print("Model registered")
+    logger.info("Model registered")
 
+    return True
 
 if __name__ == "__main__":
     try:
         train()
     except Exception as e:
-        print(f"Error generating model, time {datetime.now(tz=pytz.timezone('America/Santiago'))}")
-        print(f"Error: {e}")
+        logger.error("Error generating model, time %s", datetime.now(tz=pytz.timezone(TZ)))
+        logger.error("Error: %s", e)

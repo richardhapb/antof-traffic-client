@@ -1,8 +1,8 @@
 import mlflow
 
-from analytics.ml import ML
+# from analytics.ml import ML
 from dashboard.models import Model
-from dashboard.dash_config import MODEL_NAME
+from analytics.ml import MODEL_NAME
 
 
 def load_model(model_obj: Model):

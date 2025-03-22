@@ -1,18 +1,18 @@
+import datetime
+
+import matplotlib.pyplot as plt
+import pytz
+
 from analytics.plot import Plot
 from utils import utils
-import matplotlib.pyplot as plt
-import datetime
-import pytz
+from utils.utils import TZ
 
 
 def main():
-    tz = "America/Santiago"
-
-    extra_cols = ["day_type", "week_day", "day", "hour", "minute", "geometry"]
 
     since = int(
         (
-            datetime.datetime.now(pytz.timezone(tz)).replace(
+            datetime.datetime.now(pytz.timezone(TZ)).replace(
                 hour=0, minute=0, second=0, microsecond=0
             )
             - datetime.timedelta(days=1)
@@ -20,18 +20,18 @@ def main():
         * 1000
     )
 
-    alerts = utils.load_data("alerts", mode="since", epoch=since)
+    alerts = utils.get_data(since)
     plot = Plot()
 
     # Graficar el mapa de eventos
-    fig = plot.heat_map(alerts.to_gdf())
+    fig = plot.heat_map(alerts.data)
     fig.suptitle(
         f"Eventos en Antofagasta\ndesde {datetime.datetime.fromtimestamp(since / 1000).strftime('%d-%m-%Y')}",
         fontweight="bold",
     )
     fig.savefig("graph/alerts_heat_map.png")
 
-    events = utils.extract_event(alerts.to_gdf(tz=tz), ["ACCIDENT"], extra_cols)
+    events = alerts.data[alerts.data['type'] == "ACCIDENT"]
 
     fig = plot.heat_map(events)
     fig.suptitle(

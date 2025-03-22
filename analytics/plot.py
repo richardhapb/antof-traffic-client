@@ -39,7 +39,7 @@ class Plot:
 
     def hourly_report(self, data: gpd.GeoDataFrame)->Figure:
         """
-        Reportes de eventos por día de la semana
+        Events repots by hour of the day
         """
 
         if data.empty:
@@ -95,7 +95,7 @@ class Plot:
 
     def daily_report(self, data: gpd.GeoDataFrame)->Figure:
         """
-        Reportes de eventos por día de la semana
+        Events reports by day of the week
         """
 
         if data.empty:

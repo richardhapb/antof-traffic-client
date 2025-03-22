@@ -1,30 +1,29 @@
+import os
+from functools import wraps
 from typing import Dict, List, cast
-from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder
+
+import numpy as np
+import pandas as pd
+from geopandas import GeoDataFrame
+from sklearn.base import clone
+from sklearn.feature_extraction import FeatureHasher
 from sklearn.metrics import (
     accuracy_score,
+    confusion_matrix,
     f1_score,
     precision_score,
     recall_score,
-    confusion_matrix,
 )
-from sklearn.feature_extraction import FeatureHasher
-from sklearn.base import clone
+from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder
 from xgboost import XGBClassifier
-import pandas as pd
-from analytics.grouper import Grouper
-from utils import utils
-import matplotlib.pyplot as plt
-import contextily as cx
+
 import mlflow
 from mlflow.models import infer_signature
-from functools import wraps
-import numpy as np
-from geopandas import GeoDataFrame
-from matplotlib.figure import Figure
-import os
+from utils import utils
 
-CONCEPTS = ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"]
+
+MODEL_NAME = "XGBClassifier"
 
 
 def init_mlflow():
@@ -68,7 +67,7 @@ class ML:
         self.y_test: pd.DataFrame | None = None
         self.onehot: Dict[str, OneHotEncoder] | None = None
         self.oe: Dict[str, OrdinalEncoder] | None = None  # Ordinal Encoder
-        self.no_events: pd.DataFrame | GeoDataFrame | None = None
+        self.total_events: pd.DataFrame | GeoDataFrame | None = None
         self.x: np.ndarray | None = None
         self.y: np.ndarray | None = None
 
@@ -91,21 +90,21 @@ class ML:
 
         return pd.concat([data.drop(categories, axis=1), *labeled], axis=1)
 
-    def generate_neg_simulated_data(self, extra_cols: List, geodata: str = "group") -> None:
+    def generate_neg_simulated_data(self, geodata: str = "group") -> None:
         events2 = self.data.copy()
         events2["happen"] = 1
 
-        if not isinstance(events2["inicio"].iloc[0], np.integer):
-            events2["inicio"] = events2["inicio"].astype(np.int64, errors="ignore") / 1_000_000
+        if not isinstance(events2["pub_millis"].iloc[0], np.integer):
+            events2["pub_millis"] = events2["pub_millis"].astype(np.int64, errors="ignore") / 1_000_000
 
         step = np.int64(60_000 * 5)
 
-        min_tms = events2["inicio"].min()
-        max_tms = events2["inicio"].max()
+        min_tms = events2["pub_millis"].min()
+        max_tms = events2["pub_millis"].max()
 
         intervals = np.arange(min_tms, max_tms + step, step)
 
-        events2["interval"] = (events2["inicio"].to_numpy() // step) * step
+        events2["interval"] = (events2["pub_millis"].to_numpy() // step) * step
 
         allgroups = events2[geodata].unique()
         alltypes = events2["type"].unique()
@@ -127,29 +126,34 @@ class ML:
         merged = merged.sample(events2.shape[0], replace=False, random_state=42)
         merged["happen"] = merged["happen"].fillna(0).astype(int)
 
-        merged["inicio"] = merged["interval"]
+        merged["pub_millis"] = merged["interval"]
 
-        result = merged[["inicio", geodata, "type", "happen"]]
+        result = merged[["pub_millis", geodata, "type", "happen"]]
 
-        if not isinstance(self.data["inicio"].iloc[0], np.integer):
-            result["inicio"] = pd.to_datetime((result["inicio"] * 1_000_000), unit="ns")
+        if not isinstance(self.data["pub_millis"].iloc[0], np.integer):
+            result["pub_millis"] = pd.to_datetime((result["pub_millis"] * 1_000_000), unit="ns")
         else:
-            result["inicio"] = result["inicio"]
+            result["pub_millis"] = result["pub_millis"]
 
-        self.no_events = pd.DataFrame(result)
-        self.no_events = utils.extract_event(self.no_events, CONCEPTS, extra_cols + ["happen"])
+        happen_data = result.get("happen", {})
+        result.drop(columns=["happen"], inplace = True)
+
+        alerts = utils.generate_aggregate_data(result)
+
+        self.total_events = alerts.data
+        self.total_events["happen"] = happen_data
 
     def balance_day_type(self) -> None:
         # Balance no events and events, for weekend and workdays
         if (
-            self.no_events is None
+            self.total_events is None
             or "day_type" not in self.data.columns
-            or "day_type" not in self.no_events.columns
+            or "day_type" not in self.total_events.columns
         ):
             raise ValueError("There are not day type data in dataset")
 
         print(self.data.day_type.value_counts())
-        print(self.no_events.day_type.value_counts())
+        print(self.total_events.day_type.value_counts())
 
         days0 = self.data[(self.data.day_type == "f") | (self.data.day_type == 0)]
         days1 = self.data[(self.data.day_type == "s") | (self.data.day_type == 1)]
@@ -163,10 +167,10 @@ class ML:
             pd.concat([days1, days0.sample(q_days0 + diff, replace=True, random_state=42)]),
         )
 
-        days0 = self.no_events[(self.no_events.day_type == "f") | (self.no_events.day_type == 0)]
-        days1 = self.no_events[(self.no_events.day_type == "s") | (self.no_events.day_type == 1)]
+        days0 = self.total_events[(self.total_events.day_type == "f") | (self.total_events.day_type == 0)]
+        days1 = self.total_events[(self.total_events.day_type == "s") | (self.total_events.day_type == 1)]
 
-        self.no_events = cast(
+        self.total_events = cast(
             pd.DataFrame,
             pd.concat([
                 days1.sample(q_days1, replace=True, random_state=42),
@@ -180,16 +184,16 @@ class ML:
 
         # Clean the data
         self.data = self.data.loc[:, columns_x + [column_y]]
-        if self.no_events is not None:
-            self.no_events = self.no_events.loc[:, columns_x + [column_y]]
+        if self.total_events is not None:
+            self.total_events = self.total_events.loc[:, columns_x + [column_y]]
 
     def prepare(self, no_features=None) -> None:
         if self.data is None:
             raise ValueError("Not have data for model generation")
 
         total_events = (
-            pd.concat([self.data, self.no_events])
-            if self.no_events is not None
+            pd.concat([self.data, self.total_events])
+            if self.total_events is not None
             else self.data.copy()
         )
 
@@ -227,7 +231,8 @@ class ML:
                 self.categories = list(self.data.columns)
             for c in self.categories:
                 self.hasher[c] = FeatureHasher(n_features=no_features, input_type="string")
-                # Eliminar valores nulos y convertir todos los valores a strings
+
+                # Remove null values and convert to string
                 filtered_events = [str(s) for s in total_events[c] if pd.notnull(s)]
                 hashed = self.hasher[c].fit_transform([[s] for s in filtered_events])
 
@@ -332,63 +337,6 @@ class ML:
         elif self.hash and self.hasher:
             return self.hasher[category].transform([[s] for s in data]).toarray()
         return np.array([])
-
-    def plot_by_quad(self, grouper: Grouper, obj: pd.DataFrame) -> Figure:
-        obj = obj.copy()
-        if self.data_labeled is None:
-            self.train()
-        fig, ax = plt.subplots()
-
-        fig.set_size_inches((4.5, 9.5))
-        xc, yc = grouper.get_center_points()
-        i, j = 0, 0
-        between_x = xc[0][1] - xc[0][0]
-        between_y = yc[1][0] - yc[0][0]
-
-        if self.categories is None:
-            self.categories = list(self.data.columns)
-
-        for xp in xc[0]:
-            for yp in yc.T[0]:
-                quad = grouper.calc_quadrant(i, j)
-                xf = xp - between_x / 2
-                yf = yp - between_y / 2
-                if self.ohe and "group" in self.categories:
-                    obj["group_" + str(quad)] = 1
-                else:
-                    obj["group"] = quad
-                pred = self.predict_proba(obj)
-                pred = pred[0][1] if pred else 0
-
-                ax.text(xp - 250, yp - 150, str(round(pred, 1)), fontsize=6, alpha=0.8)
-                ax.fill_between(
-                    [xf, xf + between_x],
-                    yf,
-                    yf + between_y,
-                    alpha=pred * 0.7,
-                    color="r",
-                )
-                if self.ohe and "group" in self.categories:
-                    obj["group_" + str(quad)] = 0
-                j += 1
-            i += 1
-            j = 0
-
-        if grouper.data.crs is None or not hasattr(cx.providers, "OpenStreetMap"):
-            return fig
-
-        cx.add_basemap(
-            ax,
-            crs=grouper.data.crs.to_string(),
-            source=cx.providers.OpenStreetMap.Mapnik,
-        )
-
-        ax.set_title("Accidentes por cuadrante")
-        ax.set_ylabel("Latitud")
-        ax.set_xlabel("Longitud")
-        fig.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
-
-        return fig
 
     @mlflow_logger
     def log_model_params(self, **params) -> None:

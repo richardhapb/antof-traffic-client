@@ -28,7 +28,7 @@ for _ in range(N_ELEMENTS):
             if k == "uuid":
                 element.append(uuid)
                 uuid += 1
-            elif k == "pubMillis":
+            elif k == "pub_millis":
                 element.append(np.random.choice([today, another_day]))
             elif k == "endreport":
                 element.append(
@@ -53,7 +53,7 @@ for _ in range(N_ELEMENTS):
             if k == "uuid":
                 element.append(uuid)
                 uuid += 1
-            elif k == "pubMillis":
+            elif k == "pub_millis":
                 element.append(np.random.choice([today, another_day]))
             elif k == "endreport":
                 element.append(

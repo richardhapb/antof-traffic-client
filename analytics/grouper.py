@@ -1,13 +1,21 @@
-from typing import Dict, Any, Tuple
-import matplotlib.pyplot as plt
-import pandas as pd
-import geopandas as gpd
+from typing import Any
+
 import contextily as cx
+import geopandas as gpd
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from matplotlib.figure import Figure
 
+XMIN = -70.43627
+XMAX = -70.36259
+
+YMIN = -23.724215
+YMAX = -23.485813
+
+
 class Grouper:
-    concepts:Dict = {
+    concepts: dict = {
         "ACCIDENT": "Accidentes",
         "JAM": "Congestión",
         "HAZARD": "Peligros",
@@ -15,26 +23,26 @@ class Grouper:
         "ALL": "Eventos",
     }
 
-    def __init__(self, data: gpd.GeoDataFrame)->None:
-        self.data = data.copy()
-        self.grid:Tuple[np.ndarray[Any, Any], ...] | None = None
-        self.type:str | None = None
-        self.x_grid:np.ndarray | None = None
-        self.y_grid : np.ndarray | None = None
+    def __init__(self, grid_dim: tuple[int, int]) -> None:
+        self.grid: tuple[np.ndarray[Any, Any], ...] | None = None
+        self.type: str | None = None
+        self.x_grid: np.ndarray | None = None
+        self.y_grid: np.ndarray | None = None
 
-    def get_grid(self, n_x_div: int, n_y_div: int)->Tuple[np.ndarray[Any, Any], ...]:
-        geometry = self.data.geometry
+        self.get_grid(*grid_dim)
+
+    def get_grid(self, n_x_div: int, n_y_div: int) -> tuple[np.ndarray[Any, Any], ...]:
         bounds_x = np.array(
             np.linspace(
-                geometry.to_crs(epsg=3857).geometry.x.min(),
-                geometry.to_crs(epsg=3857).geometry.x.max(),
+                XMIN,
+                XMAX,
                 n_x_div,
             )
         )
         bounds_y = np.array(
             np.linspace(
-                geometry.to_crs(epsg=3857).geometry.y.min(),
-                geometry.to_crs(epsg=3857).geometry.y.max(),
+                YMIN,
+                YMAX,
                 n_y_div,
             )
         )
@@ -50,10 +58,10 @@ class Grouper:
         self,
         x_pos: int,
         y_pos: int,
-    )->int:
+    ) -> int:
         return self.y_len * x_pos + y_pos + 1
 
-    def get_quadrant(self, point: tuple)->Tuple:
+    def get_quadrant(self, point: tuple) -> tuple:
         """
         point: (x, y) positions, beginning in lower left corner
         """
@@ -87,7 +95,7 @@ class Grouper:
 
         return quadrant
 
-    def get_center_points(self)->Tuple:
+    def get_center_points(self) -> tuple:
         if self.grid is None:
             return tuple()
         # X
@@ -113,97 +121,59 @@ class Grouper:
 
         return center_points_x, center_points_y
 
-    def group(
-        self,
-        grid_dim: tuple,
-        concepts: list = ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"],
-    )->"Grouper":
-        grouped = self.data.copy()
-        if grouped is None:
-            raise ValueError("Grouper must be has data")
-
-        self.get_grid(*grid_dim)
-
-        grouped["group"] = grouped.to_crs(epsg=3857).geometry.apply( # type: ignore
-            lambda x: self.calc_quadrant(
-                *self.get_quadrant(
-                    (
-                        x.x,
-                        x.y,
-                    ),
-                ),
-            ),
-        )
-
-        self.data = grouped
-
-        if len(concepts) == 1:
-            self.type = concepts[0]
-        else:
-            self.type = "ALL"
-
-        return self
-
-    def filter_by_group_time(self, timedelta_min: int, inplace: bool = False)->gpd.GeoDataFrame | pd.DataFrame:
-        if self.data is None or "pubMillis" not in self.data.columns:
+    @staticmethod
+    def filter_by_group_time(
+        data: gpd.GeoDataFrame, timedelta_min: int, inplace: bool = False
+    ) -> gpd.GeoDataFrame | pd.DataFrame:
+        if data is None or "pubMillis" not in data.columns:
             return pd.DataFrame()
-        events2 = self.data.copy()
+        if not inplace:
+            data = data.copy()
 
-        if not isinstance(events2["pubMillis"].iloc[0], np.integer):
-            events2["pubMillis"] = (
-                round(events2["pubMillis"].astype(np.int64, errors="ignore") / 1_000_000)
-                .astype(np.int64)
-            )
+        if not isinstance(data["pubMillis"].iloc[0], np.integer):
+            data["pubMillis"] = round(
+                data["pubMillis"].astype(np.int64, errors="ignore") / 1_000_000
+            ).astype(np.int64)
 
         step = np.int64(60_000 * timedelta_min)  # step en milisegundos
 
         # Calcular intervalos ajustando 'pubMillis' al múltiplo más cercano de 'step'
-        events2["interval_start"] = ((events2["pubMillis"]) // step) * step
+        data["interval_start"] = ((data["pubMillis"]).to_numpy() // step) * step
 
         # Convertir 'interval_start' a datetime
-        events2["interval_start"] = pd.to_datetime(
-            events2["interval_start"], unit="ms", utc=True
-        )
-        events2["interval_start"] = events2["interval_start"].dt.tz_convert(
-            "America/Santiago"
-        )
+        data["interval_start"] = pd.to_datetime(data["interval_start"], unit="ms", utc=True)
+        data["interval_start"] = data["interval_start"].dt.tz_convert("America/Santiago")
 
         # Asegurar tipos consistentes
-        events2["group"] = events2["group"].astype(np.int16)
-        events2["type"] = events2["type"].astype(str)
+        data["group"] = data["group"].astype(np.int16)
+        data["type"] = data["type"].astype(str)
 
         # Si es necesario, filtrar eventos que ocurren en el mismo grupo, tipo e intervalo
         # Por ejemplo, podrías querer los eventos donde hay múltiples ocurrencias
-        grouped_events = events2.drop_duplicates(
-            subset=["interval_start", "group", "type"]
-        )
+        grouped_events = data.drop_duplicates(subset=["interval_start", "group", "type"])
 
         result = grouped_events.reset_index(drop=True)
 
         result["pubMillis"] = pd.to_datetime(result["pubMillis"], unit="ms", utc=True)
         result["pubMillis"] = result["pubMillis"].dt.tz_convert("America/Santiago")
 
-        if inplace:
-            self.data = result
-
         return result
 
-    def group_by_day(self)->pd.DataFrame:
+    @staticmethod
+    def group_by_day(data: gpd.GeoDataFrame) -> pd.DataFrame:
         grouped_day = (
-            pd.DataFrame(
-                {
-                    "group": self.data.group.value_counts().keys(),
-                    "qty/day": self.data.group.value_counts().values
-                    / (self.data["inicio"].max() - self.data["inicio"].min()).days,
-                }
-            )
+            pd.DataFrame({
+                "group": data.group.value_counts().keys(),
+                "qty/day": data.group.value_counts().values
+                / (data["inicio"].max() - data["inicio"].min()).days,
+            })
         ).sort_values(ascending=False, by="qty/day")
 
         return grouped_day
 
-    def plot_qty_day(self)->Figure:
+    def plot_qty_day(self, data: gpd.GeoDataFrame) -> Figure:
         fig, ax = plt.subplots()
-        grouped_day = self.group_by_day()
+        grouped_day = self.group_by_day(data)
 
         fig.set_size_inches((4.5, 9.5))
         xc, yc = self.get_center_points()
@@ -239,7 +209,7 @@ class Grouper:
                 ax.text(
                     xp - 220,
                     yp - 150,
-                    round(group_freq, 1), # type: ignore
+                    round(group_freq, 1),  # type: ignore
                     fontsize=7,
                     alpha=0.8,
                 )
@@ -255,12 +225,12 @@ class Grouper:
             i += 1
             j = 0
 
-        assert self.data.crs is not None, "CRS is None"
+        assert data.crs is not None, "CRS is None"
 
         cx.add_basemap(
             ax,
-            crs=self.data.crs.to_string(),
-            source=cx.providers.OpenStreetMap.Mapnik, # type: ignore
+            crs=data.crs.to_string(),
+            source=cx.providers.OpenStreetMap.Mapnik,  # type: ignore
         )
 
         ax.set_title(f"{self.concepts[self.type]} por día por cuadrante")
@@ -271,7 +241,7 @@ class Grouper:
 
         return fig
 
-    def plot_qty_day_alpha(self, with_numbers=False)->Figure:
+    def plot_qty_day_alpha(self, data: gpd.GeoDataFrame, with_numbers=False) -> Figure:
         fig, ax = plt.subplots()
 
         fig.set_size_inches((4.5, 9.5))
@@ -295,17 +265,14 @@ class Grouper:
                     yf + between_y,
                     alpha=(
                         (
-                            self.data["group"].value_counts()[
+                            data["group"].value_counts()[
                                 quad
-                                if quad in self.data["group"].value_counts().index
-                                else self.data["group"].value_counts().idxmin()
+                                if quad in data["group"].value_counts().index
+                                else data["group"].value_counts().idxmin()
                             ]
-                            - self.data["group"].value_counts().min()
+                            - data["group"].value_counts().min()
                         )
-                        / (
-                            self.data["group"].value_counts().max()
-                            - self.data["group"].value_counts().min()
-                        )
+                        / (data["group"].value_counts().max() - data["group"].value_counts().min())
                     ),
                     color="r",
                 )
@@ -314,7 +281,9 @@ class Grouper:
             j = 0
 
         cx.add_basemap(
-                ax, crs=self.data.crs.to_string(), source=cx.providers.OpenStreetMap.Mapnik # type: ignore
+            ax,
+            crs=data.crs.to_string(),
+            source=cx.providers.OpenStreetMap.Mapnik,  # type: ignore
         )
 
         ax.set_title(f"{self.concepts[self.type]} por cuadrante")
@@ -324,7 +293,7 @@ class Grouper:
 
         return fig
 
-    def plot_qty(self):
+    def plot_qty(self, data: gpd.GeoDataFrame):
         fig, ax = plt.subplots()
 
         fig.set_size_inches((4.5, 9.5))
@@ -339,12 +308,12 @@ class Grouper:
                 quad = self.calc_quadrant(i, j)
 
                 qty = (
-                        self.data.value_counts("group").reset_index()[
-                            self.data.value_counts("group").reset_index()["group"]
-                            == quad
-                        ]["count"].astype(np.int16)[0]
-                    if quad
-                    in self.data.value_counts("group").reset_index()["group"].values
+                    data.value_counts("group")
+                    .reset_index()[data.value_counts("group").reset_index()["group"] == quad][
+                        "count"
+                    ]
+                    .astype(np.int16)[0]
+                    if quad in data.value_counts("group").reset_index()["group"].values
                     else 0
                 )
 
@@ -366,7 +335,7 @@ class Grouper:
                 ax.text(
                     xp - 150,
                     yp - 150,
-                    str( qty ),
+                    str(qty),
                     fontsize=6,
                     alpha=0.5,
                 )
@@ -386,7 +355,9 @@ class Grouper:
             j = 0
 
         cx.add_basemap(
-                ax, crs=self.data.crs.to_string(), source=cx.providers.OpenStreetMap.Mapnik # type: ignore
+            ax,
+            crs=data.crs.to_string(),
+            source=cx.providers.OpenStreetMap.Mapnik,  # type: ignore
         )
 
         ax.set_title(f"{self.concepts[self.type]} por cuadrante")
@@ -397,7 +368,7 @@ class Grouper:
 
         return fig
 
-    def plot_qty_alpha(self, with_numbers=False)->Figure:
+    def plot_qty_alpha(self, data: gpd.GeoDataFrame, with_numbers: bool = False) -> Figure:
         fig, ax = plt.subplots()
 
         fig.set_size_inches((4.5, 9.5))
@@ -422,17 +393,14 @@ class Grouper:
                     yf + between_y,
                     alpha=(
                         (
-                            self.data["group"].value_counts()[
+                            data["group"].value_counts()[
                                 quad
-                                if quad in self.data["group"].value_counts().index
-                                else self.data["group"].value_counts().idxmin()
+                                if quad in data["group"].value_counts().index
+                                else data["group"].value_counts().idxmin()
                             ]
-                            - self.data["group"].value_counts().min()
+                            - data["group"].value_counts().min()
                         )
-                        / (
-                            self.data["group"].value_counts().max()
-                            - self.data["group"].value_counts().min()
-                        )
+                        / (data["group"].value_counts().max() - data["group"].value_counts().min())
                     ),
                     color="r",
                 )
@@ -441,7 +409,9 @@ class Grouper:
             j = 0
 
         cx.add_basemap(
-                ax, crs=self.data.crs.to_string(), source=cx.providers.OpenStreetMap.Mapnik # type: ignore
+            ax,
+            crs=data.crs.to_string(),
+            source=cx.providers.OpenStreetMap.Mapnik,  # type: ignore
         )
 
         ax.set_title(f"{self.concepts[self.type]} por cuadrante")
@@ -451,7 +421,7 @@ class Grouper:
 
         return fig
 
-    def plot_with_numbers(self)->Figure:
+    def plot_with_numbers(self, data: gpd.GeoDataFrame) -> Figure:
         fig, ax = plt.subplots()
         fig.set_size_inches((4.5, 9.5))
 
@@ -462,20 +432,17 @@ class Grouper:
         for xp in xc[0]:
             for yp in yc.T[0]:
                 quad = self.calc_quadrant(i, j)
-                ax.text(xp - 250, yp - 150, str( quad ), fontsize=6, alpha=0.5)
+                ax.text(xp - 250, yp - 150, str(quad), fontsize=6, alpha=0.5)
                 xf = xp - between_x / 2
                 yf = yp - between_y / 2
                 alpha = (
-                    self.data["group"].value_counts()[
+                    data["group"].value_counts()[
                         quad
-                        if quad in self.data["group"].value_counts().index
-                        else self.data["group"].value_counts().idxmin()
+                        if quad in data["group"].value_counts().index
+                        else data["group"].value_counts().idxmin()
                     ]
-                    - self.data["group"].value_counts().min()
-                ) / (
-                    self.data["group"].value_counts().max()
-                    - self.data["group"].value_counts().min()
-                )
+                    - data["group"].value_counts().min()
+                ) / (data["group"].value_counts().max() - data["group"].value_counts().min())
 
                 ax.fill_between(
                     [xf, xf + between_x],
@@ -489,7 +456,9 @@ class Grouper:
             j = 0
 
         cx.add_basemap(
-                ax, crs=self.data.crs.to_string(), source=cx.providers.OpenStreetMap.Mapnik # type: ignore
+            ax,
+            crs=data.crs.to_string(),
+            source=cx.providers.OpenStreetMap.Mapnik,  # type: ignore
         )
 
         ax.set_title("Accidentes por cuadrante")

@@ -1,36 +1,28 @@
 import copy
-
 import datetime
-import os
 
 import geopandas as gpd
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
 import pytz
-
-from typing import cast
 from apscheduler.schedulers.background import BackgroundScheduler
-
 from dash import Dash, Input, Output, html
 from shapely.geometry import Point, Polygon
+from analytics.grouper import Grouper
 
 from dashboard.components import graphs, header, maps, metadata, ml_params, tables
 from dashboard.init import init_app
-from dashboard.models import Alerts, Model
-
+from dashboard.models import Model
+from dashboard.train import train
 from dashboard.update_data import update_data
 from dashboard.update_model import load_model
-from dashboard.train import train
-
-from analytics.grouper import Grouper
-
 from utils import utils
-
-TZ = os.getenv("TZ", "America/Santiago")
+from utils.utils import TZ
+from waze.alerts import Alerts
 
 model = Model()
-alerts = Alerts()
+alerts = Alerts({})
 
 time_range = init_app(model, alerts)
 
@@ -103,11 +95,12 @@ def update_ML(
     kind: str,
     higlighted_segment: int | None = None,
 ):
+    g = Grouper((10, 20))
+
     if model is None or model.model is None:
         return go.Figure()
-    g = alerts.data
 
-    if g is None:
+    if alerts is None:
         return go.Figure()
 
     x_var = pd.DataFrame(
@@ -131,18 +124,18 @@ def update_ML(
 
     assert g.x_grid is not None, "Error: x_grid must not be None"
     assert g.y_grid is not None, "Error: y_grid must not be None"
-    # Convierte las coordenadas en una lista de puntos (x, y)
+
+    # Convert coordinates to a group of points (x, y)
     points = [Point(x, y) for x_row, y_row in zip(g.x_grid, g.y_grid) for x, y in zip(x_row, y_row)]
 
     if points:
-        # Crear un GeoDataFrame
         gdf = gpd.GeoDataFrame(geometry=points, crs="EPSG:3857")
-        # Convierte a EPSG:4326 (lat/lon)
+        # Convert to EPSG:4326 (lat/lon)
         gdf = gdf.to_crs(epsg=4326)
 
         if gdf is None:
             raise ValueError("Something was wrong, the geometry is null, verify the points")
-        # Extrae las coordenadas convertidas para Plotly
+        # Extract converted coordinates
         lats = sorted(list(set(gdf.geometry.y.tolist())))
         lons = sorted(list(set(gdf.geometry.x.tolist())))
 
@@ -167,7 +160,7 @@ def update_ML(
     gdf_polygons["probability"] = [
         (
             model.model.predict_proba(x_var.assign(group=g.calc_quadrant(j, i)))[0][1]
-            if g.calc_quadrant(j, i) in set(g.data["group"])
+            if g.calc_quadrant(j, i) in set(alerts.data["group"])
             else 0
         )
         for j in range(len(lons) - 1)
@@ -282,8 +275,6 @@ def update_graphs(kind, start_date, end_date, active_cell):
     if start_date is None or end_date is None:
         return STANDARD_RETURN
 
-    extra_cols = ["day_type", "week_day", "day", "hour", "minute"]
-
     start = (
         (datetime.datetime.fromisoformat(start_date))
         .replace(hour=0, minute=0, second=0, microsecond=0)
@@ -300,44 +291,28 @@ def update_graphs(kind, start_date, end_date, active_cell):
 
     filtered_alerts = copy.deepcopy(alerts.data)
 
-    if filtered_alerts is None or filtered_alerts.data.shape[0] == 0:
+    if filtered_alerts is None or filtered_alerts.shape[0] == 0:
         return STANDARD_RETURN
 
-    assert isinstance(filtered_alerts, Grouper), "Error: data must be a Grouper"
+    filtered_alerts = filtered_alerts[
+        (filtered_alerts["pub_millis"] >= start) & (filtered_alerts["pub_millis"] <= end)
+    ]
 
-    filtered_alerts.data = cast(
-        gpd.GeoDataFrame,
-        filtered_alerts.data[
-            (filtered_alerts.data["pubMillis"] >= start)
-            & (filtered_alerts.data["pubMillis"] <= end)
-        ],
-    )
-
-    scatter_data_acc = utils.extract_event(
-        filtered_alerts.data,
-        ["ACCIDENT"],
-        extra_col=extra_cols,
-    )
-
+    scatter_data_acc = filtered_alerts[filtered_alerts["type"] == "ACCIDENT"]
     scatter_data_acc = utils.hourly_group(scatter_data_acc, do_sum=True)
 
-    scatter_data_jam = utils.extract_event(
-        filtered_alerts.data,
-        ["JAM"],
-        extra_col=extra_cols,
-    )
-
+    scatter_data_jam = filtered_alerts[filtered_alerts["type"] == "JAM"]
     scatter_data_jam = utils.hourly_group(scatter_data_jam, do_sum=True)
 
     if kind is not None and kind != "all":
         streets_data = (
-            filtered_alerts.data[filtered_alerts.data["type"] == kind]
+            filtered_alerts[filtered_alerts["type"] == kind]
             .groupby("street")["type"]
             .count()
             .reset_index()
         )
     else:
-        streets_data = filtered_alerts.data.groupby("street")["type"].count().reset_index()
+        streets_data = filtered_alerts.groupby("street")["type"].count().reset_index()
 
     streets_data = streets_data.rename(columns={"street": "Calle", "type": "Eventos"})
     streets_data = streets_data.sort_values(by="Eventos", ascending=False)
@@ -345,18 +320,14 @@ def update_graphs(kind, start_date, end_date, active_cell):
     table_data = streets_data.to_dict("records")
 
     if active_cell is not None:
-        filtered_alerts.data = filtered_alerts.data.loc[
-            filtered_alerts.data["street"] == streets_data.iloc[active_cell["row"]]["Calle"]
+        filtered_alerts = filtered_alerts.loc[
+            filtered_alerts["street"] == streets_data.iloc[active_cell["row"]]["Calle"]
         ]
 
     if kind == "all":
-        events = utils.extract_event(
-            filtered_alerts.data,
-            ["ACCIDENT", "JAM", "HAZARD", "ROAD_CLOSED"],
-            extra_cols,
-        )
+        events = filtered_alerts
     else:
-        events = utils.extract_event(filtered_alerts.data, [kind], extra_cols)
+        events = filtered_alerts[filtered_alerts["type"] == kind]
 
     hourly = utils.hourly_group(events).reset_index().copy()
     hourly = pd.melt(
@@ -377,19 +348,19 @@ def update_graphs(kind, start_date, end_date, active_cell):
     )
 
     map_data = copy.deepcopy(filtered_alerts)
-    map_data.data = utils.freq_nearby(map_data.data, nearby_meters=200)
-    if map_data.data is None:
+    map_data = utils.freq_nearby(map_data, nearby_meters=200)
+    if map_data is None:
         raise ValueError("Map data is None")
-    map_data.data["freq"] = map_data.data.apply(lambda x: x["freq"] if x["freq"] > 0 else 1, axis=1)
+    map_data["freq"] = map_data.apply(lambda x: x["freq"] if x["freq"] > 0 else 1, axis=1)
 
-    map_data.data["time"] = map_data.data.pubMillis.apply(lambda x: x.strftime("%H:%M:%S"))
-    map_data.data["date"] = map_data.data.pubMillis.apply(lambda x: x.strftime("%d-%m-%Y"))
+    map_data["time"] = map_data.pub_millis.apply(lambda x: x.strftime("%H:%M:%S"))
+    map_data["date"] = map_data.pub_millis.apply(lambda x: x.strftime("%d-%m-%Y"))
 
-    map_data.data["type"] = map_data.data["type"].map(names)
+    map_data["type"] = map_data["type"].map(names)
 
     map_fig = go.Figure(
         px.scatter_map(
-            map_data.data,
+            map_data,
             lat="y",
             lon="x",
             color="type",
@@ -674,7 +645,7 @@ def update_ml_graphs(kind, date_value, hour, active_cell, table_data, page_curre
 
     day = date_ml.day
     week_day = date_ml.weekday()
-    day_type = 0 if (date_ml.weekday() >= 5) | (date_value in utils.get_holidays()) else 1
+    day_type = 0 if (date_ml.weekday() >= 5) else 1  # TODO: Introduce holidays here
 
     segment = None
     if table_data and active_cell:
@@ -693,27 +664,23 @@ def update_ml_graphs(kind, date_value, hour, active_cell, table_data, page_curre
 def update_last_events(kind):
     if alerts.data is None:
         return [], datetime.datetime.now(pytz.timezone(TZ))
-    last_events = alerts.data.data.sort_values(by="pubMillis", ascending=False)
+    last_events = alerts.data.sort_values(by="pub_millis", ascending=False)
 
     if last_events.shape[0] == 0:
         return [], [datetime.datetime.now(pytz.timezone(TZ))]
 
-    concepts = [n for n in names.keys() if n != "all"]
     if kind != "all" and kind is not None:
         last_events = last_events[last_events["type"] == kind]
-        concepts = [kind]
 
     last_events = last_events.iloc[:20]
 
     if last_events.shape[0] == 0:
         return [], datetime.datetime.now(pytz.timezone(TZ))
 
-    last_events = utils.extract_event(
-        last_events, concepts, ["type", "group", "hour", "minute", "street"]
-    )
     last_events["hour"] = last_events.apply(
         lambda row: f"{int(row['hour']):02}:{int(row['minute']):02}", axis=1
     )
+
     last_events["date"] = last_events.inicio.dt.strftime("%d/%m/%Y")
 
     last_events["type"] = last_events.type.map(names)
