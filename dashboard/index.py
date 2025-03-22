@@ -1,4 +1,6 @@
 import copy
+import time
+import logging
 
 import datetime
 import os
@@ -26,6 +28,11 @@ from dashboard.train import train
 from analytics.grouper import Grouper
 
 from utils import utils
+
+FORMAT = '%(asctime)s - %(levelname)s - %(name)s - %(message)s'
+
+logging.basicConfig(format=FORMAT, level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 TZ = os.getenv("TZ", "America/Santiago")
 
@@ -283,6 +290,7 @@ def update_graphs(kind, start_date, end_date, active_cell):
         return STANDARD_RETURN
 
     extra_cols = ["day_type", "week_day", "day", "hour", "minute"]
+    perf_init = time.perf_counter()
 
     start = (
         (datetime.datetime.fromisoformat(start_date))
@@ -649,6 +657,9 @@ def update_graphs(kind, start_date, end_date, active_cell):
         ),
     )
 
+    logger.info("Update graphs callback completed.")
+    logger.info("Process time -> %.3fs", time.perf_counter() - perf_init)
+
     return map_fig, hourly_fig, table_data, daily_fig, scatter_fig, end
 
 
@@ -672,6 +683,7 @@ def update_ml_graphs(kind, date_value, hour, active_cell, table_data, page_curre
     else:
         date_ml = datetime.date.fromisoformat(date_value)
 
+    perf_init = time.perf_counter()
     day = date_ml.day
     week_day = date_ml.weekday()
     day_type = 0 if (date_ml.weekday() >= 5) | (date_value in utils.get_holidays()) else 1
@@ -683,6 +695,8 @@ def update_ml_graphs(kind, date_value, hour, active_cell, table_data, page_curre
 
     group_fig, table_data = update_ML(hour, day_type, week_day, day, kind, segment)
 
+    logger.info("Update ML graphs callback completed.")
+    logger.info("Process time -> %.3fs", time.perf_counter() - perf_init)
     return group_fig, table_data
 
 
