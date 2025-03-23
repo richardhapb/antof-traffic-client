@@ -22,3 +22,4 @@ sql.json
 backup_waze.sql
 airflow.db
 airflow.cfg
+.python-version
