@@ -16,7 +16,7 @@ class Plot:
         if len(event) == 0:
             return plt.figure()
         event = event[["geometry"]]
-        event = event.to_crs(epsg=3857)  # Para visualización correcta en plano
+        event = event.to_crs(epsg=3857)
 
         if event is None:
             return plt.figure()
@@ -25,7 +25,8 @@ class Plot:
         fig.set_size_inches((4.5, 9.5))
         sc = event["geometry"].plot(ax=ax, alpha=0.5, cmap="GnBu") 
         cx.add_basemap(ax, source=cx.providers.OpenStreetMap.Mapnik) # type: ignore
-        # Añadir la barra de colores
+
+        # Color bar
         cbar = sc.get_figure().colorbar(sc.collections[0], ax=ax)
         cbar.set_label("Frecuencia")
         ax.set_xlabel("Longitud")
@@ -47,11 +48,11 @@ class Plot:
 
         hourly_reports = utils.hourly_group(data)
 
-        # Graficar la fluctuación de reportes por hora diferenciando entre semana y fin de semana
+        # Plot the hourly report fluctuation differentiating between weekday and weekend
         fig, ax = plt.subplots()
         fig.set_size_inches((10, 6))
 
-        # Ajustar las posiciones de las barras
+        # Adjust the bar positions
         bar_width = 0.4
         r1 = np.arange(len(hourly_reports))
         r2 = [x + bar_width for x in r1]
@@ -106,7 +107,7 @@ class Plot:
         fig, ax = plt.subplots()
         fig.set_size_inches((10, 6))
 
-        # Ajustar las posiciones de las barras
+        # Adjust the bars position
         bar_width = 0.4
         r1 = np.arange(len(daily_reports))
         r2 = [x + bar_width for x in r1]

@@ -142,19 +142,17 @@ def freq_nearby(gdf: gpd.GeoDataFrame, nearby_meters=200) -> gpd.GeoDataFrame:
 
     if gdf2 is None:
         return gpd.GeoDataFrame()
-    # Extraer coordenadas x e y
+
     coords = np.vstack((gdf2.geometry.x, gdf2.geometry.y)).T
 
-    # Construir el cKDTree
     tree = cKDTree(coords)
 
-    # Consultar el árbol
     indices = tree.query_ball_point(coords, r=nearby_meters)
 
-    # Contar vecinos (excluyendo el propio punto)
+    # Count neighbors excluding itself
     neighbor_counts = [len(ind) - 1 for ind in indices]
 
-    # Añadir los conteos al GeoDataFrame
+    # Frequency within the segment
     gdf2["freq"] = neighbor_counts
 
     return gdf2
@@ -173,7 +171,7 @@ def separate_coords(df: pd.DataFrame) -> GeoDataFrame:
     df2["x"] = df2["location"].apply(lambda x: x["x"])
     df2["y"] = df2["location"].apply(lambda y: y["y"])
     df2 = df2.drop(columns="location")
-    df2["geometry"] = df2.apply(lambda row: Point(row["x"], row["y"]), axis=1)
+    df2["geometry"] = df2.apply(lambda row: Point(row["x"], row["y"]), axis=1) # type:ignore
     dfg = gpd.GeoDataFrame(df2, geometry="geometry")
 
     # Set the coorinates references system

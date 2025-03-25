@@ -4,6 +4,7 @@ from typing import Dict, List, cast
 
 import numpy as np
 import pandas as pd
+import geopandas as gpd
 from geopandas import GeoDataFrame
 from sklearn.base import clone
 from sklearn.feature_extraction import FeatureHasher
@@ -44,6 +45,32 @@ def mlflow_logger(func):
 
 
 class ML:
+    """
+    A machine learning wrapper class for training and evaluating XGBoost classification models.
+
+    This class handles data preparation, model training, evaluation and MLflow logging for
+    XGBoost classification tasks with support for feature encoding.
+
+    Attributes:
+        data (GeoDataFrame | pd.DataFrame): Input training data
+        model (XGBClassifier): XGBoost classifier model instance
+        column_y (str | None): Target column name
+        categories (List | None): Categorical columns to encode
+        ohe (bool): Whether to use one-hot encoding
+        hash (bool): Whether to use feature hashing
+        hasher (Dict[str, FeatureHasher] | None): Feature hashers by column
+        data_labeled (GeoDataFrame | pd.DataFrame | None): Encoded training data
+        x_train (pd.DataFrame | None): Training features
+        x_test (pd.DataFrame | None): Test features
+        y_train (pd.DataFrame | None): Training labels
+        y_test (pd.DataFrame | None): Test labels
+        onehot (Dict[str, OneHotEncoder] | None): One-hot encoders by column
+        oe (Dict[str, OrdinalEncoder] | None): Ordinal encoders by column
+        total_events (pd.DataFrame | GeoDataFrame | None): Combined event data
+        x (np.ndarray | None): Feature matrix
+        y (np.ndarray | None): Label vector
+    """
+
     def __init__(
         self,
         data: GeoDataFrame | pd.DataFrame,
@@ -53,6 +80,17 @@ class ML:
         ohe: bool = False,
         hash: bool = False,
     ):
+        """
+        Initialize the ML wrapper.
+
+        Args:
+            data: Input training data
+            model: XGBoost classifier model instance
+            column_y: Name of target column
+            categories: List of categorical columns to encode
+            ohe: Whether to use one-hot encoding
+            hash: Whether to use feature hashing
+        """
         self.data: GeoDataFrame | pd.DataFrame = data
         self.model: XGBClassifier = cast(XGBClassifier, clone(model))
         self.columns_x: List = [column for column in self.data.columns if column != column_y]
@@ -62,21 +100,32 @@ class ML:
         self.hash: bool = hash
         self.hasher: Dict[str, FeatureHasher] | None = None
         self.data_labeled: GeoDataFrame | pd.DataFrame | None = None
-        self.x_train: pd.DataFrame | None = None
-        self.x_test: pd.DataFrame | None = None
-        self.y_train: pd.DataFrame | None = None
-        self.y_test: pd.DataFrame | None = None
+        self.x_train: list | pd.DataFrame | None = None
+        self.x_test: list | pd.DataFrame | None = None
+        self.y_train: list | pd.DataFrame | None = None
+        self.y_test: list | pd.DataFrame | None = None
         self.onehot: Dict[str, OneHotEncoder] | None = None
         self.oe: Dict[str, OrdinalEncoder] | None = None  # Ordinal Encoder
         self.total_events: pd.DataFrame | GeoDataFrame | None = None
-        self.x: np.ndarray | None = None
-        self.y: np.ndarray | None = None
+        self.x: np.ndarray | gpd.GeoDataFrame | pd.DataFrame | None = None
+        self.y: np.ndarray | pd.Series | pd.DataFrame | None = None
 
         if self.data is not None:
             self.data[column_y] = 1
 
     @staticmethod
     def convert_dataset_to_ohe(data: pd.DataFrame, categories: list) -> pd.DataFrame:
+        """
+        Convert categorical columns to one-hot encoded features.
+
+        Args:
+            data: Input dataframe
+            categories: List of categorical column names to encode
+
+        Returns:
+            DataFrame with one-hot encoded features
+        """
+
         labeled = []
         onehot = {}
         for c in categories:
@@ -92,11 +141,25 @@ class ML:
         return pd.concat([data.drop(categories, axis=1), *labeled], axis=1)
 
     def generate_neg_simulated_data(self, geodata: str = "group") -> None:
+        """
+        Generate negative samples by simulating non-event data points.
+
+        Creates synthetic negative examples by sampling timestamps and locations
+        where events did not occur. Uses a 5-minute interval grid and combines
+        with location groups and event types.
+
+        Args:
+            geodata: Column name containing geographical grouping information.
+                    Defaults to "group".
+        """
+
         events2 = self.data.copy()
         events2["happen"] = 1
 
         if not isinstance(events2["pub_millis"].iloc[0], np.integer):
-            events2["pub_millis"] = events2["pub_millis"].astype(np.int64, errors="ignore") / 1_000_000
+            events2["pub_millis"] = (
+                events2["pub_millis"].astype(np.int64, errors="ignore") / 1_000_000
+            )
 
         step = np.int64(60_000 * 5)
 
@@ -137,7 +200,7 @@ class ML:
             result["pub_millis"] = result["pub_millis"]
 
         happen_data = result.get("happen", {})
-        result.drop(columns=["happen"], inplace = True)
+        result.drop(columns=["happen"], inplace=True)
 
         alerts = utils.generate_aggregate_data(result)
 
@@ -145,7 +208,17 @@ class ML:
         self.total_events["happen"] = happen_data
 
     def balance_day_type(self) -> None:
-        # Balance no events and events, for weekend and workdays
+        """
+        Balance the dataset between weekday and weekend samples.
+
+        Resamples data to ensure equal representation of weekday ("f") and
+        weekend ("s") events. Uses random sampling with replacement to match
+        the counts of the larger class.
+
+        Raises:
+            ValueError: If day_type column is missing from the dataset
+        """
+
         if (
             self.total_events is None
             or "day_type" not in self.data.columns
@@ -168,8 +241,12 @@ class ML:
             pd.concat([days1, days0.sample(q_days0 + diff, replace=True, random_state=42)]),
         )
 
-        days0 = self.total_events[(self.total_events.day_type == "f") | (self.total_events.day_type == 0)]
-        days1 = self.total_events[(self.total_events.day_type == "s") | (self.total_events.day_type == 1)]
+        days0 = self.total_events[
+            (self.total_events.day_type == "f") | (self.total_events.day_type == 0)
+        ]
+        days1 = self.total_events[
+            (self.total_events.day_type == "s") | (self.total_events.day_type == 1)
+        ]
 
         self.total_events = cast(
             pd.DataFrame,
@@ -180,6 +257,14 @@ class ML:
         )
 
     def clean(self, columns_x: List, column_y: str) -> None:
+        """
+        Filter dataset to include only specified feature and target columns.
+
+        Args:
+            columns_x: List of feature column names to keep
+            column_y: Name of the target column
+        """
+
         self.columns_x = columns_x
         self.column_y = column_y
 
@@ -189,6 +274,22 @@ class ML:
             self.total_events = self.total_events.loc[:, columns_x + [column_y]]
 
     def prepare(self, no_features=None) -> None:
+        """
+        Prepare data for model training by applying feature encoding.
+
+        Handles data preparation including:
+        - Combining event and non-event data
+        - Converting day type indicators
+        - Applying one-hot encoding or feature hashing if specified
+
+        Args:
+            no_features: Number of features for feature hashing. Only used if
+                        hash=True. Defaults to 5 if not specified.
+
+        Raises:
+            ValueError: If no data is available for model generation
+        """
+
         if self.data is None:
             raise ValueError("Not have data for model generation")
 
@@ -255,6 +356,16 @@ class ML:
             self.data_labeled = total_events.copy()
 
     def train(self) -> None:
+        """
+        Train the XGBoost model on the prepared data.
+
+        Performs the following steps:
+            1. Prepares data if not already done
+            2. Splits features and target
+            3. Creates train/test split (80/20)
+            4. Fits the XGBoost model
+        """
+
         if self.data_labeled is None:
             self.prepare()
 
@@ -271,6 +382,16 @@ class ML:
         self.model.fit(self.x_train, self.y_train)
 
     def cross_validation(self) -> List:
+        """
+        Perform 10-fold cross validation on the model.
+
+        Returns:
+            List of scores from each fold of cross validation
+
+        Raises:
+            AssertionError: If data has not been prepared
+        """
+
         if self.data_labeled is None:
             self.train()
 
@@ -283,6 +404,19 @@ class ML:
         return scores
 
     def predict(self, data) -> List:
+        """
+        Make predictions on new data using the trained model.
+
+        Args:
+            data: DataFrame containing features for prediction
+
+        Returns:
+            List of predicted class labels
+
+        Raises:
+            AssertionError: If model has not been trained
+        """
+
         if self.data_labeled is None:
             self.train()
 
@@ -292,6 +426,19 @@ class ML:
         return self.model.predict(data)
 
     def predict_proba(self, data) -> None:
+        """
+        Get prediction probabilities for each class on new data.
+
+        Args:
+            data: DataFrame containing features for prediction
+
+        Returns:
+            Array of predicted probabilities for each class
+
+        Raises:
+            AssertionError: If model has not been trained
+        """
+
         if self.data_labeled is None:
             self.train()
 
@@ -301,12 +448,30 @@ class ML:
         return self.model.predict_proba(data)
 
     def select_best_params(self) -> List:
+        """
+        Get the best hyperparameters from model tuning.
+
+        Returns:
+            Dictionary of best parameter values found during tuning
+        """
+
         if self.data_labeled is None:
             self.train()
 
         return self.model.best_params_
 
     def metrics(self) -> Dict:
+        """
+        Calculate performance metrics for the model.
+
+        Returns:
+            Dictionary containing:
+                - accuracy: Accuracy score
+                - f1: F1 score
+                - precision: Precision score
+                - recall: Recall score
+        """
+
         y_pred = self.model.predict(self.x_test)
 
         metrics = {
@@ -318,16 +483,36 @@ class ML:
 
         return metrics
 
-    def confusion_matrix(self) -> List:
+    def confusion_matrix(self) -> np.ndarray:
+        """
+        Generate confusion matrix for model predictions.
+
+        Returns:
+            2D array representing the confusion matrix, empty list if model
+            hasn't been trained
+        """
+
         if self.y_train is None:
-            return []
+            return np.ndarray([])
         return confusion_matrix(
             self.y_test,
             self.model.predict(self.x_test),
-            labels=self.y_train.unique(),
+            labels=self.y_train.unique,  # type: ignore
         )
 
     def encode(self, data, category) -> np.ndarray:
+        """
+        Encode new categorical data using fitted encoders.
+
+        Args:
+            data: Data to encode
+            category: Name of the categorical column
+
+        Returns:
+            numpy.ndarray: Encoded features using either one-hot encoding,
+                          feature hashing, or empty array if no encoding set
+        """
+
         if self.data_labeled is None:
             self.train()
 
@@ -341,12 +526,31 @@ class ML:
 
     @mlflow_logger
     def log_model_params(self, **params) -> None:
+        """
+        Log model parameters, metrics and artifacts to MLflow.
+
+        Logs:
+            - Model artifact
+            - Model parameters
+            - Cross validation scores
+            - Confusion matrix
+            - Performance metrics (accuracy, f1, precision, recall)
+            - Additional custom parameters
+
+        Args:
+            **params: Additional parameters to log
+        """
+
         if self.x_train is None:
             return
 
         signature = infer_signature(self.x_train, self.model.predict(self.x_train))
 
-        if isinstance(self.model, XGBClassifier):
+        if (
+            isinstance(self.model, XGBClassifier)
+            and isinstance(self.x_train, pd.DataFrame)
+            or isinstance(self.x_train, gpd.GeoDataFrame)
+        ):
             mlflow.sklearn.log_model(
                 sk_model=self.model,
                 artifact_path="waze_data",
@@ -375,10 +579,25 @@ class ML:
         mlflow.log_params(params)
 
     def prepare_train(self):
+        """
+        Convenience method to prepare data and train model in one step.
+        """
+
         self.prepare()
         self.train()
 
     def ordinal_encoder(self, categories: list):
+        """
+        Apply ordinal encoding to specified categorical columns.
+
+        Args:
+            categories: List of categorical column names to encode
+
+        Raises:
+            ValueError: If data is not loaded or specified category
+                       doesn't exist in data
+        """
+
         if self.data is None:
             raise ValueError("Data is not loaded")
         self.oe = {}
@@ -390,6 +609,16 @@ class ML:
 
     @staticmethod
     def get_last_model(model_name: str) -> int:
+        """
+        Get the version number of the latest model in MLflow.
+
+        Args:
+            model_name: Name of the registered model
+
+        Returns:
+            Integer version number of the latest model
+        """
+
         client = mlflow.MlflowClient()
 
         model_versions = client.search_model_versions(f"name='{model_name}'")

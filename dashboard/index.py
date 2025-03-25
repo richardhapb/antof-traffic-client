@@ -2,6 +2,7 @@ import copy
 import datetime
 import time
 import os
+from typing import cast
 
 import geopandas as gpd
 import pandas as pd
@@ -35,10 +36,10 @@ app = Dash(
 
 time_range = init_app(model, alerts)
 
+
 # This function initializes the schedulers
-# and ensure initialize one per worker
-# because in production multi-workes trigger
-# multiple jobs creation
+# and ensure to initialize one per worker
+# because in production, multiple workers are created
 def initialize_scheduler():
     scheduler = BackgroundScheduler()
     worker = int(os.environ.get("APSC", "0"), 0)
@@ -49,10 +50,27 @@ def initialize_scheduler():
 
     logger.info("Initializing scheduler with worker %i", worker)
 
-    scheduler.add_job(update_data, "interval", args=[time_range, alerts], minutes=5, id="update-data", replace_existing=True)
-    scheduler.add_job(update_data_from_api, "interval", minutes=2, id="update-data-API", replace_existing=True)
+    scheduler.add_job(
+        update_data,
+        "interval",
+        args=[time_range, alerts],
+        minutes=5,
+        id="update-data",
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        update_data_from_api, "interval", minutes=2, id="update-data-API", replace_existing=True
+    )
     scheduler.add_job(train, "interval", days=30, id="train-model", replace_existing=True)
-    scheduler.add_job(load_model, "interval", args=[model], days=30, minutes=5, id="load-model", replace_existing=True)
+    scheduler.add_job(
+        load_model,
+        "interval",
+        args=[model],
+        days=30,
+        minutes=5,
+        id="load-model",
+        replace_existing=True,
+    )
     scheduler.start()
 
 
@@ -121,7 +139,7 @@ def update_ML(
     if alerts.is_empty:
         return go.Figure()
 
-    g = Grouper(alerts.data, (10, 20))
+    g = Grouper(cast(gpd.GeoDataFrame, alerts.data), (10, 20))
 
     x_var = pd.DataFrame(
         {
@@ -175,7 +193,7 @@ def update_ML(
             ])
             polygons.append(poly)
 
-    # Convertir a GeoDataFrame
+    # Convert to GeoDataFrame
     gdf_polygons: gpd.GeoDataFrame = gpd.GeoDataFrame(geometry=polygons, crs="EPSG:4326")
     gdf_polygons["probability"] = [
         (
@@ -207,10 +225,10 @@ def update_ML(
     )
 
     if higlighted_segment:
-        # Filtra el polígono seleccionado
+        # Filter the selected polygon
         selected_poly = gdf_polygons[gdf_polygons["segment"] == f"Segmento {higlighted_segment}"]
 
-        # Extrae coordenadas del polígono seleccionado
+        # Extract the coordinates
         lat_coords = selected_poly.geometry.apply(
             lambda poly: [point[1] for point in poly.exterior.coords]
         ).values[0]
@@ -369,7 +387,7 @@ def update_graphs(kind, start_date, end_date, active_cell):
         value_name="events",
     )
 
-    map_data = copy.deepcopy(filtered_alerts)
+    map_data = cast(gpd.GeoDataFrame, copy.deepcopy(filtered_alerts))
     map_data = utils.freq_nearby(map_data, nearby_meters=200)
     if map_data is None:
         raise ValueError("Map data is empty")
@@ -422,7 +440,7 @@ def update_graphs(kind, start_date, end_date, active_cell):
             ),
         )
 
-    # Configurar el estilo del tooltip para todas las trazas
+    # Polygon style
     hourly_fig.update_traces(
         hovertemplate="x: %{x}<br>y: %{y}<extra></extra>",
     )
@@ -478,7 +496,7 @@ def update_graphs(kind, start_date, end_date, active_cell):
             ),
         )
 
-    # Configurar el estilo del tooltip para todas las trazas
+    # Tooltip style
     daily_fig.update_traces(
         hovertemplate="x: %{x}<br>y: %{y}<extra></extra>",
     )
@@ -561,10 +579,11 @@ def update_graphs(kind, start_date, end_date, active_cell):
             x=scatter_data["s_jam"],
             y=scatter_data["s_accident"],
             mode="markers",
-            marker=dict(  # Tamaños variados para el efecto de burbuja
-                color="rgba(54, 170, 263, 0.6)",  # Color azul con transparencia (0.6)
+            # "Bubble" style
+            marker=dict(
+                color="rgba(54, 170, 263, 0.6)",
                 size=20,
-                line=dict(width=1, color="DarkSlateGrey"),  # Borde alrededor de las burbujas
+                line=dict(width=1, color="DarkSlateGrey"),
             ),
             name="Día de semana",
         )
@@ -575,10 +594,11 @@ def update_graphs(kind, start_date, end_date, active_cell):
             x=scatter_data["f_jam"],
             y=scatter_data["f_accident"],
             mode="markers",
-            marker=dict(  # Tamaños variados para el efecto de burbuja
-                color="rgba(170, 54, 263, 0.6)",  # Color azul con transparencia (0.6)
+            # "Bubble" style
+            marker=dict(
+                color="rgba(170, 54, 263, 0.6)",
                 size=20,
-                line=dict(width=1, color="DarkSlateGrey"),  # Borde alrededor de las burbujas
+                line=dict(width=1, color="DarkSlateGrey"),
             ),
             name="Fin de semana / Feriado",
             xaxis="x2",
@@ -586,7 +606,6 @@ def update_graphs(kind, start_date, end_date, active_cell):
         )
     )
 
-    # Configuración adicional para un estilo atractivo
     scatter_fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
@@ -607,9 +626,9 @@ def update_graphs(kind, start_date, end_date, active_cell):
         ),
         yaxis2=dict(
             title="Eventos de accidentes en fin de semana",
-            overlaying="y",  # Superpone el eje sobre el primero
-            side="right",  # Ubica el eje secundario a la derecha
-            showgrid=False,  # Opcional para ocultar la cuadrícula del segundo eje
+            overlaying="y",  # Overlays the axis on the first one
+            side="right",    # Positions the secondary axis
+            showgrid=False,
             title_font=dict(size=12),
             showline=False,
             zeroline=False,

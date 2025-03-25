@@ -1,8 +1,10 @@
+from typing import cast
 import pandas as pd
 import geopandas as gpd
 import numpy as np
 from enum import Enum
 from utils import utils
+from utils.utils import TZ
 
 
 class AlertType(Enum):
@@ -26,7 +28,7 @@ class Alerts:
             self.data = pd.concat((self.data, other.data), axis=0)
             self.data.drop_duplicates(("uuid"), inplace=True)
 
-        return self.data
+        return cast(gpd.GeoDataFrame, self.data)
 
     @property
     def is_empty(self) -> bool:
@@ -35,43 +37,75 @@ class Alerts:
     def filter_by_group_time(
         self, timedelta_min: int, inplace: bool = False
     ) -> gpd.GeoDataFrame | pd.DataFrame:
+        """
+        Filter and group data by time intervals.
+
+        Groups events into time intervals of specified duration and ensures 
+        consistent data types across columns.
+
+        Args:
+            timedelta_min: Size of time interval in minutes
+            inplace: If True, modify data in place. If False, return a copy
+
+        Returns:
+            GeoDataFrame or DataFrame with events grouped by time intervals. 
+            Empty DataFrame if input is None or missing required columns.
+
+        Notes:
+            - Converts pub_millis to milliseconds if not already in that format
+            - Creates interval_start column marking the start of each time window
+            - Converts timestamps to specified timezone
+            - Ensures consistent data types for 'group' and 'type' columns
+            - Removes duplicate events within same interval/group/type
+        """
+
         if self.data is None or "pub_millis" not in self.data.columns:
             return pd.DataFrame()
-        events2 = self.data.copy()
+        if not inplace:
+            self.data = self.data.copy()
 
-        if not isinstance(events2["pub_millis"].iloc[0], np.integer):
-            events2["pub_millis"] = round(
-                events2["pub_millis"].astype(np.int64, errors="ignore") / 1_000_000
+        if not isinstance(self.data["pub_millis"].iloc[0], np.integer):
+            self.data["pub_millis"] = round(
+                self.data["pub_millis"].astype(np.int64, errors="ignore") / 1_000_000
             ).astype(np.int64)
 
         step = np.int64(60_000 * timedelta_min)  # step en milisegundos
 
-        # Calculate intervals by adjusting 'pub_millis' to the nearest multiple of 'step'
-        events2["interval_start"] = ((events2["pub_millis"]) // step) * step
+        # Adjust `pub_millis` to the nearest step
+        self.data["interval_start"] = ((self.data["pub_millis"]).to_numpy() // step) * step
 
         # Convert 'interval_start' to datetime
-        events2["interval_start"] = pd.to_datetime(events2["interval_start"], unit="ms", utc=True)
-        events2["interval_start"] = events2["interval_start"].dt.tz_convert(utils.TZ)
+        self.data["interval_start"] = pd.to_datetime(self.data["interval_start"], unit="ms", utc=True)
+        self.data["interval_start"] = self.data["interval_start"].dt.tz_convert(TZ)
 
         # Ensure consistent types
-        events2["group"] = events2["group"].astype(np.int16)
-        events2["type"] = events2["type"].astype(str)
+        self.data["group"] = self.data["group"].astype(np.int16)
+        self.data["type"] = self.data["type"].astype(str)
 
-        # If needed, filter events that occur in the same group, type and interval
-        # For example, we might want events where there are multiple occurrences
-        grouped_events = events2.drop_duplicates(subset=["interval_start", "group", "type"])
+        # Keep only the unique events in the three-dimensional variables
+        grouped_events = self.data.drop_duplicates(subset=["interval_start", "group", "type"])
 
         result = grouped_events.reset_index(drop=True)
 
         result["pub_millis"] = pd.to_datetime(result["pub_millis"], unit="ms", utc=True)
-        result["pub_millis"] = result["pub_millis"].dt.tz_convert(utils.TZ)
-
-        if inplace:
-            self.data = result
+        result["pub_millis"] = result["pub_millis"].dt.tz_convert(TZ)
 
         return result
 
     def group_by_day(self) -> pd.DataFrame:
+        """
+        Calculate average daily event counts by group (segment).
+
+        Args:
+            data: GeoDataFrame containing event data with 'group' and 'pub_millis' columns
+
+        Returns:
+            DataFrame with columns:
+                - group: Group identifier
+                - qty/day: Average number of events per day for each group,
+                           sorted in descending order
+        """
+
         grouped_day = (
             pd.DataFrame({
                 "group": self.data.group.value_counts().keys(),
