@@ -1,20 +1,20 @@
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 import contextily as cx
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 from matplotlib.figure import Figure
 
-from utils.utils import TZ
-from waze.alerts import Alerts
 
 XMIN = -70.43627
 XMAX = -70.36259
 
 YMIN = -23.724215
 YMAX = -23.485813
+
+if TYPE_CHECKING:
+    from waze.alerts import Alerts
 
 
 class Grouper:
@@ -188,7 +188,7 @@ class Grouper:
 
     """Plotting helpers for exploratory analysis"""
 
-    def plot_qty_day(self, alerts: Alerts) -> Figure:
+    def plot_qty_day(self, alerts: "Alerts") -> Figure:
         fig, ax = plt.subplots()
         grouped_day = alerts.group_by_day()
 

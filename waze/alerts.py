@@ -4,7 +4,6 @@ import geopandas as gpd
 import numpy as np
 from enum import Enum
 from utils import utils
-from utils.utils import TZ
 
 
 class AlertType(Enum):
@@ -76,7 +75,7 @@ class Alerts:
 
         # Convert 'interval_start' to datetime
         self.data["interval_start"] = pd.to_datetime(self.data["interval_start"], unit="ms", utc=True)
-        self.data["interval_start"] = self.data["interval_start"].dt.tz_convert(TZ)
+        self.data["interval_start"] = self.data["interval_start"].dt.tz_convert(utils.TZ)
 
         # Ensure consistent types
         self.data["group"] = self.data["group"].astype(np.int16)
@@ -88,7 +87,7 @@ class Alerts:
         result = grouped_events.reset_index(drop=True)
 
         result["pub_millis"] = pd.to_datetime(result["pub_millis"], unit="ms", utc=True)
-        result["pub_millis"] = result["pub_millis"].dt.tz_convert(TZ)
+        result["pub_millis"] = result["pub_millis"].dt.tz_convert(utils.TZ)
 
         return result
 

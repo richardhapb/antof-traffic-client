@@ -396,7 +396,7 @@ def update_graphs(kind, start_date, end_date, active_cell):
     map_data["time"] = map_data.pub_millis.apply(lambda x: x.strftime("%H:%M:%S"))
     map_data["date"] = map_data.pub_millis.apply(lambda x: x.strftime("%d-%m-%Y"))
 
-    map_data["type"] = map_data["type"].map(names)
+    map_data = map_data[map_data["type"] == kind] if kind and kind != 'all' else map_data
 
     map_fig = go.Figure(
         px.scatter_map(
@@ -733,7 +733,6 @@ def update_last_events(kind):
     )
 
     last_events["date"] = last_events.pub_millis.dt.strftime("%d/%m/%Y")
-    last_events["type"] = last_events.type.map(names)
 
     last_events = last_events[["type", "group", "hour", "date", "street"]]
 
