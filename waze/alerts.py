@@ -1,8 +1,12 @@
+from datetime import datetime
+from enum import Enum
 from typing import cast
-import pandas as pd
+
 import geopandas as gpd
 import numpy as np
-from enum import Enum
+import pandas as pd
+import pytz
+
 from utils import utils
 
 
@@ -15,23 +19,43 @@ class AlertType(Enum):
 
 
 class Alerts:
-    def __init__(self, data: list, alert_type: AlertType = AlertType.ALL) -> None:
-        df = pd.DataFrame(data)
+    _instance = None
+    last_update = 0
 
-        self.data = utils.separate_coords(df)
-        self.data = utils.update_timezone(self.data, utils.TZ)
-        self.alert_type = alert_type
+    def __new__(cls, *args, **kwargs):
+        current_time = int(datetime.now(pytz.UTC).timestamp()) * 1000
+        
+        if (cls._instance is None or 
+            current_time - cls.last_update > utils.LAST_UPDATE_THRESHOLD):
+            instance = super().__new__(cls)
+            cls._instance = instance
+            cls.last_update = current_time
+            return instance
+            
+        return cls._instance
+
+    def __init__(self, data: list = [], alert_type: AlertType = AlertType.ALL) -> None:
+        # Only initialize if this is a new instance
+        if not hasattr(self, 'data'):
+            self.alert_type = alert_type
+            df = pd.DataFrame(data)
+            if df.empty:
+                self.data = gpd.GeoDataFrame()
+                return
+                
+            self.data = utils.separate_coords(df)
+            self.data = utils.update_timezone(self.data, utils.TZ)
 
     def __add__(self, other: "Alerts") -> gpd.GeoDataFrame:
-        if other.data is not None and len(other.data) > 0:
-            self.data = pd.concat((self.data, other.data), axis=0)
+        if not other.is_empty:
+            self.data = pd.concat((self.data, other.data), axis=0, ignore_index=True)
             self.data.drop_duplicates(("uuid"), inplace=True)
 
         return cast(gpd.GeoDataFrame, self.data)
 
     @property
     def is_empty(self) -> bool:
-         return not hasattr(self.data, "pub_millis")
+        return self.data.shape[0] == 0
 
     def filter_by_group_time(
         self, timedelta_min: int, inplace: bool = False
@@ -39,7 +63,7 @@ class Alerts:
         """
         Filter and group data by time intervals.
 
-        Groups events into time intervals of specified duration and ensures 
+        Groups events into time intervals of specified duration and ensures
         consistent data types across columns.
 
         Args:
@@ -47,7 +71,7 @@ class Alerts:
             inplace: If True, modify data in place. If False, return a copy
 
         Returns:
-            GeoDataFrame or DataFrame with events grouped by time intervals. 
+            GeoDataFrame or DataFrame with events grouped by time intervals.
             Empty DataFrame if input is None or missing required columns.
 
         Notes:
@@ -74,7 +98,9 @@ class Alerts:
         self.data["interval_start"] = ((self.data["pub_millis"]).to_numpy() // step) * step
 
         # Convert 'interval_start' to datetime
-        self.data["interval_start"] = pd.to_datetime(self.data["interval_start"], unit="ms", utc=True)
+        self.data["interval_start"] = pd.to_datetime(
+            self.data["interval_start"], unit="ms", utc=True
+        )
         self.data["interval_start"] = self.data["interval_start"].dt.tz_convert(utils.TZ)
 
         # Ensure consistent types
@@ -114,4 +140,3 @@ class Alerts:
         ).sort_values(ascending=False, by="qty/day")
 
         return grouped_day
-

@@ -23,10 +23,8 @@ from dashboard.update_model import load_model
 from utils import utils
 from utils.utils import logger
 from utils.utils import TZ
-from waze.alerts import Alerts
 
 model = Model()
-alerts = Alerts([])
 
 app = Dash(
     __name__,
@@ -34,8 +32,7 @@ app = Dash(
     meta_tags=metadata.meta_tags,
 )
 
-time_range = init_app(model, alerts)
-
+time_range = init_app(model)
 
 # This function initializes the schedulers
 # and ensure to initialize one per worker
@@ -49,15 +46,6 @@ def initialize_scheduler():
         return
 
     logger.info("Initializing scheduler with worker %i", worker)
-
-    scheduler.add_job(
-        update_data,
-        "interval",
-        args=[time_range, alerts],
-        minutes=5,
-        id="update-data",
-        replace_existing=True,
-    )
     scheduler.add_job(
         update_data_from_api, "interval", minutes=2, id="update-data-API", replace_existing=True
     )
@@ -135,6 +123,8 @@ def update_ML(
 ):
     if model is None or model.model is None:
         return go.Figure()
+
+    alerts = update_data(time_range)
 
     if alerts.is_empty:
         return go.Figure()
@@ -313,11 +303,6 @@ def update_graphs(kind, start_date, end_date, active_cell):
     if start_date is None or end_date is None:
         return STANDARD_RETURN
 
-    if alerts.is_empty:
-        return STANDARD_RETURN
-
-    perf_init = time.perf_counter()
-
     start = (
         (datetime.datetime.fromisoformat(start_date))
         .replace(hour=0, minute=0, second=0, microsecond=0)
@@ -329,10 +314,20 @@ def update_graphs(kind, start_date, end_date, active_cell):
         .astimezone(tz=pytz.timezone(TZ))
     )
 
+    time_range.init_time = int(start.astimezone(pytz.UTC).timestamp()) * 1000
+    time_range.end_time = int(end.astimezone(pytz.UTC).timestamp()) * 1000
+
+    alerts = update_data(time_range)
+
+    if alerts.is_empty:
+        return STANDARD_RETURN
+
+    perf_init = time.perf_counter()
+
     if end <= start:
         end = start.timestamp() + (23 * 60 * 60 + 60**2 * 59) * 1000
 
-    filtered_alerts = copy.deepcopy(alerts.data)
+    filtered_alerts = alerts.data
 
     filtered_alerts = filtered_alerts[
         (filtered_alerts["pub_millis"] >= start) & (filtered_alerts["pub_millis"] <= end)
@@ -387,7 +382,7 @@ def update_graphs(kind, start_date, end_date, active_cell):
         value_name="events",
     )
 
-    map_data = cast(gpd.GeoDataFrame, copy.deepcopy(filtered_alerts))
+    map_data = cast(gpd.GeoDataFrame, filtered_alerts)
     map_data = utils.freq_nearby(map_data, nearby_meters=200)
     if map_data is None:
         raise ValueError("Map data is empty")
@@ -680,6 +675,8 @@ def update_graphs(kind, start_date, end_date, active_cell):
     ],
 )
 def update_ml_graphs(kind, date_value, hour, active_cell, table_data, page_current, page_size):
+    alerts = update_data(time_range)
+
     if alerts.is_empty:
         return go.Figure(), []
     if kind is None:
@@ -713,28 +710,30 @@ def update_ml_graphs(kind, date_value, hour, active_cell, table_data, page_curre
     Input("dd_type", "value"),
 )
 def update_last_events(kind):
+    alerts = update_data(time_range)
     if alerts.is_empty:
         return [], datetime.datetime.now(pytz.timezone(TZ))
     last_events = alerts.data.sort_values(by="pub_millis", ascending=False)
 
+    last_events["date"] = last_events.pub_millis.apply(lambda x: x.strftime("%d-%m-%Y"))
+    last_events["date"] = last_events.pub_millis.dt.strftime("%d/%m/%Y")
+
+    last_events["hour"] = last_events.apply(
+        lambda row: f"{int(row['hour']):02}:{int(row['minute']):02}", axis=1
+    )
+
+    last_events = last_events[["type", "group", "hour", "date", "street"]]
+
     if last_events.shape[0] == 0:
         return [], [datetime.datetime.now(pytz.timezone(TZ))]
 
-    if kind != "all" and kind is not None:
+    if kind is not None and kind != "all":
         last_events = last_events[last_events["type"] == kind]
 
     last_events = last_events.iloc[:20]
 
     if last_events.shape[0] == 0:
         return [], datetime.datetime.now(pytz.timezone(TZ))
-
-    last_events["hour"] = last_events.apply(
-        lambda row: f"{int(row['hour']):02}:{int(row['minute']):02}", axis=1
-    )
-
-    last_events["date"] = last_events.pub_millis.dt.strftime("%d/%m/%Y")
-
-    last_events = last_events[["type", "group", "hour", "date", "street"]]
 
     last_events = last_events.rename(
         columns={

@@ -1,17 +1,17 @@
-import time
 import datetime
+import time
 
 import pytz
 import requests
 
+import config
 from dashboard.models import TimeRange
 from utils import utils
-from utils.utils import logger, TZ
+from utils.utils import TZ, logger
 from waze.alerts import Alerts
-import config
 
 
-def update_data(time_range_obj: TimeRange, alerts_obj: Alerts) -> None:
+def update_data(time_range_obj: TimeRange) -> Alerts:
     """
     Retrieve data from the server between the time range
 
@@ -36,24 +36,17 @@ def update_data(time_range_obj: TimeRange, alerts_obj: Alerts) -> None:
         time_range_obj.end_time, pytz.timezone(utils.TZ), pytz.UTC
     )
 
-    if alerts_obj.data.shape[0] > 0:
-        min_timestamp = utils.convert_timestamp_tz(
-            int(alerts_obj.data["pub_millis"].min().timestamp() * 1000),
-            pytz.timezone(utils.TZ),
-            pytz.UTC,
-        )
-        if min_timestamp >= time_range_obj.init_time:
-            since_request = until_request or since_request
-            until_request = None
-
     logger.info("Getting data from server")
 
     try:
         alerts_response = utils.get_data(since_request, until_request)
 
-        alerts_obj.data = alerts_obj + alerts_response
+        time_range_obj.end_time = int(alerts_response.data["pub_millis"].max().timestamp() * 1000)
 
         logger.info("Data retrieved correctly, %i elements", alerts_response.data.shape[0])
+
+        return alerts_response
+
     except requests.ConnectionError as e:
         logger.error("Error retrieving data from server: %s", e)
     except Exception as e:
@@ -61,6 +54,8 @@ def update_data(time_range_obj: TimeRange, alerts_obj: Alerts) -> None:
         logger.error("Error: %s", e)
 
     logger.info("Process time -> %.3fs", time.perf_counter() - perf_init)
+
+    return Alerts()
 
 
 def update_data_from_api() -> None:
@@ -84,7 +79,7 @@ def update_data_from_api() -> None:
 
     except requests.JSONDecodeError as e:
         logger.error("Error decoding JSON from request: %s", e)
-    except requests.ConnectTimeout:
+    except (requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout):
         logger.error("Server not respond")
-    except requests.ConnectionError as e:
+    except requests.exceptions.ConnectionError as e:
         logger.error("Error requesting the data, ensure that server is running: %s", e)

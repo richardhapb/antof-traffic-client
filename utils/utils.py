@@ -21,7 +21,8 @@ TZ = "America/Santiago"
 
 LOGGER_FORMAT = "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
 
-ALERTS_BEGIN_TIMESTAMP = 1727740800000 
+ALERTS_BEGIN_TIMESTAMP = 1727740800000
+LAST_UPDATE_THRESHOLD = 10000  # 10 seconds
 
 PERIM_X = [-70.42034224747098, -70.36743722434367]
 PERIM_Y = [-23.721724880116387, -23.511242421131792]
@@ -34,6 +35,7 @@ logging.basicConfig(format=LOGGER_FORMAT)
 
 logger = logging.getLogger("antof_traffic")
 logger.setLevel(logging.INFO)
+
 
 def get_data(
     since: int | None = None,
@@ -48,6 +50,13 @@ def get_data(
     """
     if config.SERVER_URL is None:
         raise requests.ConnectionError("Server URL don't defined")
+
+    if (
+        int(datetime.datetime.now(pytz.UTC).timestamp()) * 1000 - Alerts.last_update
+        <= LAST_UPDATE_THRESHOLD
+        and Alerts.last_update != 0
+    ):
+        return Alerts()
 
     args = f"since={since if since else ALERTS_BEGIN_TIMESTAMP}"
     args += f"&until={until}" if until else ""
@@ -69,9 +78,7 @@ def get_data(
     raise requests.ConnectionError("Error requesting data from server")
 
 
-def generate_aggregate_data(
-    data:pd.DataFrame 
-) -> Alerts:
+def generate_aggregate_data(data: pd.DataFrame) -> Alerts:
     """
     Request to server generate aggregate data from a dict
 
@@ -112,7 +119,12 @@ def update_timezone(data: gpd.GeoDataFrame, tz: str = TZ) -> gpd.GeoDataFrame:
 
     return data
 
-def convert_timestamp_tz(utc_timestamp: int, from_tz: pytz.BaseTzInfo = pytz.UTC, to_tz: pytz.BaseTzInfo = pytz.timezone(TZ)) -> int:
+
+def convert_timestamp_tz(
+    utc_timestamp: int,
+    from_tz: pytz.BaseTzInfo = pytz.UTC,
+    to_tz: pytz.BaseTzInfo = pytz.timezone(TZ),
+) -> int:
     """
     Updates the timezone of a timestamp
     """
@@ -171,7 +183,7 @@ def separate_coords(df: pd.DataFrame) -> GeoDataFrame:
     df2["x"] = df2["location"].apply(lambda x: x["x"])
     df2["y"] = df2["location"].apply(lambda y: y["y"])
     df2 = df2.drop(columns="location")
-    df2["geometry"] = df2.apply(lambda row: Point(row["x"], row["y"]), axis=1) # type:ignore
+    df2["geometry"] = df2.apply(lambda row: Point(row["x"], row["y"]), axis=1)  # type:ignore
     dfg = gpd.GeoDataFrame(df2, geometry="geometry")
 
     # Set the coorinates references system
