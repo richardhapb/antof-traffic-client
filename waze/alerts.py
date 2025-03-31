@@ -9,7 +9,7 @@ import pytz
 
 from utils import utils
 
-LAST_UPDATE_THRESHOLD = 10000  # 10 seconds
+LAST_UPDATE_THRESHOLD = 4000  # 4 seconds
 
 
 class AlertType(Enum):

@@ -56,6 +56,7 @@ select = [
 ignore = [
     "SIM910", # Use dict.get() without a default value
     "D100", # Docstrings in modules
+    "D205", # Space after first line
     "D212", # Allow non-initialization in the first line of multiline comments
     "D202", # Allow blank lines after function docstrings
     "D400", # Punctuation in the first line

@@ -16,8 +16,8 @@ def train() -> bool:
 
     try:
         alerts = utils.get_data()
-    except requests.ConnectionError as e:
-        logger.error("Error retrieving data from server %s", e)
+    except requests.ConnectionError:
+        logger.exception("Error retrieving data from server")
         return False
 
     logger.info("Data found: %i", alerts.data.shape[1])
@@ -63,6 +63,6 @@ def train() -> bool:
 if __name__ == "__main__":
     try:
         train()
-    except Exception as e:
+    except Exception:
         logger.error("Error generating model, time %s", datetime.now(tz=pytz.timezone(TZ)))
-        logger.error("Error: %s", e)
+        logger.exception("Error")

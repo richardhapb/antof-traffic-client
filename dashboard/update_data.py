@@ -16,11 +16,11 @@ def update_data(time_range_obj: TimeRange) -> Alerts:
     Retrieve data from the server between the time range
 
     Args:
-        time_range_obj -> TimeRange: TimeRange object a global variable
-        alerts_obj -> Alerts: Data stored in memory a global variable
+        time_range_obj (TimeRange): TimeRange object a global variable
 
     Returns:
         Return -> None
+
     """
 
     perf_init = time.perf_counter()
@@ -47,13 +47,13 @@ def update_data(time_range_obj: TimeRange) -> Alerts:
         time_range_obj.end_time = int(alerts_response.data["pub_millis"].max().timestamp() * 1000)
         logger.info("Data retrieved correctly, %i elements", alerts_response.data.shape[0])
 
-        return alerts_response
-
-    except requests.ConnectionError as e:
-        logger.error("Error retrieving data from server: %s", e)
-    except Exception as e:
+    except requests.ConnectionError:
+        logger.exception("Error retrieving data from server")
+    except Exception:
         logger.error("Something was wrong while updating alerts")
-        logger.error("Error: %s", e)
+        logger.exception("Error")
+    else:
+        return alerts_response
 
     logger.info("Process time -> %.3fs", time.perf_counter() - perf_init)
 
@@ -79,9 +79,9 @@ def update_data_from_api() -> None:
         logger.info("Data retrieved from API sucessfully")
         logger.info("Process time -> %.3fs", time.perf_counter() - perf_init)
 
-    except requests.JSONDecodeError as e:
-        logger.error("Error decoding JSON from request: %s", e)
+    except requests.JSONDecodeError:
+        logger.exception("Error decoding JSON from request")
     except (requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout):
-        logger.error("Server not respond")
-    except requests.exceptions.ConnectionError as e:
-        logger.error("Error requesting the data, ensure that server is running: %s", e)
+        logger.exception("Server not respond")
+    except requests.exceptions.ConnectionError:
+        logger.exception("Error requesting the data, ensure that server is running")
