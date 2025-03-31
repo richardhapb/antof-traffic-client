@@ -37,11 +37,12 @@ def get_data(
     until: int | None = None,
 ) -> Alerts:
     """
-    Request alerts data from server
+    Request alerts data from server.
 
     Args:
         since: Millis timestamp with the begin of time to request data in UTC
         until: Millis timestamp with the end of time to request data in UTC
+
     """
     if config.SERVER_URL is None:
         raise requests.ConnectionError("Server URL don't defined")
@@ -61,13 +62,14 @@ def get_data(
         response = requests.get(url, timeout=10).json()
         alerts = Alerts(response.get("alerts", []))
 
-        return alerts
-    except requests.JSONDecodeError as e:
-        logger.error("Error decoding JSON from request: %s", e)
+    except requests.JSONDecodeError:
+        logger.exception("Error decoding JSON from requests")
     except requests.ConnectTimeout:
-        logger.error("Server not respond")
-    except requests.ConnectionError as e:
-        logger.error("Error requesting the data, ensure that server is running: %s", e)
+        logger.exception("Server not respond")
+    except requests.ConnectionError:
+        logger.exception("Error requesting the data, ensure that server is running")
+    else:
+        return alerts
 
     raise requests.ConnectionError("Error requesting data from server")
 
@@ -88,20 +90,18 @@ def generate_aggregate_data(data: pd.DataFrame) -> Alerts:
         response = requests.post(url, None, data, timeout=10).json()
 
         return Alerts(response)
-    except requests.JSONDecodeError as e:
-        logger.error("Error decoding JSON from request: %s", e)
+    except requests.JSONDecodeError:
+        logger.exception("Error decoding JSON from request")
     except requests.ConnectTimeout:
-        logger.error("Server not respond")
-    except requests.ConnectionError as e:
-        logger.error("Error requesting the data, ensure that server is running: %s", e)
+        logger.exception("Server not respond")
+    except requests.ConnectionError:
+        logger.exception("Error requesting the data, ensure that server is running: %s")
 
     raise requests.ConnectionError("Error requesting data from server")
 
 
 def update_timezone(data: gpd.GeoDataFrame, tz: str = TZ) -> gpd.GeoDataFrame:
-    """
-    Updates the timezone of event data
-    """
+    """Update the timezone of event data."""
 
     if not hasattr(data, "pub_millis"):
         return data
@@ -193,9 +193,7 @@ def separate_coords(df: pd.DataFrame) -> GeoDataFrame:
 def hourly_group(
     data: pd.DataFrame | gpd.GeoDataFrame, do_sum: bool = False
 ) -> pd.DataFrame | gpd.GeoDataFrame:
-    """
-    Transform an events DataFrame into an hourly report
-    """
+    """Transform an events DataFrame into an hourly report."""
 
     df = data[["day_type", "hour", "pub_millis", "end_pub_millis"]].copy()
 
@@ -230,8 +228,8 @@ def hourly_group(
 
     if not do_sum:
         # Calculate ratio
-        hourly_reports["f"] = hourly_reports["f"] / days
-        hourly_reports["s"] = hourly_reports["s"] / days
+        hourly_reports["f"] /= days
+        hourly_reports["s"] /= days
 
     return hourly_reports
 
@@ -239,9 +237,7 @@ def hourly_group(
 def daily_group(
     data: pd.DataFrame | gpd.GeoDataFrame,
 ) -> pd.DataFrame | gpd.GeoDataFrame:
-    """
-    Transform an events DataFrame into a daily report
-    """
+    """Transform an events DataFrame into a daily report."""
 
     df = data[["day_type", "day", "pub_millis", "end_pub_millis"]].copy()
 
@@ -274,6 +270,6 @@ def daily_group(
         daily_reports["f"] = daily_reports["f"].astype(float)
 
     # Calculate ratio
-    daily_reports["f"] = daily_reports["f"] / months
-    daily_reports["s"] = daily_reports["s"] / months
+    daily_reports["f"] /= months
+    daily_reports["s"] /= months
     return daily_reports

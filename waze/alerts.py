@@ -11,6 +11,7 @@ from utils import utils
 
 LAST_UPDATE_THRESHOLD = 10000  # 10 seconds
 
+
 class AlertType(Enum):
     ACCIDENT = ("Accidentes",)
     JAM = ("Congestión",)
@@ -25,40 +26,37 @@ class Alerts:
 
     def __new__(cls, *args, **kwargs):
         current_time = int(datetime.now(pytz.UTC).timestamp()) * 1000
-        
-        if (cls._instance is None or 
-            current_time - cls.last_update > LAST_UPDATE_THRESHOLD):
+
+        if cls._instance is None or current_time - cls.last_update > LAST_UPDATE_THRESHOLD:
             instance = super().__new__(cls)
             cls._instance = instance
             cls.last_update = current_time
-            return instance
-            
+
         return cls._instance
 
-    def __init__(self, data: list = [], alert_type: AlertType = AlertType.ALL) -> None:
-        self.alert_type = alert_type
-        df = pd.DataFrame(data)
-        if df.empty:
-            self.data = gpd.GeoDataFrame()
-            return
-            
-        self.data = utils.separate_coords(df)
-        self.data = utils.update_timezone(self.data, utils.TZ)
+    def __init__(self, data: list | None = None, alert_type: AlertType = AlertType.ALL) -> None:
+        if not data:
+            data = []
+
+        if not hasattr(self, "data") and data:
+            self.alert_type = alert_type
+            df = pd.DataFrame(data)
+
+            self.data = utils.separate_coords(df)
+            self.data = utils.update_timezone(self.data, utils.TZ)
 
     def __add__(self, other: "Alerts") -> gpd.GeoDataFrame:
         if not other.is_empty:
             self.data = pd.concat((self.data, other.data), axis=0, ignore_index=True)
             self.data.drop_duplicates(("uuid"), inplace=True)
 
-        return cast(gpd.GeoDataFrame, self.data)
+        return cast("gpd.GeoDataFrame", self.data)
 
     @property
     def is_empty(self) -> bool:
-        return self.data.shape[0] == 0
+        return not hasattr(self, "data") or self.data.shape[0] == 0
 
-    def filter_by_group_time(
-        self, timedelta_min: int, inplace: bool = False
-    ) -> gpd.GeoDataFrame | pd.DataFrame:
+    def filter_by_group_time(self, timedelta_min: int, inplace: bool = False) -> gpd.GeoDataFrame | pd.DataFrame:
         """
         Filter and group data by time intervals.
 
@@ -97,9 +95,7 @@ class Alerts:
         self.data["interval_start"] = ((self.data["pub_millis"]).to_numpy() // step) * step
 
         # Convert 'interval_start' to datetime
-        self.data["interval_start"] = pd.to_datetime(
-            self.data["interval_start"], unit="ms", utc=True
-        )
+        self.data["interval_start"] = pd.to_datetime(self.data["interval_start"], unit="ms", utc=True)
         self.data["interval_start"] = self.data["interval_start"].dt.tz_convert(utils.TZ)
 
         # Ensure consistent types
