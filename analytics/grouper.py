@@ -7,6 +7,7 @@ import numpy as np
 from matplotlib.figure import Figure
 
 
+# Antofagasta's perimeter
 XMIN = -70.43627
 XMAX = -70.36259
 

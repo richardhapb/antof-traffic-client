@@ -21,15 +21,11 @@ TZ = "America/Santiago"
 
 LOGGER_FORMAT = "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
 
-ALERTS_BEGIN_TIMESTAMP = 1727740800000
+ALERTS_BEGIN_TIMESTAMP = 1727740800000  # 2024/10/01
+# Time to retrieve last singleton instance between graphics
 LAST_UPDATE_THRESHOLD = 10000  # 10 seconds
 
-PERIM_X = [-70.42034224747098, -70.36743722434367]
-PERIM_Y = [-23.721724880116387, -23.511242421131792]
-
-PERIM_AFTA = gpd.GeoDataFrame(geometry=gpd.points_from_xy(PERIM_X, PERIM_Y))
-PERIM_AFTA.crs = "EPSG:4326"
-PERIM_AFTA = PERIM_AFTA.to_crs("EPSG:3857")
+MINUTES_BETWEEN_UPDATES_FROM_API = 2
 
 logging.basicConfig(format=LOGGER_FORMAT)
 
@@ -52,7 +48,8 @@ def get_data(
         raise requests.ConnectionError("Server URL don't defined")
 
     if (
-        int(datetime.datetime.now(pytz.UTC).timestamp()) * 1000 - Alerts.last_update
+        int(datetime.datetime.now(pytz.UTC).timestamp()) * 1000  # Millis
+        - Alerts.last_update
         <= LAST_UPDATE_THRESHOLD
         and Alerts.last_update != 0
     ):

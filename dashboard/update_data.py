@@ -7,7 +7,7 @@ import requests
 import config
 from dashboard.models import TimeRange
 from utils import utils
-from utils.utils import TZ, logger
+from utils.utils import TZ, logger, MINUTES_BETWEEN_UPDATES_FROM_API
 from waze.alerts import Alerts
 
 
@@ -33,16 +33,18 @@ def update_data(time_range_obj: TimeRange) -> Alerts:
         time_range_obj.init_time, pytz.timezone(utils.TZ), pytz.UTC
     )
     until_request: int | None = utils.convert_timestamp_tz(
-        time_range_obj.end_time, pytz.timezone(utils.TZ), pytz.UTC
+        # now - 2 minutes (request data from the last API request), this allows
+        # retrieving the last data from the cache instead of the database
+        time_range_obj.end_time - MINUTES_BETWEEN_UPDATES_FROM_API * 60 * 1000,  # Millis
+        pytz.timezone(utils.TZ),
+        pytz.UTC,
     )
 
     logger.info("Getting data from server")
 
     try:
         alerts_response = utils.get_data(since_request, until_request)
-
         time_range_obj.end_time = int(alerts_response.data["pub_millis"].max().timestamp() * 1000)
-
         logger.info("Data retrieved correctly, %i elements", alerts_response.data.shape[0])
 
         return alerts_response

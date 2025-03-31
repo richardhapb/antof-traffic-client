@@ -1,4 +1,3 @@
-import copy
 import datetime
 import time
 import os
@@ -22,7 +21,7 @@ from dashboard.update_data import update_data, update_data_from_api
 from dashboard.update_model import load_model
 from utils import utils
 from utils.utils import logger
-from utils.utils import TZ
+from utils.utils import TZ, MINUTES_BETWEEN_UPDATES_FROM_API
 
 model = Model()
 
@@ -33,6 +32,7 @@ app = Dash(
 )
 
 time_range = init_app(model)
+
 
 # This function initializes the schedulers
 # and ensure to initialize one per worker
@@ -47,7 +47,11 @@ def initialize_scheduler():
 
     logger.info("Initializing scheduler with worker %i", worker)
     scheduler.add_job(
-        update_data_from_api, "interval", minutes=2, id="update-data-API", replace_existing=True
+        update_data_from_api,
+        "interval",
+        minutes=MINUTES_BETWEEN_UPDATES_FROM_API,
+        id="update-data-API",
+        replace_existing=True,
     )
     scheduler.add_job(train, "interval", days=30, id="train-model", replace_existing=True)
     scheduler.add_job(
@@ -391,7 +395,7 @@ def update_graphs(kind, start_date, end_date, active_cell):
     map_data["time"] = map_data.pub_millis.apply(lambda x: x.strftime("%H:%M:%S"))
     map_data["date"] = map_data.pub_millis.apply(lambda x: x.strftime("%d-%m-%Y"))
 
-    map_data = map_data[map_data["type"] == kind] if kind and kind != 'all' else map_data
+    map_data = map_data[map_data["type"] == kind] if kind and kind != "all" else map_data
 
     map_fig = go.Figure(
         px.scatter_map(
@@ -622,7 +626,7 @@ def update_graphs(kind, start_date, end_date, active_cell):
         yaxis2=dict(
             title="Eventos de accidentes en fin de semana",
             overlaying="y",  # Overlays the axis on the first one
-            side="right",    # Positions the secondary axis
+            side="right",  # Positions the secondary axis
             showgrid=False,
             title_font=dict(size=12),
             showline=False,
