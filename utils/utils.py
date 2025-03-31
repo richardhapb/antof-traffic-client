@@ -23,7 +23,6 @@ LOGGER_FORMAT = "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
 
 ALERTS_BEGIN_TIMESTAMP = 1727740800000  # 2024/10/01
 # Time to retrieve last singleton instance between graphics
-LAST_UPDATE_THRESHOLD = 10000  # 10 seconds
 
 MINUTES_BETWEEN_UPDATES_FROM_API = 2
 
@@ -47,13 +46,11 @@ def get_data(
     if config.SERVER_URL is None:
         raise requests.ConnectionError("Server URL don't defined")
 
-    if (
-        int(datetime.datetime.now(pytz.UTC).timestamp()) * 1000  # Millis
-        - Alerts.last_update
-        <= LAST_UPDATE_THRESHOLD
-        and Alerts.last_update != 0
-    ):
-        return Alerts()
+    # If an instance exists, return it; if a new instance is created, that
+    # should be empty
+    alerts = Alerts()
+    if not alerts.is_empty:
+        return alerts
 
     args = f"since={since if since else ALERTS_BEGIN_TIMESTAMP}"
     args += f"&until={until}" if until else ""

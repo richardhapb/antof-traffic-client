@@ -9,6 +9,7 @@ import pytz
 
 from utils import utils
 
+LAST_UPDATE_THRESHOLD = 10000  # 10 seconds
 
 class AlertType(Enum):
     ACCIDENT = ("Accidentes",)
@@ -26,7 +27,7 @@ class Alerts:
         current_time = int(datetime.now(pytz.UTC).timestamp()) * 1000
         
         if (cls._instance is None or 
-            current_time - cls.last_update > utils.LAST_UPDATE_THRESHOLD):
+            current_time - cls.last_update > LAST_UPDATE_THRESHOLD):
             instance = super().__new__(cls)
             cls._instance = instance
             cls.last_update = current_time
@@ -35,16 +36,14 @@ class Alerts:
         return cls._instance
 
     def __init__(self, data: list = [], alert_type: AlertType = AlertType.ALL) -> None:
-        # Only initialize if this is a new instance
-        if not hasattr(self, 'data'):
-            self.alert_type = alert_type
-            df = pd.DataFrame(data)
-            if df.empty:
-                self.data = gpd.GeoDataFrame()
-                return
-                
-            self.data = utils.separate_coords(df)
-            self.data = utils.update_timezone(self.data, utils.TZ)
+        self.alert_type = alert_type
+        df = pd.DataFrame(data)
+        if df.empty:
+            self.data = gpd.GeoDataFrame()
+            return
+            
+        self.data = utils.separate_coords(df)
+        self.data = utils.update_timezone(self.data, utils.TZ)
 
     def __add__(self, other: "Alerts") -> gpd.GeoDataFrame:
         if not other.is_empty:
