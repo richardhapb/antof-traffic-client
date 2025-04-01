@@ -21,8 +21,8 @@ class AlertType(Enum):
 
 
 class Alerts:
-    _instance = None
-    last_update = 0
+    _instance: 'Alerts | None' = None
+    last_update: int = 0
 
     def __new__(cls, *args, **kwargs):
         current_time = int(datetime.now(pytz.UTC).timestamp()) * 1000

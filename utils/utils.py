@@ -10,12 +10,17 @@ import requests
 from geopandas.geodataframe import GeoDataFrame
 from scipy.spatial import cKDTree
 from shapely.geometry import Point
+import threading
 
 import config
 from waze.alerts import Alerts
 
 # Disable SettingWithCopyWarning
 warnings.simplefilter(action="ignore", category=pd.errors.SettingWithCopyWarning)
+
+# Using to ensure thread safety
+# when retrieving data
+_data_lock = threading.Lock()
 
 TZ = "America/Santiago"
 
@@ -47,31 +52,33 @@ def get_data(
     if config.SERVER_URL is None:
         raise requests.ConnectionError("Server URL don't defined")
 
-    # If an instance exists, return it; if a new instance is created, that
-    # should be empty
-    alerts = Alerts()
-    if not alerts.is_empty:
-        return alerts
+    # Ensure thread safety
+    with _data_lock:
+        # If an instance exists, return it; if a new instance is created, that
+        # should be empty
+        alerts = Alerts()
+        if not alerts.is_empty:
+            return alerts
 
-    args = f"since={since if since else ALERTS_BEGIN_TIMESTAMP}"
-    args += f"&until={until}" if until else ""
+        args = f"since={since if since else ALERTS_BEGIN_TIMESTAMP}"
+        args += f"&until={until}" if until else ""
 
-    url = f"{config.SERVER_URL}/get-data?{args}"
+        url = f"{config.SERVER_URL}/get-data?{args}"
 
-    try:
-        response = requests.get(url, timeout=10).json()
-        alerts = Alerts(response.get("alerts", []))
+        try:
+            response = requests.get(url, timeout=10).json()
+            alerts = Alerts(response.get("alerts", []))
 
-    except requests.JSONDecodeError:
-        logger.exception("Error decoding JSON from requests")
-    except requests.ConnectTimeout:
-        logger.exception("Server not respond")
-    except requests.ConnectionError:
-        logger.exception("Error requesting the data, ensure that server is running")
-    else:
-        return alerts
+        except requests.JSONDecodeError:
+            logger.exception("Error decoding JSON from requests")
+        except requests.ConnectTimeout:
+            logger.exception("Server not respond")
+        except requests.ConnectionError:
+            logger.exception("Error requesting the data, ensure that server is running")
+        else:
+            return alerts
 
-    raise requests.ConnectionError("Error requesting data from server")
+        raise requests.ConnectionError("Error requesting data from server")
 
 
 def generate_aggregate_data(data: pd.DataFrame) -> Alerts:

@@ -1,9 +1,10 @@
 import datetime
+import concurrent.futures
+from unittest.mock import patch
 
 import geopandas as gpd
 import pandas as pd
 import pytest
-from unittest.mock import MagicMock, patch
 import pytz
 
 from utils import utils
@@ -124,17 +125,49 @@ def test_get_data_multiple():
     delattr(Alerts._instance, "data")
     Alerts._instance = None
 
-    with patch("utils.utils.Alerts") as mock_alerts:
+    with patch("utils.utils.Alerts") as mock_alerts, patch("utils.utils.requests.get") as mock_requests:
         mock_alerts.side_effect = [alerts_empty, alerts_full]
 
         alerts = utils.get_data(since, until)
         assert mock_alerts.call_count == calls_when_request_to_server
+        mock_requests.assert_called_once()
+        mock_requests.reset_mock()
 
-    for _ in range(4):
-        alerts = utils.get_data(since, until)
-        assert isinstance(alerts, Alerts)
-        assert not alerts.is_empty
-        assert alerts.data.shape[0] > 0
+    with patch("utils.utils.requests.get") as mock_requests:
+        # Mock the http response: `Response`
+        response_mock = mock_requests.return_value
+        response_mock.json.return_value = {"alerts": generate_alerts_data()}
+
+        for _ in range(4):
+            alerts = utils.get_data(since, until)
+            assert isinstance(alerts, Alerts)
+            assert not alerts.is_empty
+            assert alerts.data.shape[0] > 0
+
+        # Only one request to the server
+        mock_requests.assert_called_once()
+
+
+def test_get_data_concurrent():
+    """Test concurrent requests for data"""
+
+    Alerts._instance = None
+    now = datetime.datetime.now(pytz.UTC)
+    since = int((now - datetime.timedelta(days=30)).timestamp()) * 1000
+    until = int((now - datetime.timedelta(minutes=MINUTES_BETWEEN_UPDATES_FROM_API)).timestamp()) * 1000
+
+    workers = 4
+
+    with patch("utils.utils.requests.get") as mock_requests:
+        mock_requests.return_value.json.return_value = {"alerts": generate_alerts_data()}
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
+            futures = [executor.submit(utils.get_data, since, until) for _ in range(4)]
+            results = [f.result() for f in futures]
+            assert len(results) == workers
+
+        # Should still only make one request despite concurrent calls
+        mock_requests.assert_called_once()
 
 
 def test_update_timezone():
