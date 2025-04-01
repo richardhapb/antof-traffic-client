@@ -1,7 +1,8 @@
 import datetime
-import time
 import os
-from typing import cast
+import time
+from collections.abc import Hashable
+from typing import Any, cast
 
 import geopandas as gpd
 import pandas as pd
@@ -20,8 +21,7 @@ from dashboard.train import train
 from dashboard.update_data import update_data, update_data_from_api
 from dashboard.update_model import load_model
 from utils import utils
-from utils.utils import logger
-from utils.utils import TZ, MINUTES_BETWEEN_UPDATES_FROM_API
+from utils.utils import MINUTES_BETWEEN_UPDATES_FROM_API, TZ, logger
 
 model = Model()
 
@@ -37,7 +37,9 @@ time_range = init_app(model)
 # This function initializes the schedulers
 # and ensure to initialize one per worker
 # because in production, multiple workers are created
-def initialize_scheduler():
+def initialize_scheduler() -> None:
+    """Initialize jobs that are executed periodically"""
+
     scheduler = BackgroundScheduler()
     worker = int(os.environ.get("APSC", "0"), 0)
 
@@ -114,26 +116,28 @@ app.layout = html.Div(
 )
 
 
-## CALLBACKS
+# CALLBACKS
 
 
-def update_ML(
+def update_ml(  # noqa: PLR0913, PLR0917
     hour: int,
     day_type: int,
     week_day: int,
     day: int,
     kind: str,
     higlighted_segment: int | None = None,
-):
+) -> tuple[go.Figure, list[dict[Hashable, Any]]]:
+    """Prepare data for updating ML in graphics"""
+
     if model is None or model.model is None:
-        return go.Figure()
+        return go.Figure(), []
 
     alerts = update_data(time_range)
 
     if alerts.is_empty:
-        return go.Figure()
+        return go.Figure(), []
 
-    g = Grouper(cast(gpd.GeoDataFrame, alerts.data), (10, 20))
+    g = Grouper(cast("gpd.GeoDataFrame", alerts.data), (10, 20))
 
     x_var = pd.DataFrame(
         {
@@ -154,11 +158,14 @@ def update_ML(
         x_var["type_ACCIDENT"] = 1
         kind = "ACCIDENT"
 
-    assert g.x_grid is not None, "Error: x_grid must not be None"
-    assert g.y_grid is not None, "Error: y_grid must not be None"
+    if g.x_grid is None or g.y_grid is None:
+        logger.error("x_grid and y_grid must not be None, %s, %s", g.x_grid, g.y_grid)
+        return go.Figure(), []
 
     # Convert coordinates to a group of points (x, y)
-    points = [Point(x, y) for x_row, y_row in zip(g.x_grid, g.y_grid) for x, y in zip(x_row, y_row)]
+    points = [
+        Point(x, y) for x_row, y_row in zip(g.x_grid, g.y_grid, strict=True) for x, y in zip(x_row, y_row, strict=True)
+    ]
 
     if points:
         gdf = gpd.GeoDataFrame(geometry=points, crs="EPSG:3857")
@@ -166,10 +173,11 @@ def update_ML(
         gdf = gdf.to_crs(epsg=4326)
 
         if gdf is None:
-            raise ValueError("Something was wrong, the geometry is null, verify the points")
+            msg = "Something was wrong, the geometry is null, verify the points"
+            raise ValueError(msg)
         # Extract converted coordinates
-        lats = sorted(list(set(gdf.geometry.y.tolist())))
-        lons = sorted(list(set(gdf.geometry.x.tolist())))
+        lats = sorted(set(gdf.geometry.y.tolist()))
+        lons = sorted(set(gdf.geometry.x.tolist()))
 
     else:
         lats = []
@@ -199,9 +207,7 @@ def update_ML(
         for i in range(len(lats) - 1)
     ]
     gdf_polygons["segment"] = [
-        f"Segmento {g.calc_quadrant(j, i)}"
-        for j in range(len(lons) - 1)
-        for i in range(len(lats) - 1)
+        f"Segmento {g.calc_quadrant(j, i)}" for j in range(len(lons) - 1) for i in range(len(lats) - 1)
     ]
     fig = go.Figure(
         go.Choroplethmapbox(
@@ -223,12 +229,8 @@ def update_ML(
         selected_poly = gdf_polygons[gdf_polygons["segment"] == f"Segmento {higlighted_segment}"]
 
         # Extract the coordinates
-        lat_coords = selected_poly.geometry.apply(
-            lambda poly: [point[1] for point in poly.exterior.coords]
-        ).values[0]
-        lon_coords = selected_poly.geometry.apply(
-            lambda poly: [point[0] for point in poly.exterior.coords]
-        ).values[0]
+        lat_coords = selected_poly.geometry.apply(lambda poly: [point[1] for point in poly.exterior.coords]).values[0]
+        lon_coords = selected_poly.geometry.apply(lambda poly: [point[0] for point in poly.exterior.coords]).values[0]
 
         fig.add_trace(
             go.Scattermapbox(
@@ -237,7 +239,7 @@ def update_ML(
                 mode="lines",
                 fill="toself",
                 fillcolor="rgba(255, 0, 0, 0.3)",
-                line=dict(color="red", width=2),
+                line={"color": "red", "width": 2},
                 hoverinfo="skip",
             )
         )
@@ -245,24 +247,24 @@ def update_ML(
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="#ccc"),
-        mapbox=dict(
-            style="carto-darkmatter",
-            center=dict(
-                lat=lats[int(len(lats) / 2)],
-                lon=lons[int(len(lons) / 2)],
-            ),
-            zoom=11.5,
-        ),
-        title=dict(
-            text=f"Modelo predictivo:<br>Probabilidad de {names[kind].lower()}",
-            font=dict(
-                color="#ccc",
-                weight=600,
-                family="Verdana",
-                size=20,
-            ),
-        ),
+        font={"color": "#ccc"},
+        mapbox={
+            "style": "carto-darkmatter",
+            "center": {
+                "lat": lats[int(len(lats) / 2)],
+                "lon": lons[int(len(lons) / 2)],
+            },
+            "zoom": 11.5,
+        },
+        title={
+            "text": f"Modelo predictivo:<br>Probabilidad de {names[kind].lower()}",
+            "font": {
+                "color": "#ccc",
+                "weight": 600,
+                "family": "Verdana",
+                "size": 20,
+            },
+        },
         margin={"r": 0, "t": 95, "l": 0, "b": 0},
     )
 
@@ -295,17 +297,21 @@ def update_ML(
         Input("table", "active_cell"),
     ],
 )
-def update_graphs(kind, start_date, end_date, active_cell):
-    STANDARD_RETURN = (
+def update_graphs(
+    kind: str, start_date: str | None, end_date: str | None, active_cell: list[dict[Hashable, Any]] | None
+) -> tuple[go.Figure, go.Figure, list[dict[Hashable, Any]], go.Figure, go.Figure, datetime.datetime]:
+    """Update all exploratory graphics"""
+
+    default_return = (
         go.Figure(),
         go.Figure(),
         [],
-        None,
+        go.Figure(),
         go.Figure(),
         datetime.datetime.now(pytz.timezone(TZ)),
     )
     if start_date is None or end_date is None:
-        return STANDARD_RETURN
+        return default_return
 
     start = (
         (datetime.datetime.fromisoformat(start_date))
@@ -324,18 +330,16 @@ def update_graphs(kind, start_date, end_date, active_cell):
     alerts = update_data(time_range)
 
     if alerts.is_empty:
-        return STANDARD_RETURN
+        return default_return
 
     perf_init = time.perf_counter()
 
     if end <= start:
-        end = start.timestamp() + (23 * 60 * 60 + 60**2 * 59) * 1000
+        end = start + datetime.timedelta(hours=23, minutes=59)  # One day of difference
 
     filtered_alerts = alerts.data
 
-    filtered_alerts = filtered_alerts[
-        (filtered_alerts["pub_millis"] >= start) & (filtered_alerts["pub_millis"] <= end)
-    ]
+    filtered_alerts = filtered_alerts[(filtered_alerts["pub_millis"] >= start) & (filtered_alerts["pub_millis"] <= end)]
 
     scatter_data_acc = filtered_alerts[filtered_alerts["type"] == "ACCIDENT"]
     scatter_data_acc = utils.hourly_group(scatter_data_acc, do_sum=True)
@@ -344,12 +348,7 @@ def update_graphs(kind, start_date, end_date, active_cell):
     scatter_data_jam = utils.hourly_group(scatter_data_jam, do_sum=True)
 
     if kind is not None and kind != "all":
-        streets_data = (
-            filtered_alerts[filtered_alerts["type"] == kind]
-            .groupby("street")["type"]
-            .count()
-            .reset_index()
-        )
+        streets_data = filtered_alerts[filtered_alerts["type"] == kind].groupby("street")["type"].count().reset_index()
     else:
         streets_data = filtered_alerts.groupby("street")["type"].count().reset_index()
 
@@ -360,13 +359,10 @@ def update_graphs(kind, start_date, end_date, active_cell):
 
     if active_cell is not None:
         filtered_alerts = filtered_alerts.loc[
-            filtered_alerts["street"] == streets_data.iloc[active_cell["row"]]["Calle"]
+            filtered_alerts["street"] == streets_data.iloc[active_cell["row"]]["Calle"]  # type: ignore
         ]
 
-    if kind == "all":
-        events = filtered_alerts
-    else:
-        events = filtered_alerts[filtered_alerts["type"] == kind]
+    events = filtered_alerts if kind == "all" else filtered_alerts[filtered_alerts["type"] == kind]
 
     hourly = utils.hourly_group(events).reset_index().copy()
     hourly = pd.melt(
@@ -386,10 +382,11 @@ def update_graphs(kind, start_date, end_date, active_cell):
         value_name="events",
     )
 
-    map_data = cast(gpd.GeoDataFrame, filtered_alerts)
-    map_data = utils.freq_nearby(map_data, nearby_meters=200)
+    map_data = cast("gpd.GeoDataFrame", filtered_alerts)
+    utils.freq_nearby(map_data, nearby_meters=200)
     if map_data is None:
-        raise ValueError("Map data is empty")
+        msg = "Map data is empty"
+        raise ValueError(msg)
     map_data["freq"] = map_data.apply(lambda x: x["freq"] if x["freq"] > 0 else 1, axis=1)
 
     map_data["time"] = map_data.pub_millis.apply(lambda x: x.strftime("%H:%M:%S"))
@@ -430,12 +427,12 @@ def update_graphs(kind, start_date, end_date, active_cell):
                 opacity=0.8,
                 name={"f": "Fin de semana / Feriado", "s": "Semana"}[day_type],
                 marker_color={"f": "salmon", "s": "skyblue"}[day_type],
-                hoverlabel=dict(
-                    bgcolor="lightblue",
-                    font_size=12,
-                    font_family="Arial",
-                    font_color="black",
-                ),
+                hoverlabel={
+                    "bgcolor": "lightblue",
+                    "font_size": 12,
+                    "font_family": "Arial",
+                    "font_color": "black",
+                },
             ),
         )
 
@@ -447,34 +444,34 @@ def update_graphs(kind, start_date, end_date, active_cell):
     hourly_fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="#ccc"),
+        font={"color": "#ccc"},
         autosize=True,
         width=None,
-        title=dict(
-            text=f"Promedio de {names[kind].lower()} por hora del día",
-            font=dict(
-                color="#ccc",
-                weight=600,
-                family="Verdana",
-                size=18,
-            ),
-            pad=dict(b=30, l=50),
-            x=0.5,
-        ),
+        title={
+            "text": f"Promedio de {names[kind].lower()} por hora del día",
+            "font": {
+                "color": "#ccc",
+                "weight": 600,
+                "family": "Verdana",
+                "size": 18,
+            },
+            "pad": {"b": 30, "l": 50},
+            "x": 0.5,
+        },
         grid_ygap=1,
         # nogrid
-        yaxis=dict(title=f"Promedio de {names[kind].lower()} reportados", showgrid=False),
-        xaxis=dict(title="Hora del día", showgrid=False),
+        yaxis={"title": f"Promedio de {names[kind].lower()} reportados", "showgrid": False},
+        xaxis={"title": "Hora del día", "showgrid": False},
         barmode="group",
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="right",
-            x=1,
-            bgcolor="rgb(37, 37, 37)",
-        ),
-        margin=dict(t=120, b=20, l=100, r=30),
+        legend={
+            "orientation": "h",
+            "yanchor": "bottom",
+            "y": 1.02,
+            "xanchor": "right",
+            "x": 1,
+            "bgcolor": "rgb(37, 37, 37)",
+        },
+        margin={"t": 120, "b": 20, "l": 100, "r": 30},
     )
 
     daily_fig = go.Figure()
@@ -486,12 +483,12 @@ def update_graphs(kind, start_date, end_date, active_cell):
                 opacity=0.8,
                 name={"f": "Fin de semana / Feriado", "s": "Semana"}[day_type],
                 marker_color={"f": "rgb(210, 41, 252)", "s": "rgb(34, 243, 173)"}[day_type],
-                hoverlabel=dict(
-                    bgcolor="lightgreen",
-                    font_size=12,
-                    font_family="Arial",
-                    font_color="black",
-                ),
+                hoverlabel={
+                    "bgcolor": "lightgreen",
+                    "font_size": 12,
+                    "font_family": "Arial",
+                    "font_color": "black",
+                },
             ),
         )
 
@@ -503,68 +500,66 @@ def update_graphs(kind, start_date, end_date, active_cell):
     daily_fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="#ccc"),
+        font={"color": "#ccc"},
         autosize=True,
         width=None,
-        title=dict(
-            text=f"Promedio de {names[kind].lower()} por día del mes",
-            font=dict(
-                color="#ccc",
-                weight=600,
-                family="Verdana",
-                size=18,
-            ),
-            pad=dict(b=30, l=50),
-            x=0.5,
-        ),
+        title={
+            "text": f"Promedio de {names[kind].lower()} por día del mes",
+            "font": {
+                "color": "#ccc",
+                "weight": 600,
+                "family": "Verdana",
+                "size": 18,
+            },
+            "pad": {"b": 30, "l": 50},
+            "x": 0.5,
+        },
         grid_ygap=1,
         # nogrid
-        yaxis=dict(title=f"Promedio de {names[kind].lower()} reportados", showgrid=False),
-        xaxis=dict(title="Día del mes", showgrid=False),
+        yaxis={"title": f"Promedio de {names[kind].lower()} reportados", "showgrid": False},
+        xaxis={"title": "Día del mes", "showgrid": False},
         barmode="group",
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="right",
-            x=1,
-            bgcolor="rgb(37, 37, 37)",
-        ),
-        margin=dict(t=120, b=20, l=100, r=30),
+        legend={
+            "orientation": "h",
+            "yanchor": "bottom",
+            "y": 1.02,
+            "xanchor": "right",
+            "x": 1,
+            "bgcolor": "rgb(37, 37, 37)",
+        },
+        margin={"t": 120, "b": 20, "l": 100, "r": 30},
     )
 
     map_fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        hoverlabel_font=dict(color="#fff"),
+        hoverlabel_font={"color": "#fff"},
         showlegend=False,
-        title=dict(
-            text=f"Reportes de {names[kind].lower()}",
-            font=dict(
-                color="#ccc",
-                weight=600,
-                family="Verdana",
-                size=20,
-            ),
-            xanchor="left",
-            yanchor="top",
-            pad=dict(b=30, l=50),
-        ),
-        margin=dict(t=80, b=20, l=40, r=30),
+        title={
+            "text": f"Reportes de {names[kind].lower()}",
+            "font": {
+                "color": "#ccc",
+                "weight": 600,
+                "family": "Verdana",
+                "size": 20,
+            },
+            "xanchor": "left",
+            "yanchor": "top",
+            "pad": {"b": 30, "l": 50},
+        },
+        margin={"t": 80, "b": 20, "l": 40, "r": 30},
         map_style="dark",
     )
 
     if kind == "all":
         map_fig.update_layout(
             showlegend=True,
-            legend_font=dict(color="#ccc"),
+            legend_font={"color": "#ccc"},
         )
 
-    ## SCATTER PLOT
+    # SCATTER PLOT
 
-    scatter_data = scatter_data_jam.join(
-        scatter_data_acc, on="hour", lsuffix="_jam", rsuffix="_accident"
-    ).reset_index()
+    scatter_data = scatter_data_jam.join(scatter_data_acc, on="hour", lsuffix="_jam", rsuffix="_accident").reset_index()
     scatter_data = scatter_data[
         (scatter_data["s_jam"] > 0)
         & (scatter_data["s_accident"] > 0)
@@ -579,11 +574,11 @@ def update_graphs(kind, start_date, end_date, active_cell):
             y=scatter_data["s_accident"],
             mode="markers",
             # "Bubble" style
-            marker=dict(
-                color="rgba(54, 170, 263, 0.6)",
-                size=20,
-                line=dict(width=1, color="DarkSlateGrey"),
-            ),
+            marker={
+                "color": "rgba(54, 170, 263, 0.6)",
+                "size": 20,
+                "line": {"width": 1, "color": "DarkSlateGrey"},
+            },
             name="Día de semana",
         )
     )
@@ -594,11 +589,11 @@ def update_graphs(kind, start_date, end_date, active_cell):
             y=scatter_data["f_accident"],
             mode="markers",
             # "Bubble" style
-            marker=dict(
-                color="rgba(170, 54, 263, 0.6)",
-                size=20,
-                line=dict(width=1, color="DarkSlateGrey"),
-            ),
+            marker={
+                "color": "rgba(170, 54, 263, 0.6)",
+                "size": 20,
+                "line": {"width": 1, "color": "DarkSlateGrey"},
+            },
             name="Fin de semana / Feriado",
             xaxis="x2",
             yaxis="y2",
@@ -608,56 +603,56 @@ def update_graphs(kind, start_date, end_date, active_cell):
     scatter_fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(
-            color="#ccc",
-            weight=500,
-            family="Verdana",
-            size=14,
-        ),
-        xaxis2=dict(
-            title="Eventos de congestión en fin de semana",
-            overlaying="x",
-            side="top",
-            showgrid=False,
-            title_font=dict(size=12),
-            showline=False,
-            zeroline=False,
-        ),
-        yaxis2=dict(
-            title="Eventos de accidentes en fin de semana",
-            overlaying="y",  # Overlays the axis on the first one
-            side="right",  # Positions the secondary axis
-            showgrid=False,
-            title_font=dict(size=12),
-            showline=False,
-            zeroline=False,
-        ),
-        hoverlabel_font=dict(color="#fff"),
+        font={
+            "color": "#ccc",
+            "weight": 500,
+            "family": "Verdana",
+            "size": 14,
+        },
+        xaxis2={
+            "title": "Eventos de congestión en fin de semana",
+            "overlaying": "x",
+            "side": "top",
+            "showgrid": False,
+            "title_font": {"size": 12},
+            "showline": False,
+            "zeroline": False,
+        },
+        yaxis2={
+            "title": "Eventos de accidentes en fin de semana",
+            "overlaying": "y",  # Overlays the axis on the first one
+            "side": "right",  # Positions the secondary axis
+            "showgrid": False,
+            "title_font": {"size": 12},
+            "showline": False,
+            "zeroline": False,
+        },
+        hoverlabel_font={"color": "#fff"},
         title="Relación entre congestión de tráfico y accidentes",
-        xaxis=dict(
-            title="Eventos de congestión día de semana",
-            showgrid=False,
-            title_font=dict(size=12),
-        ),
-        yaxis=dict(
-            title="Eventos de accidente día de semana",
-            showgrid=False,
-            title_font=dict(size=12),
-        ),
+        xaxis={
+            "title": "Eventos de congestión día de semana",
+            "showgrid": False,
+            "title_font": {"size": 12},
+        },
+        yaxis={
+            "title": "Eventos de accidente día de semana",
+            "showgrid": False,
+            "title_font": {"size": 12},
+        },
         showlegend=True,
-        margin=dict(t=180),
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=-0.45,
-            xanchor="right",
-            x=1,
-            bgcolor="rgb(37, 37, 37)",
-            font=dict(
-                size=10,
-                color="white",
-            ),
-        ),
+        margin={"t": 180},
+        legend={
+            "orientation": "h",
+            "yanchor": "bottom",
+            "y": -0.45,
+            "xanchor": "right",
+            "x": 1,
+            "bgcolor": "rgb(37, 37, 37)",
+            "font": {
+                "size": 10,
+                "color": "white",
+            },
+        },
     )
 
     logger.info("Update graphs callback completed.")
@@ -678,30 +673,39 @@ def update_graphs(kind, start_date, end_date, active_cell):
         Input("table_ml", "page_size"),
     ],
 )
-def update_ml_graphs(kind, date_value, hour, active_cell, table_data, page_current, page_size):
+def update_ml_graphs(  # noqa: PLR0913, PLR0917
+    kind: str | None,
+    date_value: str,
+    hour: int,
+    active_cell: dict | None,
+    table_data: list[dict[Hashable, Any]] | None,
+    page_current: int,
+    page_size: int,
+) -> tuple[go.Figure, list[dict[Hashable, Any]]]:
+    """Update ML graphs with filters selected by user"""
+
     alerts = update_data(time_range)
 
     if alerts.is_empty:
         return go.Figure(), []
     if kind is None:
         kind = "ACCIDENT"
-    if date_value is None:
-        date_ml = datetime.date.today()
-    else:
-        date_ml = datetime.date.fromisoformat(date_value)
+
+    date_ml = datetime.date.today() if not date_value else datetime.date.fromisoformat(date_value)
 
     perf_init = time.perf_counter()
 
     day = date_ml.day
     week_day = date_ml.weekday()
-    day_type = 0 if (date_ml.weekday() >= 5) else 1  # TODO: Introduce holidays here
+    saturday = 5
+    day_type = 0 if (date_ml.weekday() >= saturday) else 1  # TODO: Introduce holidays here
 
     segment = None
     if table_data and active_cell:
         global_index = page_current * page_size + active_cell["row"]
         segment = table_data[global_index]["Segmento"]
 
-    group_fig, table_data = update_ML(hour, day_type, week_day, day, kind, segment)
+    group_fig, table_data = update_ml(hour, day_type, week_day, day, kind, segment)
 
     logger.info("Update ML graphs callback completed.")
     logger.info("Process time -> %.3fs", time.perf_counter() - perf_init)
@@ -713,7 +717,8 @@ def update_ml_graphs(kind, date_value, hour, active_cell, table_data, page_curre
     [Output("table_last", "data"), Output("date_range", "max_date_allowed")],
     Input("dd_type", "value"),
 )
-def update_last_events(kind):
+def update_last_events(kind: str) -> tuple[list[dict[Hashable, Any]], datetime.datetime]:
+    """Update the last 20 events in table"""
     alerts = update_data(time_range)
     if alerts.is_empty:
         return [], datetime.datetime.now(pytz.timezone(TZ))
@@ -722,14 +727,12 @@ def update_last_events(kind):
     last_events["date"] = last_events.pub_millis.apply(lambda x: x.strftime("%d-%m-%Y"))
     last_events["date"] = last_events.pub_millis.dt.strftime("%d/%m/%Y")
 
-    last_events["hour"] = last_events.apply(
-        lambda row: f"{int(row['hour']):02}:{int(row['minute']):02}", axis=1
-    )
+    last_events["hour"] = last_events.apply(lambda row: f"{int(row['hour']):02}:{int(row['minute']):02}", axis=1)
 
     last_events = last_events[["type", "group", "hour", "date", "street"]]
 
     if last_events.shape[0] == 0:
-        return [], [datetime.datetime.now(pytz.timezone(TZ))]
+        return [], datetime.datetime.now(pytz.timezone(TZ))
 
     if kind is not None and kind != "all":
         last_events = last_events[last_events["type"] == kind]
@@ -754,13 +757,15 @@ def update_last_events(kind):
 
 # Clear filter in table selections
 @app.callback(Output("table_ml", "active_cell"), Input("table_ml_clear", "n_clicks"))
-def clear_ml(_):
-    return None
+def clear_ml(_: int) -> None:
+    """Clear filters on ML table"""
+    return
 
 
 @app.callback(Output("table", "active_cell"), Input("table_clear", "n_clicks"))
-def clear(_):
-    return None
+def clear(_: int) -> None:
+    """Clear filters on ML table"""
+    return
 
 
 # Show instructions button

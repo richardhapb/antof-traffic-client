@@ -6,22 +6,27 @@ from xgboost import XGBClassifier
 
 from analytics.ml import ML, init_mlflow
 from utils import utils
-from utils.utils import TZ, logger
+from utils.utils import TZ, logger, ALERTS_BEGIN_TIMESTAMP
 
 
 def train() -> bool:
+    """Trigger the model trainning"""
+
     init_mlflow()
 
-    logger.info("Extracting data from database")
+    logger.info("Extracting data from server")
+
+    now_millis = int(datetime.now(pytz.UTC).timestamp()) * 1000
 
     try:
-        alerts = utils.get_data()
+        alerts = utils.get_data(ALERTS_BEGIN_TIMESTAMP, now_millis)  # Get all data
     except requests.ConnectionError:
         logger.exception("Error retrieving data from server")
         return False
 
     logger.info("Data found: %i", alerts.data.shape[1])
 
+    # Best params tested with GridSearch
     model = XGBClassifier(
         learning_rate=0.1,
         random_state=42,
@@ -45,7 +50,6 @@ def train() -> bool:
 
     logger.info("Model trained")
 
-
     ml.log_model_params(
         hash_encode=ml.hash,
         ohe=ml.ohe,
@@ -59,6 +63,7 @@ def train() -> bool:
     logger.info("Model registered")
 
     return True
+
 
 if __name__ == "__main__":
     try:

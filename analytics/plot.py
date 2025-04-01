@@ -1,3 +1,8 @@
+"""
+Used only to generate plots for data exploration; this module is not used as an element
+for the dashboard or anything related. It is not optimized and is used in specific cases
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 from utils import utils
@@ -7,7 +12,10 @@ from matplotlib.figure import Figure
 
 
 class Plot:
-    def heat_map(self, data: gpd.GeoDataFrame)->Figure:
+    """Class for manage the plots and explore data"""
+
+    @staticmethod
+    def heat_map(data: gpd.GeoDataFrame) -> Figure:
         event = data.copy()
 
         if event is None:
@@ -23,12 +31,14 @@ class Plot:
 
         fig, ax = plt.subplots()
         fig.set_size_inches((4.5, 9.5))
-        sc = event["geometry"].plot(ax=ax, alpha=0.5, cmap="GnBu") 
-        cx.add_basemap(ax, source=cx.providers.OpenStreetMap.Mapnik) # type: ignore
+        sc = event["geometry"].plot(ax=ax, alpha=0.5, cmap="GnBu")
+        cx.add_basemap(ax, source=cx.providers.OpenStreetMap.Mapnik)  # type: ignore
 
         # Color bar
-        cbar = sc.get_figure().colorbar(sc.collections[0], ax=ax)
-        cbar.set_label("Frecuencia")
+        sc_fig = sc.get_figure()
+        if sc_fig:
+            cbar = sc_fig.colorbar(sc.collections[0], ax=ax)
+            cbar.set_label("Frecuencia")
         ax.set_xlabel("Longitud")
         ax.set_ylabel("Latitud")
         plt.xticks(rotation=45)
@@ -38,10 +48,9 @@ class Plot:
 
         return fig
 
-    def hourly_report(self, data: gpd.GeoDataFrame)->Figure:
-        """
-        Events repots by hour of the day
-        """
+    @staticmethod
+    def hourly_report(data: gpd.GeoDataFrame) -> Figure:
+        """Events repots by hour of the day"""
 
         if data.empty:
             return plt.figure()
@@ -94,10 +103,9 @@ class Plot:
 
         return fig
 
-    def daily_report(self, data: gpd.GeoDataFrame)->Figure:
-        """
-        Events reports by day of the week
-        """
+    @staticmethod
+    def daily_report(data: gpd.GeoDataFrame) -> Figure:
+        """Events reports by day of the week"""
 
         if data.empty:
             return plt.figure()

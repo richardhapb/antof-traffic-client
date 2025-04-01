@@ -3,8 +3,9 @@ from dash import html, dcc, dash_table
 from dashboard.models import Model
 
 
-def get_ml_params_component(model: Model):
-    ml_params = html.Div(
+def get_ml_params_component(model: Model) -> html.Div:
+    """ML parameters template, load the model, and display the information"""
+    return html.Div(
         [
             html.Div(
                 [
@@ -82,10 +83,7 @@ def get_ml_params_component(model: Model):
                             html.Button("Limpiar selección", id="table_ml_clear"),
                             dash_table.DataTable(
                                 id="table_ml",
-                                columns=[
-                                    {"name": i, "id": i}
-                                    for i in ["Segmento", "Probabilidad"]
-                                ],
+                                columns=[{"name": i, "id": i} for i in ["Segmento", "Probabilidad"]],
                                 data=[],
                                 filter_action="native",
                                 sort_action="native",
@@ -139,5 +137,3 @@ def get_ml_params_component(model: Model):
         ],
         className="plot-container",
     )
-
-    return ml_params

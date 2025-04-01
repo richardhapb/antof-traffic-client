@@ -1,12 +1,15 @@
 import datetime
-from dash import html, dcc
+
+from dash import dcc, html
 
 today = datetime.datetime.today()
 
 MIN_DATE = datetime.datetime(year=2024, month=10, day=1)
 
-def get_header():
-    header = html.Div(
+
+def get_header() -> html.Div:
+    """Header template"""
+    return html.Div(
         [
             html.H1("Inteligencia de Tráfico para la Gestión Urbana en Antofagasta"),
             html.H2(
@@ -79,5 +82,3 @@ def get_header():
         ],
         className="header",
     )
-
-    return header

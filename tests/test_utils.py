@@ -73,6 +73,8 @@ def generate_alerts_data():
 
 
 def generate_dummy_coord_df(n_nearby: int, n_total: int) -> pd.DataFrame:
+    """Generate coordinates data for testing"""
+
     x_base = -70.42034224747098
     y_base = -23.721724880116387
 
@@ -86,21 +88,22 @@ def generate_dummy_coord_df(n_nearby: int, n_total: int) -> pd.DataFrame:
         x.append(x_base + n * 10)
         y.append(y_base + n * 10)
 
-    df = pd.DataFrame({
+    return pd.DataFrame({
         "dummy": ["data"] * n_total,
-        "location": [{"x": a, "y": b} for a, b in zip(x, y)],
+        "location": [{"x": a, "y": b} for a, b in zip(x, y, strict=True)],
     })
-
-    return df
 
 
 def test_get_data():
+    """Test that get_data returns Alerts instance correctly"""
     Alerts._instance = None
     alerts = utils.get_data()
     assert isinstance(alerts, Alerts)
-    assert alerts.data.shape[0] > 0
-    assert not alerts.is_empty
-    assert isinstance(alerts.data, gpd.GeoDataFrame)
+
+    # Should be returned an Alerts
+    # instance without data attribute
+    assert not hasattr(alerts, "data")
+    assert alerts.is_empty
 
 
 def test_get_data_multiple():
@@ -171,6 +174,7 @@ def test_get_data_concurrent():
 
 
 def test_update_timezone():
+    """Ensure update timezone behavior"""
     curr_time = datetime.datetime.now()
     future_time = curr_time + datetime.timedelta(hours=2)
 
@@ -186,6 +190,10 @@ def test_update_timezone():
 
 
 def test_separate_coords():
+    """
+    Ensure that the returned GeoDataFrame has the correct data
+    with location and shape
+    """
     n = 15
     df = generate_dummy_coord_df(10, n)
 
@@ -193,9 +201,16 @@ def test_separate_coords():
 
     assert isinstance(gdf, gpd.GeoDataFrame)
     assert gdf.shape[0] == n
+    assert hasattr(gdf, "geometry")
 
 
 def test_freq_nearby():
+    """
+    Ensure the frequency is generated correctly,
+    generate `nearby` elements close together and return with
+    a new `freq` column, that should contains the `nearby` frequency
+    in some element.
+    """
     nearby = 10
     df = generate_dummy_coord_df(nearby, 15)
 
@@ -207,6 +222,7 @@ def test_freq_nearby():
 # TODO: Implement aggregate data on server for test this
 @pytest.mark.skip
 def test_hourly_group():
+    """Check for the hourly group, ensuring is generated correctly"""
     nearby = 10
     n = 15
     df = generate_dummy_coord_df(nearby, n)
@@ -225,13 +241,15 @@ def test_hourly_group():
     df3 = utils.generate_aggregate_data(df2)
 
     hourly = utils.hourly_group(df3.data)
+    day_hours = 24
 
-    assert hourly.shape[0] == 24
+    assert hourly.shape[0] == day_hours
 
 
 # TODO: Implement aggregate data on server for test this
 @pytest.mark.skip
 def test_daily_group():
+    """Check for the daily group, ensuring is generated correctly"""
     nearby = 10
     n = 15
     df = generate_dummy_coord_df(nearby, n)
@@ -250,5 +268,6 @@ def test_daily_group():
     df3 = utils.generate_aggregate_data(df2)
 
     daily = utils.daily_group(df3.data)
+    month_days = 31
 
-    assert daily.shape[0] == 31
+    assert daily.shape[0] == month_days

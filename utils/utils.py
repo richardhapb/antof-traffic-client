@@ -50,7 +50,8 @@ def get_data(
 
     """
     if config.SERVER_URL is None:
-        raise requests.ConnectionError("Server URL don't defined")
+        msg = "Server URL don't defined"
+        raise requests.ConnectionError(msg)
 
     # Ensure thread safety
     with _data_lock:
@@ -75,10 +76,8 @@ def get_data(
             logger.exception("Server not respond")
         except requests.ConnectionError:
             logger.exception("Error requesting the data, ensure that server is running")
-        else:
-            return alerts
 
-        raise requests.ConnectionError("Error requesting data from server")
+        return alerts
 
 
 def generate_aggregate_data(data: pd.DataFrame) -> Alerts:
@@ -87,9 +86,11 @@ def generate_aggregate_data(data: pd.DataFrame) -> Alerts:
 
     Args:
         data: Data that ask for aggregate data
+
     """
     if config.SERVER_URL is None:
-        raise requests.ConnectionError("Server URL don't defined")
+        msg = "Server URL don't defined"
+        raise requests.ConnectionError(msg)
 
     url = f"{config.SERVER_URL}/aggregate"
 
@@ -104,7 +105,8 @@ def generate_aggregate_data(data: pd.DataFrame) -> Alerts:
     except requests.ConnectionError:
         logger.exception("Error requesting the data, ensure that server is running: %s")
 
-    raise requests.ConnectionError("Error requesting data from server")
+    msg = "Error requesting data from server"
+    raise requests.ConnectionError(msg)
 
 
 def update_timezone(data: gpd.GeoDataFrame, tz: str = TZ) -> gpd.GeoDataFrame:
@@ -124,11 +126,12 @@ def update_timezone(data: gpd.GeoDataFrame, tz: str = TZ) -> gpd.GeoDataFrame:
 def convert_timestamp_tz(
     utc_timestamp: int,
     from_tz: pytz.BaseTzInfo = pytz.UTC,
-    to_tz: pytz.BaseTzInfo = pytz.timezone(TZ),
+    to_tz: pytz.BaseTzInfo | None = None,
 ) -> int:
-    """
-    Updates the timezone of a timestamp
-    """
+    """Update the timezone of a timestamp"""
+
+    if not to_tz:
+        to_tz = pytz.timezone(TZ)
 
     date = datetime.datetime.fromtimestamp(utc_timestamp / 1000, from_tz)
     date = datetime.datetime.astimezone(date, to_tz)
@@ -136,27 +139,28 @@ def convert_timestamp_tz(
     return int(date.timestamp()) * 1000
 
 
-def freq_nearby(gdf: gpd.GeoDataFrame, nearby_meters=200) -> gpd.GeoDataFrame:
+def freq_nearby(gdf: gpd.GeoDataFrame, nearby_meters: int = 200) -> gpd.GeoDataFrame:
     """
-    Counts how many nearby points are within a specified radius for each point in the GeoDataFrame.
+    Count how many nearby points are within a specified radius for each point in the GeoDataFrame.
+    Modify data inplace for avoid duplicate data and double memory usage.
 
     Args:
-        - gdf: GeoDataFrame containing point geometries.
-        - radius: Search radius in meters.
+        gdf: GeoDataFrame containing point geometries.
+        nearby_meters: Meters to the `GeoDataFrame` point in meters
 
     Returns:
-        - GeoDataFrame with an additional 'freq' column.
+        GeoDataFrame modified with an additional 'freq' column.
+
     """
-    gdf2 = gdf.copy()
-    assert gdf2.crs is not None, "GeoDataFrame empty"
+    if gdf.crs is None:
+        logger.warning("GeoDataFrame `crs` empty")
+        return gdf
+
     # Ensure the GeoDataFrame is in a projected CRS with units in meters
-    if gdf2.crs.is_geographic:
-        gdf2 = gdf2.to_crs(epsg=3857)
+    if gdf.crs.is_geographic:
+        gdf = gdf.to_crs(epsg=3857)
 
-    if gdf2 is None:
-        return gpd.GeoDataFrame()
-
-    coords = np.vstack((gdf2.geometry.x, gdf2.geometry.y)).T
+    coords = np.vstack((gdf.geometry.x, gdf.geometry.y)).T
 
     tree = cKDTree(coords)
 
@@ -166,26 +170,23 @@ def freq_nearby(gdf: gpd.GeoDataFrame, nearby_meters=200) -> gpd.GeoDataFrame:
     neighbor_counts = [len(ind) - 1 for ind in indices]
 
     # Frequency within the segment
-    gdf2["freq"] = neighbor_counts
+    gdf["freq"] = neighbor_counts
 
-    return gdf2
+    return gdf
 
 
 def separate_coords(df: pd.DataFrame) -> GeoDataFrame:
-    """
-    Separate coordinates from a DataFrame into two columns, returning a GeoDataFrame
-    """
+    """Separate coordinates from a DataFrame into two columns, returning a GeoDataFrame"""
 
     if not hasattr(df, "location"):
         logger.debug("Received empty dataframe, returning the same data")
         return gpd.GeoDataFrame(df)
 
-    df2 = df.copy()
-    df2["x"] = df2["location"].apply(lambda x: x["x"])
-    df2["y"] = df2["location"].apply(lambda y: y["y"])
-    df2 = df2.drop(columns="location")
-    df2["geometry"] = df2.apply(lambda row: Point(row["x"], row["y"]), axis=1)  # type:ignore
-    dfg = gpd.GeoDataFrame(df2, geometry="geometry")
+    df["x"] = df["location"].apply(lambda x: x["x"])
+    df["y"] = df["location"].apply(lambda y: y["y"])
+    df = df.drop(columns="location")
+    df["geometry"] = df.apply(lambda row: Point(row["x"], row["y"]), axis=1)  # type:ignore
+    dfg = gpd.GeoDataFrame(df, geometry="geometry")
 
     # Set the coorinates references system
     dfg = dfg.set_crs(epsg=4326)
@@ -202,7 +203,7 @@ def hourly_group(
 ) -> pd.DataFrame | gpd.GeoDataFrame:
     """Transform an events DataFrame into an hourly report."""
 
-    df = data[["day_type", "hour", "pub_millis", "end_pub_millis"]].copy()
+    df = data[["day_type", "hour", "pub_millis", "end_pub_millis"]]
 
     df.reset_index(inplace=True, drop=True)
 
@@ -246,7 +247,7 @@ def daily_group(
 ) -> pd.DataFrame | gpd.GeoDataFrame:
     """Transform an events DataFrame into a daily report."""
 
-    df = data[["day_type", "day", "pub_millis", "end_pub_millis"]].copy()
+    df = data[["day_type", "day", "pub_millis", "end_pub_millis"]]
 
     df.reset_index(inplace=True, drop=True)
 

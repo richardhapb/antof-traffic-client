@@ -1,3 +1,4 @@
+import gc
 from datetime import datetime
 from enum import Enum
 from typing import cast
@@ -13,6 +14,8 @@ LAST_UPDATE_THRESHOLD = 4000  # 4 seconds
 
 
 class AlertType(Enum):
+    """Types of accidents according to the Waze API"""
+
     ACCIDENT = ("Accidentes",)
     JAM = ("Congestión",)
     HAZARD = ("Peligros",)
@@ -21,13 +24,31 @@ class AlertType(Enum):
 
 
 class Alerts:
-    _instance: 'Alerts | None' = None
+    """
+    Main class where all the Alerts data is stored. This is a Singleton class that ensures
+    ensures that the data is stored once and avoids duplicates, as the dataset is large
+    requires a large amount of memory
+
+    On the first call, the Alerts are initialized if data is passed as an argument in the constructor; otherwise,
+    is initialized without a `data` attribute. If data is passed, it is initialized and returned with
+    `data` attribute contains a `GeoDataFrame` with geodata
+
+    If the `LAST_UPDATE_THRESHOLD` is exceeded, the data is initialized again, allowing for data updates when
+    new data is available from the server
+    """
+
+    _instance: "Alerts | None" = None
     last_update: int = 0
 
     def __new__(cls, *args, **kwargs):
         current_time = int(datetime.now(pytz.UTC).timestamp()) * 1000
 
         if cls._instance is None or current_time - cls.last_update > LAST_UPDATE_THRESHOLD:
+            # Ensure memory is freed as soon as possible
+            if cls._instance is not None:
+                del cls._instance
+                gc.collect()
+
             instance = super().__new__(cls)
             cls._instance = instance
             cls.last_update = current_time
@@ -42,12 +63,17 @@ class Alerts:
             self.alert_type = alert_type
             df = pd.DataFrame(data)
 
-            self.data = utils.separate_coords(df)
+            self.data: gpd.GeoDataFrame = utils.separate_coords(df)
             self.data = utils.update_timezone(self.data, utils.TZ)
 
     def __add__(self, other: "Alerts") -> gpd.GeoDataFrame:
+        """
+        Concatenate data with another alerts and drop duplicate returns. Modifies
+        the `data` attribute of `Alerts` in place to avoid duplicate data and double
+        memory usage
+        """
         if not other.is_empty:
-            self.data = pd.concat((self.data, other.data), axis=0, ignore_index=True)
+            self.data = gpd.GeoDataFrame(pd.concat((self.data, other.data), axis=0, ignore_index=True))
             self.data.drop_duplicates(("uuid"), inplace=True)
 
         return cast("gpd.GeoDataFrame", self.data)
@@ -77,6 +103,7 @@ class Alerts:
             - Converts timestamps to specified timezone
             - Ensures consistent data types for 'group' and 'type' columns
             - Removes duplicate events within same interval/group/type
+
         """
 
         if self.data is None or "pub_millis" not in self.data.columns:
@@ -124,14 +151,13 @@ class Alerts:
                 - group: Group identifier
                 - qty/day: Average number of events per day for each group,
                            sorted in descending order
+
         """
 
-        grouped_day = (
+        return (
             pd.DataFrame({
                 "group": self.data.group.value_counts().keys(),
                 "qty/day": self.data.group.value_counts().values
                 / (self.data["pub_millis"].max() - self.data["pub_millis"].min()).days,
             })
         ).sort_values(ascending=False, by="qty/day")
-
-        return grouped_day

@@ -1,4 +1,4 @@
-from typing import Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING, ClassVar
 
 import contextily as cx
 import geopandas as gpd
@@ -18,8 +18,17 @@ if TYPE_CHECKING:
     from waze.alerts import Alerts
 
 
+class GroupNotFoundError(Exception):
+    """Exception throwed when group is not found"""
+
+    def __init__(self, point: tuple[int, int]):
+        super().__init__(f"The point {point} is not in any quadrant")
+
+
 class Grouper:
-    concepts: dict = {
+    """Class for group alerts according to geospatial location (x, y)"""
+
+    concepts: ClassVar[dict[str, str]] = {
         "ACCIDENT": "Accidentes",
         "JAM": "Congestión",
         "HAZARD": "Peligros",
@@ -48,6 +57,7 @@ class Grouper:
 
         Returns:
             The calculated two-dimensional array
+
         """
         geometry = data.geometry
         bounds_x = np.array(
@@ -109,7 +119,6 @@ class Grouper:
             in the lower-left corner
 
         Example:
-
               +-----+-----+-22--+-----+-----+-----+-----+-----+-----+-----+
               |     |     |     |     |     |     |     |     |     |     |
               | 11  | 12  |[13] | 14  | 15  | 16  | 17  | 18  | 19  | 20  |
@@ -126,7 +135,7 @@ class Grouper:
         x_pos, y_pos = -1, -1
 
         if self.x_grid is None or self.y_grid is None:
-            return tuple()
+            return (-1, -1)
 
         for xi in range(len(self.x_grid[0])):
             if (
@@ -147,11 +156,9 @@ class Grouper:
                 break
 
         if x_pos < 0 or y_pos < 0:
-            raise ValueError(f"The point {point} is not in any quadrant")
+            raise GroupNotFoundError(point)
 
-        quadrant = x_pos, y_pos
-
-        return quadrant
+        return x_pos, y_pos
 
     def get_center_points(self) -> tuple:
         """
@@ -159,10 +166,11 @@ class Grouper:
 
         Returns:
             An two-dimensional array with the center points
+
         """
 
         if self.grid is None:
-            return tuple()
+            return (-1, -1)
         # X
         center_points_x = np.zeros((self.y_len, self.x_len))
 
@@ -185,9 +193,13 @@ class Grouper:
             center_points_y[c][:] = center_points_y[c][0]
 
         return center_points_x, center_points_y
-    
 
-    """Plotting helpers for exploratory analysis"""
+    """
+    Plotting helpers for exploratory analysis
+
+    This code is for exploratory purposes and contains a lot of repetitive code
+    but it is not used; I need to review it for refactoring or removal
+    """
 
     def plot_qty_day(self, alerts: "Alerts") -> Figure:
         fig, ax = plt.subplots()
@@ -199,8 +211,8 @@ class Grouper:
         between_x = xc[0][1] - xc[0][0]
         between_y = yc[1][0] - yc[0][0]
         labels = [False, False, False]
-        for xp in xc[0]:
-            for yp in yc.T[0]:
+        for i, xp in enumerate(xc[0]):
+            for j, yp in enumerate(yc.T[0]):
                 quad = self.calc_quadrant(i, j)
                 xf = xp - between_x / 2
                 yf = yp - between_y / 2
@@ -239,9 +251,6 @@ class Grouper:
                     color=color,
                     label=label,
                 )
-                j += 1
-            i += 1
-            j = 0
 
         assert alerts.data.crs is not None, "CRS is None"
 
@@ -300,7 +309,7 @@ class Grouper:
 
         cx.add_basemap(
             ax,
-            crs=data.crs.to_string(),
+            crs=data.crs.to_string() if data.crs else '',
             source=cx.providers.OpenStreetMap.Mapnik,  # type: ignore
         )
 
@@ -374,7 +383,7 @@ class Grouper:
 
         cx.add_basemap(
             ax,
-            crs=data.crs.to_string(),
+            crs=data.crs.to_string() if data.crs else '',
             source=cx.providers.OpenStreetMap.Mapnik,  # type: ignore
         )
 
@@ -428,7 +437,7 @@ class Grouper:
 
         cx.add_basemap(
             ax,
-            crs=data.crs.to_string(),
+            crs=data.crs.to_string() if data.crs else '',
             source=cx.providers.OpenStreetMap.Mapnik,  # type: ignore
         )
 
@@ -475,7 +484,7 @@ class Grouper:
 
         cx.add_basemap(
             ax,
-            crs=data.crs.to_string(),
+            crs=data.crs.to_string() if data.crs else '',
             source=cx.providers.OpenStreetMap.Mapnik,  # type: ignore
         )
 

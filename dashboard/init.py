@@ -8,6 +8,7 @@ from utils.utils import convert_timestamp_tz
 
 
 def init_app(model_obj: Model) -> TimeRange:
+    """Init the application"""
     init_mlflow()
 
     since = int((datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=30)).timestamp()) * 1000

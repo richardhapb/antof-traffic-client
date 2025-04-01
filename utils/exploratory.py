@@ -1,3 +1,8 @@
+"""
+Used only to get plots for exploring data; this module is not used as an element
+for the dashboard or anything related
+"""
+
 import datetime
 
 import matplotlib.pyplot as plt
@@ -8,7 +13,8 @@ from utils import utils
 from utils.utils import TZ
 
 
-def main():
+def main() -> None:
+    """Run the flow to get data for exploratory purposes"""
 
     since = int(
         (
