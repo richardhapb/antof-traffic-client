@@ -15,7 +15,7 @@ YMIN = -23.724215
 YMAX = -23.485813
 
 if TYPE_CHECKING:
-    from waze.alerts import Alerts
+    from .alerts import Alerts
 
 
 class GroupNotFoundError(Exception):

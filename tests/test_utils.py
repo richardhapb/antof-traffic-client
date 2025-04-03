@@ -9,7 +9,7 @@ import pytz
 
 from utils import utils
 from utils.utils import MINUTES_BETWEEN_UPDATES_FROM_API
-from waze.alerts import Alerts
+from analytics.alerts import Alerts
 
 
 def generate_alerts_data():

@@ -13,7 +13,7 @@ from shapely.geometry import Point
 import threading
 
 import config
-from waze.alerts import Alerts
+from analytics.alerts import Alerts
 
 # Disable SettingWithCopyWarning
 warnings.simplefilter(action="ignore", category=pd.errors.SettingWithCopyWarning)

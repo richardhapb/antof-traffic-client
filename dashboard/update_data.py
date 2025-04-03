@@ -8,7 +8,7 @@ import config
 from dashboard.models import TimeRange
 from utils import utils
 from utils.utils import TZ, logger, MINUTES_BETWEEN_UPDATES_FROM_API
-from waze.alerts import Alerts
+from analytics.alerts import Alerts
 
 
 def update_data(time_range_obj: TimeRange) -> Alerts:
