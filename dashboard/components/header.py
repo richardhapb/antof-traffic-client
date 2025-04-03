@@ -11,6 +11,8 @@ def get_header() -> html.Div:
     """Header template"""
     return html.Div(
         [
+            # This is used for update max_date_allowed
+            dcc.Interval(id="interval_update", interval=60 ** 2 * 1000, n_intervals=0),
             html.H1("Inteligencia de Tráfico para la Gestión Urbana en Antofagasta"),
             html.H2(
                 "Análisis de patrones y eventos reportados por usuarios para gestión de tráfico",

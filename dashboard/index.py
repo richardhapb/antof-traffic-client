@@ -714,14 +714,14 @@ def update_ml_graphs(  # noqa: PLR0913, PLR0917
 
 
 @app.callback(
-    [Output("table_last", "data"), Output("date_range", "max_date_allowed")],
+    Output("table_last", "data"),
     Input("dd_type", "value"),
 )
-def update_last_events(kind: str) -> tuple[list[dict[Hashable, Any]], datetime.datetime]:
+def update_last_events(kind: str) -> list[dict[Hashable, Any]]:
     """Update the last 20 events in table"""
     alerts = update_data(time_range)
     if alerts.is_empty:
-        return [], datetime.datetime.now(pytz.timezone(TZ))
+        return []
     last_events = alerts.data.sort_values(by="pub_millis", ascending=False)
 
     last_events["date"] = last_events.pub_millis.apply(lambda x: x.strftime("%d-%m-%Y"))
@@ -732,7 +732,7 @@ def update_last_events(kind: str) -> tuple[list[dict[Hashable, Any]], datetime.d
     last_events = last_events[["type", "group", "hour", "date", "street"]]
 
     if last_events.shape[0] == 0:
-        return [], datetime.datetime.now(pytz.timezone(TZ))
+        return []
 
     if kind is not None and kind != "all":
         last_events = last_events[last_events["type"] == kind]
@@ -740,7 +740,7 @@ def update_last_events(kind: str) -> tuple[list[dict[Hashable, Any]], datetime.d
     last_events = last_events.iloc[:20]
 
     if last_events.shape[0] == 0:
-        return [], datetime.datetime.now(pytz.timezone(TZ))
+        return []
 
     last_events = last_events.rename(
         columns={
@@ -752,7 +752,7 @@ def update_last_events(kind: str) -> tuple[list[dict[Hashable, Any]], datetime.d
         }
     )
 
-    return last_events.to_dict("records"), datetime.datetime.now(pytz.timezone(TZ))
+    return last_events.to_dict("records")
 
 
 # Clear filter in table selections
@@ -766,6 +766,12 @@ def clear_ml(_: int) -> None:
 def clear(_: int) -> None:
     """Clear filters on ML table"""
     return
+
+
+@app.callback(Output("date_range", "max_date_allowed"), Input("interval_update", "n_intervals"))
+def update_max_date_allowed(_: int) -> datetime.datetime:
+    """Update the max_data_allowed field within the date range, necessary to keep it current"""
+    return datetime.datetime.now(pytz.timezone(TZ))
 
 
 # Show instructions button
