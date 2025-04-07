@@ -220,7 +220,7 @@ class ML:
         result = merged[["pub_millis", geodata, "type", "happen"]]
 
         if not isinstance(self.data["pub_millis"].iloc[0], np.integer):
-            result["pub_millis"] = pd.to_datetime((result["pub_millis"] * 1_000_000), unit="ns")
+            result["pub_millis"] = pd.to_datetime((result["pub_millis"] * 1_000_000), unit="ms")
         else:
             result["pub_millis"] = result["pub_millis"]
 

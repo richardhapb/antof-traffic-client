@@ -4,7 +4,6 @@ from unittest.mock import patch
 
 import geopandas as gpd
 import pandas as pd
-import pytest
 import pytz
 
 from utils import utils
@@ -19,7 +18,7 @@ def generate_alerts_data():
             "uuid": "16272ee8-9a60-4dea-a4b1-76a8281732d4",
             "reliability": 6,
             "type": "HAZARD",
-            "roadType": 2,
+            "road_type": 2,
             "magvar": 356.0,
             "subtype": "HAZARD_ON_SHOULDER_CAR_STOPPED",
             "location": {"x": -70.38938, "y": -23.628653},
@@ -37,7 +36,7 @@ def generate_alerts_data():
             "uuid": "3ed960c0-13e9-441d-baf9-7a27181c35a4",
             "reliability": 6,
             "type": "JAM",
-            "roadType": 6,
+            "road_type": 6,
             "magvar": 210.0,
             "subtype": "JAM_HEAVY_TRAFFIC",
             "location": {"x": -70.39465, "y": -23.623049},
@@ -55,7 +54,7 @@ def generate_alerts_data():
             "uuid": "f51a5fbc-1a4a-4a36-9c4e-b8c67598e1f3",
             "reliability": 5,
             "type": "JAM",
-            "roadType": 2,
+            "road_type": 2,
             "magvar": 44.0,
             "subtype": "JAM_STAND_STILL_TRAFFIC",
             "location": {"x": -70.392654, "y": -23.54594},
@@ -70,6 +69,11 @@ def generate_alerts_data():
             "minute": 51,
         },
     ]
+
+
+def generate_simple_alerts_data() -> pd.DataFrame:
+    """Generate alerts without aggregates"""
+    return pd.DataFrame(generate_alerts_data()).drop(columns=["group", "day", "day_type", "week_day", "hour", "minute"])
 
 
 def generate_dummy_coord_df(n_nearby: int, n_total: int) -> pd.DataFrame:
@@ -89,21 +93,20 @@ def generate_dummy_coord_df(n_nearby: int, n_total: int) -> pd.DataFrame:
         y.append(y_base + n * 10)
 
     return pd.DataFrame({
-        "dummy": ["data"] * n_total,
         "location": [{"x": a, "y": b} for a, b in zip(x, y, strict=True)],
     })
 
 
 def test_get_data():
     """Test that get_data returns Alerts instance correctly"""
-    Alerts._instance = None
+    Alerts.reset_instance()
     alerts = utils.get_data()
     assert isinstance(alerts, Alerts)
 
     # Should be returned an Alerts
     # instance without data attribute
-    assert not hasattr(alerts, "data")
-    assert alerts.is_empty
+    assert hasattr(alerts, "data")
+    assert not alerts.is_empty
 
 
 def test_get_data_multiple():
@@ -112,7 +115,7 @@ def test_get_data_multiple():
 
     Simulate behavior in the graph when multiple requests are made
     """
-    Alerts._instance = None
+    Alerts.reset_instance()
 
     now = datetime.datetime.now(pytz.UTC)
     since = int((now - datetime.timedelta(days=30)).timestamp()) * 1000
@@ -122,11 +125,10 @@ def test_get_data_multiple():
 
     # Side effect
     alerts_empty = Alerts()
-    alerts_full = Alerts(generate_alerts_data())
+    alerts_full = Alerts.new_instance(generate_alerts_data())
 
     # Reset data of Singleton class
-    delattr(Alerts._instance, "data")
-    Alerts._instance = None
+    Alerts.reset_instance()
 
     with patch("utils.utils.Alerts") as mock_alerts, patch("utils.utils.requests.get") as mock_requests:
         mock_alerts.side_effect = [alerts_empty, alerts_full]
@@ -154,7 +156,7 @@ def test_get_data_multiple():
 def test_get_data_concurrent():
     """Test concurrent requests for data"""
 
-    Alerts._instance = None
+    Alerts.reset_instance()
     now = datetime.datetime.now(pytz.UTC)
     since = int((now - datetime.timedelta(days=30)).timestamp()) * 1000
     until = int((now - datetime.timedelta(minutes=MINUTES_BETWEEN_UPDATES_FROM_API)).timestamp()) * 1000
@@ -219,55 +221,49 @@ def test_freq_nearby():
     assert freq_df["freq"].max() == nearby
 
 
-# TODO: Implement aggregate data on server for test this
-@pytest.mark.skip
 def test_hourly_group():
     """Check for the hourly group, ensuring is generated correctly"""
-    nearby = 10
-    n = 15
-    df = generate_dummy_coord_df(nearby, n)
-
-    freq_df = utils.freq_nearby(utils.separate_coords(df))
+    df = generate_simple_alerts_data()
+    n = len(df)
 
     curr_time = datetime.datetime.now()
     future_time = curr_time + datetime.timedelta(hours=2)
 
-    freq_df["pub_millis"] = [curr_time] * n
-    freq_df["end_pub_millis"] = [future_time] * n
+    df["pub_millis"] = [curr_time] * n
+    df["end_pub_millis"] = [future_time] * n
 
-    df2 = utils.update_timezone(freq_df)
+    df2 = utils.update_timezone(df)
     df2["type"] = ["ACCIDENT"] * n
 
     df3 = utils.generate_aggregate_data(df2)
 
-    hourly = utils.hourly_group(df3.data)
+    freq_df = utils.freq_nearby(df3.data)
+
+    hourly = utils.hourly_group(freq_df)
     day_hours = 24
 
     assert hourly.shape[0] == day_hours
 
 
-# TODO: Implement aggregate data on server for test this
-@pytest.mark.skip
 def test_daily_group():
     """Check for the daily group, ensuring is generated correctly"""
-    nearby = 10
-    n = 15
-    df = generate_dummy_coord_df(nearby, n)
-
-    freq_df = utils.freq_nearby(utils.separate_coords(df))
+    df = generate_simple_alerts_data()
+    n = len(df)
 
     curr_time = datetime.datetime.now()
     future_time = curr_time + datetime.timedelta(hours=2)
 
-    freq_df["pub_millis"] = [curr_time] * n
-    freq_df["end_pub_millis"] = [future_time] * n
+    df["pub_millis"] = [curr_time] * n
+    df["end_pub_millis"] = [future_time] * n
 
-    df2 = utils.update_timezone(freq_df)
+    df2 = utils.update_timezone(df)
     df2["type"] = ["ACCIDENT"] * n
 
     df3 = utils.generate_aggregate_data(df2)
 
-    daily = utils.daily_group(df3.data)
+    freq_df = utils.freq_nearby(df3.data)
+
+    daily = utils.daily_group(freq_df)
     month_days = 31
 
     assert daily.shape[0] == month_days

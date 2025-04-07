@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 import warnings
 
@@ -37,6 +38,15 @@ logger = logging.getLogger("antof_traffic")
 logger.setLevel(logging.INFO)
 
 
+class SerializeError(Exception):
+    """Error when serialization is not possible"""
+
+    def __init__(self, data: pd.DataFrame | str):
+        if isinstance(data, (pd.DataFrame, gpd.GeoDataFrame)):
+            super().__init__(f"Cannot serialize the data, getted columns {data.columns}")
+        super().__init__(data)
+
+
 def get_data(
     since: int | None = None,
     until: int | None = None,
@@ -50,7 +60,7 @@ def get_data(
 
     """
     if config.SERVER_URL is None:
-        msg = "Server URL don't defined"
+        msg = "Server URL doesn't defined"
         raise requests.ConnectionError(msg)
 
     # Ensure thread safety
@@ -95,24 +105,51 @@ def generate_aggregate_data(data: pd.DataFrame) -> Alerts:
     url = f"{config.SERVER_URL}/aggregate"
 
     try:
-        response = requests.post(url, None, data, timeout=10).json()
+        response = requests.post(url, json=serialize_data(data), timeout=10)
+        response.raise_for_status()
+        response_data = response.json()
 
-        return Alerts(response)
+        return Alerts.new_instance(response_data.get("alerts", []))
     except requests.JSONDecodeError:
         logger.exception("Error decoding JSON from request")
     except requests.ConnectTimeout:
         logger.exception("Server not respond")
     except requests.ConnectionError:
         logger.exception("Error requesting the data, ensure that server is running: %s")
+    except SerializeError:
+        logger.exception("Error serializing data")
 
     msg = "Error requesting data from server"
     raise requests.ConnectionError(msg)
 
 
-def update_timezone(data: gpd.GeoDataFrame, tz: str = TZ) -> gpd.GeoDataFrame:
+def serialize_data(data: pd.DataFrame) -> dict:
+    """Convert the GeoDataFrame instance to a JSON string"""
+
+    if not hasattr(data, "pub_millis") or not hasattr(data, "end_pub_millis"):
+        raise SerializeError(data)
+
+    has_timezone = data.pub_millis.dt.tz is not None
+
+    if has_timezone:
+        data.pub_millis = data.pub_millis.dt.tz_convert(pytz.UTC)
+        data.end_pub_millis = data.end_pub_millis.dt.tz_convert(pytz.UTC)
+
+    data.pub_millis = (data.pub_millis.astype(np.int64) // 1_000_000).astype(np.int64)
+    data.end_pub_millis = (data.end_pub_millis.astype(np.int64) // 1_000_000).astype(np.int64)
+
+    try:
+        serialized = {"alerts": data.to_dict(orient="records")}
+    except json.JSONDecodeError as e:
+        raise SerializeError(e.msg) from None
+
+    return serialized
+
+
+def update_timezone(data: pd.DataFrame | gpd.GeoDataFrame, tz: str = TZ) -> pd.DataFrame | gpd.GeoDataFrame:
     """Update the timezone of event data."""
 
-    if not hasattr(data, "pub_millis"):
+    if not hasattr(data, "pub_millis") or not hasattr(data, "end_pub_millis"):
         return data
 
     data["pub_millis"] = pd.to_datetime(data["pub_millis"], unit="ms", utc=True)
@@ -198,9 +235,7 @@ def separate_coords(df: pd.DataFrame) -> GeoDataFrame:
     return dfg
 
 
-def hourly_group(
-    data: pd.DataFrame | gpd.GeoDataFrame, do_sum: bool = False
-) -> pd.DataFrame | gpd.GeoDataFrame:
+def hourly_group(data: pd.DataFrame | gpd.GeoDataFrame, do_sum: bool = False) -> pd.DataFrame | gpd.GeoDataFrame:
     """Transform an events DataFrame into an hourly report."""
 
     df = data[["day_type", "hour", "pub_millis", "end_pub_millis"]]
@@ -212,9 +247,7 @@ def hourly_group(
     days = 1 if days <= 0 else days
 
     # Group by day and day_type
-    hourly_reports = (
-        df.loc[:, ["day_type", "hour"]].groupby(["day_type", "hour"]).size().unstack(level=0)
-    )
+    hourly_reports = df.loc[:, ["day_type", "hour"]].groupby(["day_type", "hour"]).size().unstack(level=0)
 
     # Create a index that include all days of the month
     all_hours = pd.Index(range(24), name="hour")
@@ -252,9 +285,7 @@ def daily_group(
     df.reset_index(inplace=True, drop=True)
 
     # Group by day and day_type
-    daily_reports = (
-        df.loc[:, ["day_type", "day"]].groupby(["day_type", "day"]).size().unstack(level=0)
-    )
+    daily_reports = df.loc[:, ["day_type", "day"]].groupby(["day_type", "day"]).size().unstack(level=0)
 
     # Create a index that include all days of the month
     all_days = pd.Index(range(1, 32), name="day")

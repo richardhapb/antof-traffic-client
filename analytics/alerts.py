@@ -45,9 +45,7 @@ class Alerts:
 
         if cls._instance is None or current_time - cls.last_update > LAST_UPDATE_THRESHOLD:
             # Ensure memory is freed as soon as possible
-            if cls._instance is not None:
-                del cls._instance
-                gc.collect()
+            cls.reset_instance()
 
             instance = super().__new__(cls)
             cls._instance = instance
@@ -64,7 +62,7 @@ class Alerts:
             df = pd.DataFrame(data)
 
             self.data: gpd.GeoDataFrame = utils.separate_coords(df)
-            self.data = utils.update_timezone(self.data, utils.TZ)
+            self.data = cast("gpd.GeoDataFrame", utils.update_timezone(self.data, utils.TZ))
 
     def __add__(self, other: "Alerts") -> gpd.GeoDataFrame:
         """
@@ -77,6 +75,22 @@ class Alerts:
             self.data.drop_duplicates(("uuid"), inplace=True)
 
         return cast("gpd.GeoDataFrame", self.data)
+
+    @classmethod
+    def reset_instance(cls) -> None:
+        """Clear the data and instance to prepare for another build"""
+        if hasattr(cls, "_instance") and cls._instance:
+            cls._instance = None
+            gc.collect()
+
+    @classmethod
+    def new_instance(cls, data: list | None = None) -> "Alerts":
+        """Create a new instance while ignoring the singleton instance"""
+        if data is None:
+            data = []
+        instance = super().__new__(cls)
+        instance.__init__(data)  # noqa: PLC2801
+        return instance
 
     @property
     def is_empty(self) -> bool:
