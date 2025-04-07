@@ -62,6 +62,7 @@ class Alerts:
             df = pd.DataFrame(data)
 
             self.data: gpd.GeoDataFrame = utils.separate_coords(df)
+            self.data.drop(columns=["end_pub_millis"], inplace=True)
             self.data = cast("gpd.GeoDataFrame", utils.update_timezone(self.data, utils.TZ))
 
     def __add__(self, other: "Alerts") -> gpd.GeoDataFrame:

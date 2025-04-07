@@ -133,10 +133,8 @@ def serialize_data(data: pd.DataFrame) -> dict:
 
     if has_timezone:
         data.pub_millis = data.pub_millis.dt.tz_convert(pytz.UTC)
-        data.end_pub_millis = data.end_pub_millis.dt.tz_convert(pytz.UTC)
 
     data.pub_millis = (data.pub_millis.astype(np.int64) // 1_000_000).astype(np.int64)
-    data.end_pub_millis = (data.end_pub_millis.astype(np.int64) // 1_000_000).astype(np.int64)
 
     try:
         serialized = {"alerts": data.to_dict(orient="records")}
@@ -149,13 +147,11 @@ def serialize_data(data: pd.DataFrame) -> dict:
 def update_timezone(data: pd.DataFrame | gpd.GeoDataFrame, tz: str = TZ) -> pd.DataFrame | gpd.GeoDataFrame:
     """Update the timezone of event data."""
 
-    if not hasattr(data, "pub_millis") or not hasattr(data, "end_pub_millis"):
+    if not hasattr(data, "pub_millis"):
         return data
 
     data["pub_millis"] = pd.to_datetime(data["pub_millis"], unit="ms", utc=True)
     data["pub_millis"] = data["pub_millis"].dt.tz_convert(tz)
-    data["end_pub_millis"] = pd.to_datetime(data["end_pub_millis"], unit="ms", utc=True)
-    data["end_pub_millis"] = data["end_pub_millis"].dt.tz_convert(tz)
 
     return data
 
@@ -238,7 +234,7 @@ def separate_coords(df: pd.DataFrame) -> GeoDataFrame:
 def hourly_group(data: pd.DataFrame | gpd.GeoDataFrame, do_sum: bool = False) -> pd.DataFrame | gpd.GeoDataFrame:
     """Transform an events DataFrame into an hourly report."""
 
-    df = data[["day_type", "hour", "pub_millis", "end_pub_millis"]]
+    df = data[["day_type", "hour", "pub_millis"]]
 
     df.reset_index(inplace=True, drop=True)
 
@@ -280,7 +276,7 @@ def daily_group(
 ) -> pd.DataFrame | gpd.GeoDataFrame:
     """Transform an events DataFrame into a daily report."""
 
-    df = data[["day_type", "day", "pub_millis", "end_pub_millis"]]
+    df = data[["day_type", "day", "pub_millis"]]
 
     df.reset_index(inplace=True, drop=True)
 

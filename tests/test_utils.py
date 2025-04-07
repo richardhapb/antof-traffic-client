@@ -183,12 +183,11 @@ def test_update_timezone():
     assert curr_time.tzname() is None
     assert future_time.tzname() is None
 
-    df = gpd.GeoDataFrame({"pub_millis": [curr_time], "end_pub_millis": [future_time]})
+    df = gpd.GeoDataFrame({"pub_millis": [curr_time]})
 
     df2 = utils.update_timezone(df, utils.TZ)
 
     assert str(df2["pub_millis"].dt.tz) == utils.TZ
-    assert str(df2["end_pub_millis"].dt.tz) == utils.TZ
 
 
 def test_separate_coords():
@@ -227,15 +226,10 @@ def test_hourly_group():
     n = len(df)
 
     curr_time = datetime.datetime.now()
-    future_time = curr_time + datetime.timedelta(hours=2)
 
     df["pub_millis"] = [curr_time] * n
-    df["end_pub_millis"] = [future_time] * n
 
-    df2 = utils.update_timezone(df)
-    df2["type"] = ["ACCIDENT"] * n
-
-    df3 = utils.generate_aggregate_data(df2)
+    df3 = utils.generate_aggregate_data(df)
 
     freq_df = utils.freq_nearby(df3.data)
 
@@ -251,15 +245,10 @@ def test_daily_group():
     n = len(df)
 
     curr_time = datetime.datetime.now()
-    future_time = curr_time + datetime.timedelta(hours=2)
 
     df["pub_millis"] = [curr_time] * n
-    df["end_pub_millis"] = [future_time] * n
 
-    df2 = utils.update_timezone(df)
-    df2["type"] = ["ACCIDENT"] * n
-
-    df3 = utils.generate_aggregate_data(df2)
+    df3 = utils.generate_aggregate_data(df)
 
     freq_df = utils.freq_nearby(df3.data)
 
@@ -267,3 +256,25 @@ def test_daily_group():
     month_days = 31
 
     assert daily.shape[0] == month_days
+
+
+def test_generate_aggregate_data():
+    """
+    Test the response of the API in /aggregate.
+    Must be return aggregate data and group information.
+    """
+    df = generate_simple_alerts_data()
+    n = len(df)
+
+    curr_time = datetime.datetime.now()
+    df["pub_millis"] = [curr_time] * n
+    df3 = utils.generate_aggregate_data(df)
+
+    assert len(df3.data), n
+
+    assert hasattr(df3.data, "group")
+    assert hasattr(df3.data, "day")
+    assert hasattr(df3.data, "minute")
+    assert hasattr(df3.data, "hour")
+    assert hasattr(df3.data, "day_type")
+    assert hasattr(df3.data, "week_day")
