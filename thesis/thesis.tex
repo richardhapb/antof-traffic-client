@@ -44,22 +44,20 @@ A mí.
 % \tableofcontents
 % \newpage
 
-Aquí está la versión corregida, usando el tiempo pasado, acorde a un trabajo ya realizado:
-
 \section*{Resumen}
 
-El presente proyecto tuvo como propósito desarrollar una herramienta efectiva para analizar y predecir, con alta confiabilidad, el comportamiento del tráfico vehicular en la ciudad de Antofagasta mediante el uso de datos provenientes de la plataforma Waze Cities. Waze, a través de su comunidad de usuarios, ofrece información en tiempo real que permitió obtener una visión detallada de los eventos de tráfico que ocurren en la ciudad. Esta investigación generó información relevante para la gestión del tráfico, facilitando la toma de decisiones por parte de las autoridades locales con el fin de mejorar la seguridad vial y optimizar la eficiencia del flujo vehicular. A través del análisis y explotación de estos datos, se identificaron patrones y tendencias que, integrados en la planificación urbana, contribuyeron a optimizar rutas críticas, reducir la congestión y minimizar la probabilidad de accidentes.
+El presente proyecto tiene como propósito desarrollar una herramienta efectiva para analizar y predecir, con alta confiabilidad, el comportamiento del tráfico vehicular en la ciudad de Antofagasta mediante el uso de datos provenientes de la plataforma Waze Cities. Waze, a través de su comunidad de usuarios, ofrece información en tiempo real que permite obtener una visión detallada de los eventos de tráfico que ocurren en la ciudad. Esta investigación genera información relevante para la gestión del tráfico, facilitando la toma de decisiones por parte de las autoridades locales con el fin de mejorar la seguridad vial y optimizar la eficiencia del flujo vehicular. A través del análisis y explotación de estos datos, se identifican patrones y tendencias que, integrados en la planificación urbana, contribuirán a optimizar rutas críticas, reducir la congestión y minimizar la probabilidad de accidentes.
 
-En este estudio se emplearon técnicas de análisis de datos y métodos geoespaciales mediante el uso de GeoPandas, además de la aplicación de series temporales para proporcionar visualizaciones claras y comprensibles dirigidas al usuario final. Adicionalmente, se implementaron técnicas de aprendizaje automático para realizar predicciones de tráfico, anticipándose a eventos y contribuyendo al desarrollo urbano eficiente y seguro \parencite{barcelo2005}.
+En este estudio se emplearán técnicas de análisis de datos y métodos geoespaciales mediante el uso de la librería GeoPandas en Python, además de la aplicación de series temporales para proporcionar visualizaciones claras y comprensibles dirigidas al usuario final. Adicionalmente, se implementarán técnicas de aprendizaje automático para realizar predicciones de tráfico, anticipándose a eventos y contribuyendo al desarrollo urbano eficiente y seguro \parencite{barcelo2005}.
 
 \section{Introducción}
 \subsection{Descripción del problema}
 
-Antofagasta, una ciudad con más de 106,000 vehículos en circulación \parencite{comision2023}, enfrenta desafíos significativos en la gestión de su tráfico vehicular. Durante el año 2023, se registraron 1.715 accidentes, los cuales resultaron en 31 fallecidos y 102 heridos graves \parencite{comision2023}. La infraestructura vial limitada, sumada a la alta concentración de vehículos en un número reducido de arterias principales, agravó la congestión y elevó el riesgo de accidentes. A pesar de la existencia de estos problemas, no se contaba con sistemas de monitoreo en tiempo real que permitieran gestionar el tráfico de manera proactiva. Por ello, se aprovecharon fuentes de datos alternativas, como Waze, para recolectar información valiosa que facilitara la toma de decisiones en materia de tráfico \parencite{chen2015}.
+Antofagasta, una ciudad con más de 106,000 vehículos en circulación \parencite{comision2023}, enfrenta desafíos significativos en la gestión de su tráfico vehicular. Durante el año 2023, se registraron 1,715 accidentes, los cuales resultaron en 31 fallecidos y 102 heridos graves \parencite{comision2023}. La infraestructura vial limitada, sumada a la alta concentración de vehículos en un número reducido de arterias principales, agravó la congestión y elevó el riesgo de accidentes. A pesar de la existencia de estos problemas, no se cuenta con sistemas de monitoreo en tiempo real que permitan gestionar el tráfico de manera proactiva. Por ello, se aprovecharán fuentes de datos alternativas, como Waze, para recolectar información valiosa que facilite la toma de decisiones en materia de tráfico \parencite{chen2015}.
 
 \subsection{Objetivo general}
 
-Realizar un análisis exhaustivo del comportamiento del tráfico en la ciudad de Antofagasta basado en los eventos reportados por los conductores en la plataforma Waze. El objetivo final fue generar información relevante que contribuyera a la gestión eficiente del tráfico, mejorando la seguridad vial y optimizando el flujo vehicular.
+Realizar un análisis exhaustivo del comportamiento del tráfico en la ciudad de Antofagasta basado en los eventos reportados por los conductores en la plataforma Waze. El objetivo final es generar información relevante que contribuya a la gestión eficiente del tráfico, mejorando la seguridad vial y optimizando el flujo vehicular.
 
 \subsection{Objetivos específicos}
 
@@ -68,12 +66,12 @@ Realizar un análisis exhaustivo del comportamiento del tráfico en la ciudad de
     \item Realizar un análisis descriptivo de los datos recolectados para identificar patrones y tendencias relevantes en el comportamiento del tráfico.
     \item Identificar los factores clave que influyen en la seguridad vial y la eficiencia del tráfico en la ciudad.
     \item Presentar información visualmente comprensible y útil para las autoridades de gestión vial, facilitando la implementación de políticas y acciones basadas en datos \parencite{auld2009}.
-    \item Utilizar los datos disponibles para desarrollar modelos predictivos de tráfico que permitieran anticipar eventos y tomar decisiones proactivas en la gestión vial.
+    \item Utilizar los datos disponibles para desarrollar modelos predictivos de tráfico que permitan anticipar eventos y tomar decisiones proactivas en la gestión vial.
 \end{itemize}
 
 \section{Marco teórico}
 
-El tráfico vehicular en entornos urbanos presenta un comportamiento complejo e impredecible, lo que dificulta su gestión eficiente. No obstante, el avance de las tecnologías móviles y la popularidad de aplicaciones como Waze permiten disponer de datos en tiempo real generados por los propios usuarios. Este proyecto se apoyó en técnicas de análisis de datos y aprendizaje de máquinas (Machine Learning) para convertir esta información en herramientas útiles para la gestión vial. La utilización de datos geoespaciales, junto con la automatización de los procesos de recolección, análisis y visualización, constituyó una solución costo-efectiva para mejorar la planificación del tráfico \parencite{barcelo2005}.
+El tráfico vehicular en entornos urbanos presenta un comportamiento complejo e impredecible, lo que dificulta su gestión eficiente. No obstante, el avance de las tecnologías móviles y la popularidad de aplicaciones como Waze permiten disponer de datos en tiempo real generados por los propios usuarios. Este proyecto se apoya en técnicas de análisis de datos y aprendizaje de máquinas (Machine Learning) para convertir esta información en herramientas útiles para la gestión vial. La utilización de datos geoespaciales, junto con la automatización de los procesos de recolección, análisis y visualización, constituye una solución costo-efectiva para mejorar la planificación del tráfico \parencite{barcelo2005}.
 
 \subsection{Metodología}
 
@@ -81,13 +79,15 @@ Una de las principales limitaciones en el análisis de fenómenos es la ausencia
 
 Se realizó un análisis geoespacial con el objetivo de identificar puntos críticos, como vías principales, calles secundarias y zonas de alto tráfico. Este análisis se llevó a cabo utilizando GeoPandas, una herramienta de Python especializada en operaciones geoespaciales. Además, se analizaron series temporales para detectar patrones y tendencias del tráfico, identificando estacionalidades en el comportamiento. Los resultados se presentaron mediante técnicas de visualización que permitieron interpretar las tendencias y puntos de interés de manera efectiva.
 
-El pipeline de datos incluyó una base de datos relacional para almacenar los datos, un ETL (Extract, Transform, Load) para procesarlos y un servidor web para visualizarlos. Se utilizó PostgreSQL como base de datos, Apache Airflow para la orquestación de tareas y Dash para la creación de visualizaciones interactivas. Este enfoque permitió automatizar el flujo de datos y garantizar la actualización constante de la información.
+El pipeline de datos incluyó una base de datos relacional para almacenar los datos, un flujo ETL (Extract, Transform, Load) para procesarlos y un servidor web para visualizarlos. Se utilizó PostgreSQL como base de datos, APScheduler para la programación de tareas y Dash como herramienta de visualización. Este enfoque permitió automatizar el flujo de datos y garantizar la actualización constante de la información.
 
 Adicionalmente, se entrenó un modelo de clasificación para determinar la probabilidad de ocurrencia de accidentes en diferentes puntos de la ciudad. El modelo seleccionado fue XGBoost, el cual fue seleccionado utilizando técnicas de validación cruzada y optimización de hiperparámetros. Los resultados obtenidos permitieron identificar las variables más influyentes en la ocurrencia de accidentes, así como la probabilidad de ocurrencia en diferentes condiciones de tráfico. Para la selección de variables se utilizó GridSearchCV, una técnica de búsqueda de hiperparámetros que permite encontrar la mejor combinación de variables para el modelo, se compararon modelos de regresión logística, árboles de decisión y XGBoost, siendo este último el que presentó el mejor desempeño en términos de precisión y sensibilidad.
 
-Para la gestión del modelo, en cuanto a su implementación, mantenimiento y actualización, se utilizó la herramienta MLflow, que permite gestionar el ciclo de vida de los modelos de aprendizaje automático, desde su entrenamiento hasta su despliegue en producción y versionado.
+Para la gestión del modelo, en cuanto a su implementación, mantenimiento y actualización, se programó con APSCheduler, una librería de tareas asíncronas en Python, que permite gestionar el ciclo de vida de los modelos de aprendizaje automático, desde su entrenamiento hasta su despliegue en producción y versionado.
 
-En la parte de backend, para las diferentes solicitudes y eventos que se generan en la aplicación, se utilizó Flask, un framework de Python que permite crear APIs sencillas, con esto se generó la capacidad de poder responder a eventos generados desde Airflow para la actualización de los datos, renderizado, y actualización de los modelos.
+En la parte del servidor, se desarrolló en Rust, un lenguaje de programación enfocado en la eficiencia en el uso de memoria y seguridad en el uso de la misma. Se utilizó la herramienta Memcached para generar un caché de los datos y de esta forma poder servirlos de manera más eficiente y rápida, debido al volumen de dato, se priorizó la unicidad de los datos, evitando generar copias, para no aumentar el uso de memoria.
+
+Para el procesado de los datos en el cliente (Dash), se generan multiples workers que permiten servir la aplicación de forma eficiente, y se utiliza solo una instancia en memoria de los datos, compartidos por todos los datos, y para mantener la integridad de los datos, se implementó un Mutex para controlar el acceso de lectura a los mismos desde las tareas asíncronas.
 
 La perspectiva general del flujo de datos se muestra en la \autoref{fig:fuente} y el flujo desde la API de Waze hasta el dashboard se puede observar en la \autoref{fig:wf_dash}
 
