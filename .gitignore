@@ -34,3 +34,10 @@ mlflow.db
 *.blg
 *.bcf
 *.run.xml
+!thesis/images
+analisis/**/*.html
+analisis/**/*.css
+analisis/**/*.woff
+analisis/**/*.js
+analisis/**/*.py
+
