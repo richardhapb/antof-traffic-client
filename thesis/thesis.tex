@@ -26,6 +26,7 @@
 \usepackage{parskip}
 \usepackage[spanish]{cleveref}
 
+\usepackage[caption = true]{subfig}
 
 \usepackage[backend=biber,style=apa,language=spanish]{biblatex}
 \bibliography{biblio}
@@ -107,7 +108,7 @@ La perspectiva general del flujo de datos se muestra en la \autoref{fig:fuente} 
 
 \section{Desarrollo}
 
-Para obtener los datos necesarios para el análisis, fue necesario generar un mecanismo para recolectar y almacenar la información de Waze Cities. Se implementó un servidor que se encarga de realizar peticiones a la API de Waze, recolectar los eventos de tráfico y almacenarlos en una base de datos PostgreSQL. Este servidor se ejecutaba de manera continua, actualizando la información cada 5 minutos. La estructura de la base de datos se muestra en la \autoref{fig:db_diagram}.
+Para obtener los datos necesarios para el análisis, fue necesario generar un mecanismo para recolectar y almacenar la información de Waze Cities. Se implementó un servidor que se encarga de realizar peticiones a la API de Waze, recolectar los eventos de tráfico y almacenarlos en una base de datos PostgreSQL. Este servidor se ejecutaba de manera continua, actualizando la información cada 2 minutos. La estructura de la base de datos se muestra en la \autoref{fig:db_diagram}.
 
 \begin{figure}[H]
     \centering
@@ -118,12 +119,109 @@ Para obtener los datos necesarios para el análisis, fue necesario generar un me
 
 Existen dos estructuras principales, las alertas (alerts) y las congestiones (jams), el primero registra todos los eventos reportados por usuarios, tales como peligros, accidentes, congestión o rutas cerradas. En el caso de los eventos de congestión, son datos generados automáticamente por Waze, los cuales usando la geolocalización, estiman congestiones en diferentes puntos de la ciudad. Para este proyecto, se utilizó la información de las alertas. Sin embargo, se almacenaron los datos de congestión, para un posterior análisis, que está fuera del alcance de este estudio. Esta estructura se definió con base en los datos relevantes y completos que proporciona la API, los tipos de datos disponibles pueden ser consultados en la documentación de Waze \parencite{waze2024}.
 
-Una vez capturados datos desde octubre hasta noviembre, se da inicio a la fase de análisis exploratorio, para lograr obtener información relevante de los datos.
+Desde octubre de 2024 hasta Abril de 2025, se han acumulado 40429 alertas, las cuales se analizarán a lo largo de esde estudio.
+
+
+\subsection{Eventos en el espacio y tiempo}
+
+En la \autoref{fig:dist_events} se muestran como los difentes tipos de eventos se distribuyen a lo largo de la ciudad, teniendo concentraciones las avenidas principales y en el caso de accidentes, en los cruces entre ellas.
+
+
+\begin{figure}[H]
+    \centering
+    \subfloat[Accidentes]{
+        \includegraphics[width=0.33\textwidth]{images/dist_accidents.png}
+    }
+    \subfloat[Congestión]{
+        \includegraphics[width=0.33\textwidth]{images/dist_jams.png}
+    }
+    \subfloat[Peligros]{
+        \includegraphics[width=0.33\textwidth]{images/dist_hazards.png}
+    }
+    \caption{Distribución de eventos en Antofagasta}
+    \label{fig:dist_events}
+\end{figure}
+
+Para realizar el análisis de tiempo, se agruparán los eventos por hora de ocurrencia en el día, tomando el promedio de eventos ocurridos al día. En la \autoref{fig:time_events}, los eventos se concentran en los horarios punta, tanto para accidentes como para congestión, para el caso de peligro, se observa una distribución más uniforme durante el día.
+
+\begin{figure}[H]
+    \centering
+    \subfloat[Accidentes]{
+        \includegraphics[width=0.6\textwidth]{images/ACCIDENT_per_hour.png}
+    }
+    \newline
+    \subfloat[Congestión]{
+        \includegraphics[width=0.6\textwidth]{images/JAM_per_hour.png}
+    }
+    \newline
+    \subfloat[Peligros]{
+        \includegraphics[width=0.6\textwidth]{images/HAZARD_per_hour.png}
+    }
+    \newline
+    \caption{Eventos según hora del día en Antofagasta}
+    \label{fig:time_events}
+\end{figure}
+
+% Prueba hipótesis relación accidents-jams
+
+
+\begin{figure}[H]
+    \centering
+    \subfloat[Día de semana]{
+        \includegraphics[width=0.9\textwidth]{images/corr_lin_ds.png}
+    }
+    \newline
+    \subfloat[Fin de semana]{
+        \includegraphics[width=0.9\textwidth]{images/corr_lin_fs.png}
+    }
+    \newline
+    \caption{Correlación lineal entre accidentes y congestión}
+    \label{fig:corr_lineal}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \subfloat[Día de semana]{
+        \includegraphics[width=0.9\textwidth]{images/corr_exp_ds.png}
+    }
+    \newline
+    \subfloat[Fin de semana]{
+        \includegraphics[width=0.9\textwidth]{images/corr_exp_fs.png}
+    }
+    \newline
+    \caption{Correlación exponencial inversa entre accidentes y congestión}
+    \label{fig:corr_exp}
+\end{figure}
+
+% Cálculo de la frecuencia por zona
+% Filtro por zona
+%    Algóritmo cKDTree
+
+\subsection{Frecuencia por zona}
+Para representar conjuntos estáticos de puntos espaciales, se utiliza la estructura cKd-tree, una variante compacta del Kd-tree que codifica distancias relativas mediante spiral codes y las almacena usando Directly Addressable Codes (DACs), optimizando el uso de memoria sin sacrificar eficiencia en consultas espaciales \parencite{gutierrez2023ckdtree}. A cada zona la llamaremos grupo o segmento.
+
+% Ruta más segura
+
+% Machine learning (XGBoost)
+
+% Aplicación implementacióñ (dashboard online y ML)
 
 % \section{Resultados}
+
+% Observaciones y resultados del estudio
+
 % \section{Discusión}
+
+% Preguntas y posibles soluciones
+
 % \section{Conclusiones}
+
+% Conclusión según los resultados
+
 % \section{Recomendaciones}
+
+% Propuesta de solución o nuevo estudio
 
 \printbibliography
 
