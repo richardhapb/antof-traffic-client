@@ -199,7 +199,34 @@ Para realizar el análisis de tiempo, se agruparán los eventos por hora de ocur
 %    Algóritmo cKDTree
 
 \subsection{Frecuencia por zona}
-Para representar conjuntos estáticos de puntos espaciales, se utiliza la estructura cKd-tree, una variante compacta del Kd-tree que codifica distancias relativas mediante spiral codes y las almacena usando Directly Addressable Codes (DACs), optimizando el uso de memoria sin sacrificar eficiencia en consultas espaciales \parencite{gutierrez2023ckdtree}. A cada zona la llamaremos grupo o segmento.
+
+Para representar conjuntos estáticos de puntos espaciales, se utiliza la estructura cKd-tree, una variante compacta del Kd-tree que codifica distancias relativas mediante spiral codes y las almacena usando Directly Addressable Codes (DACs), optimizando el uso de memoria sin sacrificar eficiencia en consultas espaciales \parencite{gutierrez2023ckdtree}. A cada zona la llamaremos cuadrante o segmento.
+
+En la \autoref{fig:quad_acc} puede verse como se distribuyen los segmentos númericamente, partiendo desde el segmento 1 en la esquina inferior izquierda. La opacidad del color rojo va en relación con la cantidad de accidentes por segmento.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.38\textwidth]{images/quad_acc.png}
+    \caption{Identificación de cuadrantes en mapa de Antofagasta}
+    \label{fig:quad_acc}
+\end{figure}
+
+Tomamos la media de accidentes diarios, los agrupamos por segmento, definimos que las zonas mayores a 0.8 accidentes por día son considerados críticos, construimos un mapa según la criticidad (\autoref{fig:quad_mean_day}), si tomamos la suma de los accidentes, tenemos la \autoref{fig:quad_acc_total} que muestra la cantidad de accidentes reportados en el segmento en el periodo de estudio, que a su vez se clasifican como críticos si poseen más de 140 accidentes.
+
+
+\begin{figure}[H]
+    \centering
+    \subfloat[Media de accidentes por día]{
+        \includegraphics[width=0.5\textwidth]{images/quad_mean_day_color.png}
+        \label{fig:quad_mean_day}
+    }
+    \subfloat[Total accidentes]{
+        \includegraphics[width=0.5\textwidth]{images/quad_acc_color.png}
+        \label{fig:quad_acc_total}
+    }
+    \caption{Accidentes por segmento}
+\end{figure}
+
 
 % Ruta más segura
 
