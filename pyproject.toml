@@ -197,18 +197,4 @@ max-complexity = 10
 indent-style = "space"
 quote-style = "double"
 
-[tool.pyright]
-exclude = [
-    "**/__pycache__",
-    ".venv",
-    "venv"
-]
-
-pythonVersion = "3.12"
-pythonPlatform = "Linux"
-stubPath = "stubs"
-
-executionEnvironments = [
-  { root = "", pythonVersion = "3.12", pythonPlatform = "Linux", extraPaths = [], reportMissingImports = "none" },
-]
 
