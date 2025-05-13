@@ -1,8 +1,7 @@
 %!TEX root = thesis.tex
 
 \documentclass[12pt]{article}
-\usepackage[utf8]{inputenc}
-\usepackage[spanish,es-ES]{babel}
+\usepackage[spanish]{babel}
 
 % Margenes
 \usepackage{geometry}
@@ -15,7 +14,8 @@
 }
 
 % Fuente
-\usepackage{times}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
 \usepackage{csquotes}
 
 \renewcommand{\baselinestretch}{1.5}
@@ -38,10 +38,8 @@
 \date{\today}
 \maketitle
 
-\section*{Dedicatoria}
-A nadie.
-\section*{Reconocimientos}
-A mí.
+% \section*{Dedicatoria}
+% \section*{Reconocimientos}
 % \tableofcontents
 % \newpage
 
@@ -94,14 +92,14 @@ La perspectiva general del flujo de datos se muestra en la \autoref{fig:fuente} 
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.8\textwidth]{diagrams/fuente_datos.png}
+    \includegraphics[width=0.8\textwidth]{images/fuente_datos.png}
     \caption{Pipeline general de datos}
     \label{fig:fuente}
 \end{figure}
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.8\textwidth]{diagrams/wf_dash.png}
+    \includegraphics[width=0.8\textwidth]{images/wf_dash.png}
     \caption{Flujo de información en dashboard}
     \label{fig:wf_dash}
 \end{figure}
@@ -124,8 +122,7 @@ Desde octubre de 2024 hasta Abril de 2025, se han acumulado 40429 alertas, las c
 
 \subsection{Eventos en el espacio y tiempo}
 
-En la \autoref{fig:dist_events} se muestran como los difentes tipos de eventos se distribuyen a lo largo de la ciudad, teniendo concentraciones las avenidas principales y en el caso de accidentes, en los cruces entre ellas.
-
+En la \autoref{fig:dist_events} se observa la distribución espacial de los distintos tipos de eventos en la ciudad. Se aprecia una mayor concentración en las principales avenidas, especialmente en el caso de los accidentes, los cuales tienden a ocurrir con mayor frecuencia en los cruces de estas arterias.
 
 \begin{figure}[H]
     \centering
@@ -138,11 +135,11 @@ En la \autoref{fig:dist_events} se muestran como los difentes tipos de eventos s
     \subfloat[Peligros]{
         \includegraphics[width=0.33\textwidth]{images/dist_hazards.png}
     }
-    \caption{Distribución de eventos en Antofagasta}
+    \caption{Distribución espacial de eventos en Antofagasta}
     \label{fig:dist_events}
 \end{figure}
 
-Para realizar el análisis de tiempo, se agruparán los eventos por hora de ocurrencia en el día, tomando el promedio de eventos ocurridos al día. En la \autoref{fig:time_events}, los eventos se concentran en los horarios punta, tanto para accidentes como para congestión, para el caso de peligro, se observa una distribución más uniforme durante el día.
+Para el análisis temporal, los eventos se agruparon por hora del día, calculando el promedio de eventos ocurridos por jornada. En la \autoref{fig:time_events} se evidencia una concentración de accidentes y congestiones durante las horas punta. En contraste, los eventos de tipo peligro presentan una distribución más uniforme a lo largo del día.
 
 \begin{figure}[H]
     \centering
@@ -231,6 +228,146 @@ Tomamos la media de accidentes diarios, los agrupamos por segmento, definimos qu
 % Ruta más segura
 
 % Machine learning (XGBoost)
+
+\subsection{Selección del modelo}
+
+Se evaluaron distintos algoritmos de clasificación para abordar el problema planteado. Inicialmente se probaron modelos clásicos como \textit{Logistic Regression}, \textit{K-Nearest Neighbors}, \textit{Decision Tree}, entre otros. Sin embargo, estos no mostraron mejoras relevantes en las métricas evaluadas, por lo que se descartaron para la fase de ajuste de hiperparámetros.
+
+Se procedió entonces a aplicar una búsqueda exhaustiva (\textit{GridSearchCV}) sobre dos modelos con buen desempeño preliminar: \textbf{Random Forest} y \textbf{XGBoost}.
+
+\paragraph{Random Forest.}
+Se evaluaron los siguientes hiperparámetros:
+
+\begin{itemize}
+    \item \texttt{max\_depth}: [2, 5, 10]
+    \item \texttt{n\_estimators}: [20, 80, 100, 200]
+    \item \texttt{min\_samples\_leaf}: [2, 4, 8]
+    \item \texttt{max\_leaf\_nodes}: [2, 8]
+    \item \texttt{max\_features}: [2, 8]
+    \item \texttt{class\_weight}: [None, 'balanced']
+\end{itemize}
+
+Los mejores hiperparámetros obtenidos fueron:
+
+\begin{itemize}
+    \item \texttt{class\_weight}: None
+    \item \texttt{max\_depth}: 10
+    \item \texttt{max\_features}: 2
+    \item \texttt{max\_leaf\_nodes}: 8
+    \item \texttt{min\_samples\_leaf}: 2
+    \item \texttt{n\_estimators}: 100
+\end{itemize}
+
+Con estos valores, el modelo alcanzó una puntuación máxima de \textbf{0.7957} en validación cruzada.
+
+
+\paragraph{XGBoost.}
+Se aplicaron múltiples rondas de \textit{grid search} con distintos rangos de hiperparámetros, refinando progresivamente los valores. Los mejores resultados se obtuvieron con:
+
+\begin{itemize}
+    \item \texttt{colsample\_bytree}: 0.7
+    \item \texttt{gamma}: 1
+    \item \texttt{learning\_rate}: 0.1
+    \item \texttt{max\_depth}: 30
+    \item \texttt{n\_estimators}: 80
+\end{itemize}
+
+Este modelo logró una métrica de validación cruzada de \textbf{0.8665}, superando significativamente al resto de las alternativas evaluadas. Por este motivo, \textbf{XGBoost fue seleccionado como modelo final}.
+
+En el \autoref{tab:model-comparison} se puede observar la comparación de ambos modelos.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|p{9cm}|c|}
+\hline
+\textbf{Modelo} & \textbf{Mejores Hiperparámetros} & \textbf{Mejor Score} \\
+\hline
+\textbf{Random Forest} &
+\begin{tabular}[c]{@{}l@{}}
+\texttt{class\_weight}: None\\
+\texttt{max\_depth}: 10\\
+\texttt{max\_features}: 2\\
+\texttt{max\_leaf\_nodes}: 8\\
+\texttt{min\_samples\_leaf}: 2\\
+\texttt{n\_estimators}: 100
+\end{tabular}
+& 0.7957 \\
+\hline
+\textbf{XGBoost} &
+\begin{tabular}[c]{@{}l@{}}
+\texttt{colsample\_bytree}: 0.7\\
+\texttt{gamma}: 1\\
+\texttt{learning\_rate}: 0.1\\
+\texttt{max\_depth}: 30\\
+\texttt{n\_estimators}: 80
+\end{tabular}
+& \textbf{0.8665} \\
+\hline
+\end{tabular}
+\caption{Comparativa de modelos ajustados con GridSearchCV}
+\label{tab:model-comparison}
+\end{table}
+
+
+\subsection{Generación de eventos negativos simulados}
+
+Dado que el conjunto original contenía únicamente eventos positivos (ocurridos), fue necesario generar instancias negativas (no ocurridos) para entrenar un modelo de clasificación binaria. Para ello, se implementó una estrategia inspirada en el enfoque de generación de eventos negativos artificiales propuesto por Goedertier et al. (2009), que permite representar problemas secuenciales como tareas de clasificación supervisada.
+
+En nuestro caso, la generación se basa en una grilla temporal con intervalos de 5 minutos, sobre la cual se combinan todas las posibles ubicaciones (\texttt{group}) y tipos de evento. Luego, se identifican aquellas combinaciones que no se encuentran en los datos originales (es decir, donde no ocurrió un evento) y se etiquetan como eventos negativos (\texttt{happen} = 0). Estas instancias se muestrean de forma aleatoria para igualar la cantidad de eventos positivos, logrando así un conjunto balanceado con un 50\% de eventos positivos y 50\% de negativos.
+
+Este enfoque permite mantener la estructura temporal y geoespacial de los datos reales, evitando introducir ruido aleatorio, y facilitando la evaluación robusta de métricas como \texttt{recall} y \texttt{precision} \parencite{goedertier2009robust}.
+
+
+\subsection{Resultados del modelo seleccionado}
+
+La versión final del modelo (\texttt{v6}) se entrenó utilizando los hiperparámetros obtenidos durante la etapa de validación cruzada. El modelo fue registrado y versionado mediante \textit{MLflow}, permitiendo un seguimiento detallado de sus parámetros y métricas.
+
+\noindent Los parámetros más relevantes del modelo fueron:
+
+\begin{itemize}
+    \item \texttt{max\_depth} = 20
+    \item \texttt{n\_estimators} = 80
+    \item \texttt{learning\_rate} = 0.1
+    \item \texttt{gamma} = 0.8
+    \item \texttt{colsample\_bytree} = 0.7
+\end{itemize}
+
+El modelo utiliza codificación \textit{one-hot} y un esquema de clasificación binaria (\texttt{binary:logistic}), con una semilla aleatoria (\texttt{random\_state = 42}) para garantizar la reproducibilidad.
+
+
+\noindent En cuanto al rendimiento, se obtuvieron los siguientes resultados para una muestra de 64.708 eventos, con un 50\% de eventos ocurridos y un 50\% de no ocurridos. Esta proporción se logró mediante la simulación de eventos negativos sobre una grilla temporal de 5 minutos, generando combinaciones posibles de tiempo, localización y tipo de evento que no están presentes en los datos originales. Esto permite evaluar el modelo en condiciones balanceadas, facilitando la interpretación de métricas como \texttt{precision}, \texttt{recall} y \texttt{F1-score}.
+
+\begin{itemize}
+    \item \textbf{Accuracy}: 0.8795
+    \item \textbf{Recall}: 0.9076
+    \item \textbf{Precision}: 0.8583
+    \item \textbf{F1-score}: 0.8823
+    \item \textbf{Promedio validación cruzada (10 folds)}: 0.7819
+\end{itemize}
+
+\noindent Respecto a la matriz de confusión, se registraron los siguientes valores:
+
+\begin{itemize}
+    \item Verdaderos positivos: 5,539
+    \item Verdaderos negativos: 5,843
+    \item Falsos positivos: 965
+    \item Falsos negativos: 595
+\end{itemize}
+
+Estas métricas evidencian un modelo con excelente capacidad para identificar correctamente los casos positivos, sin sacrificar precisión ni balance. La validación cruzada muestra estabilidad a lo largo de los distintos folds, lo que refuerza la robustez del modelo final.
+
+\subsection{Curva de aprendizaje del modelo}
+
+La \autoref{fig:learning_curve} muestra la curva de aprendizaje del modelo XGBoost entrenado. Se observa un rendimiento alto y consistente tanto en el conjunto de entrenamiento como en el de validación (aproximadamente 0.88–0.90), con una brecha mínima entre ambas curvas. Esto indica que el modelo generaliza adecuadamente, sin presentar sobreajuste ni subajuste. Además, el comportamiento plano de ambas curvas sugiere que incrementar el tamaño del conjunto de entrenamiento no tendría un impacto significativo en el rendimiento, lo cual evidencia una saturación en la capacidad de aprendizaje del modelo con las características actuales.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/learning_curve.png}
+    \caption{Identificación de cuadrantes en mapa de Antofagasta}
+    \label{fig:learning_curve}
+\end{figure}
+
 
 % Aplicación implementacióñ (dashboard online y ML)
 
