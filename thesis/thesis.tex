@@ -21,6 +21,7 @@
 \renewcommand{\baselinestretch}{1.5}
 
 \usepackage{graphicx}
+\usepackage{amsmath}
 \usepackage{hyperref}
 \usepackage{float}
 \usepackage{parskip}
@@ -163,16 +164,7 @@ Para el análisis temporal, los eventos se agruparon por hora del día, calculan
 
 Los resultados de la regresión lineal entre accidentes y reportes de congestión, presentados en la \autoref{fig:corr_lineal}, indican una fuerte correlación positiva durante los días de semana ($R^2 = 0.92$), lo que sugiere que a mayor número de reportes de congestión, también aumenta el número de accidentes. En cambio, durante los fines de semana la relación es más débil ($R^2 = 0.56$), aunque aún presente.
 
-Estos resultados permiten postular una relación directa entre el flujo vehicular y la ocurrencia de accidentes, especialmente bajo condiciones de alta actividad urbana. Sin embargo, al observar ciertos patrones no lineales en las distribuciones horarias de los eventos, se plantea la hipótesis de que esta relación podría estar mejor explicada por una función de tipo exponencial inversa, especialmente en condiciones de congestión extrema donde la reducción de velocidad podría disminuir la gravedad o frecuencia de los accidentes.
-
-A continuación, se explora esta hipótesis utilizando un modelo de correlación no lineal basado en la función exponencial inversa:
-
-\begin{equation}
-    A(x) = \alpha \cdot e^{-\beta x} + \gamma
-    \label{eq:exp_corr}
-\end{equation}
-
-donde $A(x)$ representa el número estimado de accidentes en función del número de reportes de congestión $x$, y los parámetros $\alpha$, $\beta$ y $\gamma$ son ajustados mediante regresión no lineal. Este modelo se ajusta a los datos tanto para días de semana como para fines de semana, cuyos resultados se presentan en la \autoref{fig:corr_exp}.
+Estos resultados permiten postular una relación directa entre el flujo vehicular y la ocurrencia de accidentes, especialmente bajo condiciones de alta actividad urbana.
 
 % Prueba hipótesis relación accidents-jams
 
@@ -254,6 +246,7 @@ Los gráficos Q-Q (\autoref{fig:qq_lin}) muestran una aproximación razonable a 
 Los gráficos de residuos (\autoref{fig:resid_lin}) revelan patrones distintos para cada período. En días de semana, aunque hay cierta dispersión alrededor de cero, se observa variabilidad considerable con algunos residuos positivos destacados (especialmente entre valores ajustados de 0.5 y 1.25) y residuos negativos pronunciados en valores extremos. Para fines de semana, los residuos muestran menor magnitud global pero un patrón menos aleatorio, sugiriendo posible estructura no capturada por el modelo lineal.
 
 En resumen, el análisis confirma una relación lineal significativa entre congestión y accidentes, considerablemente más fuerte durante días laborables ($R^2 = 0.92$) que en fines de semana ($R^2 = 0.56$). Los patrones observados en los residuos, particularmente para fines de semana, sugieren la pertinencia de explorar modelos no lineales que podrían capturar mejor las relaciones subyacentes en los datos.
+
 
 \subsection{Modelo de correlación exponencial inversa}
 
