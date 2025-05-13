@@ -159,8 +159,22 @@ Para el análisis temporal, los eventos se agruparon por hora del día, calculan
     \label{fig:time_events}
 \end{figure}
 
-% Prueba hipótesis relación accidents-jams
+\subsection{Modelo de correlación lineal}
 
+Los resultados de la regresión lineal entre accidentes y reportes de congestión, presentados en la \autoref{fig:corr_lineal}, indican una fuerte correlación positiva durante los días de semana ($R^2 = 0.92$), lo que sugiere que a mayor número de reportes de congestión, también aumenta el número de accidentes. En cambio, durante los fines de semana la relación es más débil ($R^2 = 0.56$), aunque aún presente.
+
+Estos resultados permiten postular una relación directa entre el flujo vehicular y la ocurrencia de accidentes, especialmente bajo condiciones de alta actividad urbana. Sin embargo, al observar ciertos patrones no lineales en las distribuciones horarias de los eventos, se plantea la hipótesis de que esta relación podría estar mejor explicada por una función de tipo exponencial inversa, especialmente en condiciones de congestión extrema donde la reducción de velocidad podría disminuir la gravedad o frecuencia de los accidentes.
+
+A continuación, se explora esta hipótesis utilizando un modelo de correlación no lineal basado en la función exponencial inversa:
+
+\begin{equation}
+    A(x) = \alpha \cdot e^{-\beta x} + \gamma
+    \label{eq:exp_corr}
+\end{equation}
+
+donde $A(x)$ representa el número estimado de accidentes en función del número de reportes de congestión $x$, y los parámetros $\alpha$, $\beta$ y $\gamma$ son ajustados mediante regresión no lineal. Este modelo se ajusta a los datos tanto para días de semana como para fines de semana, cuyos resultados se presentan en la \autoref{fig:corr_exp}.
+
+% Prueba hipótesis relación accidents-jams
 
 \begin{figure}[H]
     \centering
@@ -176,6 +190,91 @@ Para el análisis temporal, los eventos se agruparon por hora del día, calculan
     \label{fig:corr_lineal}
 \end{figure}
 
+\subsection{Prueba de hipótesis de correlación lineal}
+
+Para evaluar la existencia de una relación estadísticamente significativa entre el número de reportes de congestión y la cantidad de accidentes por hora, se aplicó una prueba de correlación de Pearson.
+
+La hipótesis nula ($H_0$) establece que no existe correlación lineal entre ambas variables, mientras que la hipótesis alternativa ($H_1$) plantea que sí existe tal correlación:
+
+\begin{align}
+H_0&:\ \rho = 0 \\
+H_1&:\ \rho \ne 0
+\end{align}
+
+Donde $\rho$ representa el coeficiente de correlación poblacional. El estadístico de prueba se calcula mediante:
+
+\begin{equation}
+t = \frac{r \sqrt{n - 2}}{\sqrt{1 - r^2}}
+\end{equation}
+
+donde $r$ es el coeficiente de correlación muestral y $n$ el número de observaciones. El valor resultante se contrasta con la distribución t de Student con $n - 2$ grados de libertad.
+
+El análisis estadístico del modelo lineal entregó resultados significativos tanto para días de semana como para fin de semana:
+
+\begin{itemize}
+    \item Para días de semana:
+    \begin{itemize}
+        \item El modelo ajustado fue $y = 0.1054x + 0.1824$
+        \item Se obtuvo un $R^2 = 0.92$, explicando el 92\% de la variabilidad
+        \item El coeficiente de correlación de Pearson fue $r = 0.96$ con IC 95\%: [0.91, 0.98]
+        \item La significancia global fue $F(1, 22) = 256.29$, $p < 0.0001$
+        \item Los parámetros fueron estadísticamente significativos con $p < 0.001$
+        \item El estadístico $t$ para la prueba de correlación fue $t = 16.01$, $p < 0.0001$
+    \end{itemize}
+
+    \item Para fines de semana:
+    \begin{itemize}
+        \item El modelo ajustado fue $y = 0.1042x + 0.1078$
+        \item Se obtuvo un $R^2 = 0.56$, explicando el 56\% de la variabilidad
+        \item El coeficiente de correlación de Pearson fue $r = 0.75$ con IC 95\%: [0.49, 0.88]
+        \item La significancia global fue $F(1, 22) = 27.74$, $p < 0.0001$
+        \item Los parámetros fueron estadísticamente significativos con $p < 0.0001$
+        \item El estadístico $t$ para la prueba de correlación fue $t = 5.27$, $p < 0.0001$
+    \end{itemize}
+\end{itemize}
+
+Estos resultados permiten rechazar la hipótesis nula con un nivel de confianza del 99\%, confirmando la existencia de una relación lineal estadísticamente significativa entre el número de reportes de congestión y la cantidad de accidentes registrados por hora.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{images/residuos_lin.png}
+\caption{Residuos del modelo lineal para días de semana y fines de semana}
+\label{fig:resid_lin}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{images/qq_lin.png}
+\caption{Gráficos Q-Q de los residuos del modelo lineal}
+\label{fig:qq_lin}
+\end{figure}
+
+Los gráficos Q-Q (\autoref{fig:qq_lin}) muestran una aproximación razonable a la distribución normal en ambos períodos. Para los días de semana, los puntos siguen la línea de referencia bastante bien, con pequeñas desviaciones en los extremos. En el caso de fin de semana, aunque también hay una tendencia lineal, se observan algunas desviaciones más notables en los valores centrales.
+
+Los gráficos de residuos (\autoref{fig:resid_lin}) revelan patrones distintos para cada período. En días de semana, aunque hay cierta dispersión alrededor de cero, se observa variabilidad considerable con algunos residuos positivos destacados (especialmente entre valores ajustados de 0.5 y 1.25) y residuos negativos pronunciados en valores extremos. Para fines de semana, los residuos muestran menor magnitud global pero un patrón menos aleatorio, sugiriendo posible estructura no capturada por el modelo lineal.
+
+En resumen, el análisis confirma una relación lineal significativa entre congestión y accidentes, considerablemente más fuerte durante días laborables ($R^2 = 0.92$) que en fines de semana ($R^2 = 0.56$). Los patrones observados en los residuos, particularmente para fines de semana, sugieren la pertinencia de explorar modelos no lineales que podrían capturar mejor las relaciones subyacentes en los datos.
+
+\subsection{Modelo de correlación exponencial inversa}
+
+Dado que la relación entre congestión y accidentes no necesariamente es lineal en todos los contextos —especialmente bajo alta densidad vehicular— se propuso un modelo de potencia inversa. Este considera que, a medida que aumenta la congestión (y por ende, disminuye la velocidad promedio), podría reducirse la probabilidad de accidentes graves.
+
+El modelo propuesto se ajusta a la siguiente forma funcional:
+
+\begin{equation}
+A(x) = \frac{\alpha}{x^{\beta}} + \gamma
+\end{equation}
+
+donde:
+\begin{itemize}
+    \item $A(x)$ es el número estimado de accidentes por hora,
+    \item $x$ representa el número de reportes de congestión por hora,
+    \item $\alpha$, $\beta$ y $\gamma$ son parámetros ajustados mediante regresión no lineal.
+\end{itemize}
+
+Este modelo fue aplicado tanto a los días de semana como a los fines de semana. En ambos casos, se observó un buen ajuste visual, respaldando la hipótesis de una relación decreciente no lineal entre ambas variables bajo ciertas condiciones de tráfico.
+
+Los resultados del ajuste se presentan en la \autoref{fig:corr_exp}, mostrando un ajuste significativo del modelo a los datos.
 
 \begin{figure}[H]
     \centering
@@ -187,9 +286,51 @@ Para el análisis temporal, los eventos se agruparon por hora del día, calculan
         \includegraphics[width=0.9\textwidth]{images/corr_exp_fs.png}
     }
     \newline
-    \caption{Correlación exponencial inversa entre accidentes y congestión}
+    \caption{Correlación de potencia inversa entre accidentes y congestión}
     \label{fig:corr_exp}
 \end{figure}
+
+El análisis estadístico del modelo de potencia inversa entregó resultados significativos tanto para días de semana como para fin de semana:
+
+\begin{itemize}
+    \item Para días de semana:
+    \begin{itemize}
+        \item El modelo ajustado fue $y = 0.2962/x^{0.6415}$
+        \item Se obtuvo un $R^2 = 0.96$, explicando el 96\% de la variabilidad
+        \item La significancia global fue $F(2, 22) = 263.68$, $p < 0.0001$
+        \item Los parámetros fueron estadísticamente significativos con $p < 0.0001$
+    \end{itemize}
+
+    \item Para fines de semana:
+    \begin{itemize}
+        \item El modelo ajustado fue $y = 0.2206/x^{0.2512}$
+        \item Se obtuvo un $R^2 = 0.55$, explicando el 55\% de la variabilidad
+        \item La significancia global fue $F(2, 22) = 13.41$, $p < 0.001$
+        \item Los parámetros fueron estadísticamente significativos con $p < 0.001$
+    \end{itemize}
+\end{itemize}
+
+Este análisis revela diferencias importantes en la dinámica de la relación congestión-accidentes entre períodos. Durante los días de semana, el exponente negativo de mayor magnitud ($-0.6415$) indica una relación más sensible entre las variables, mientras que en fines de semana el exponente menor ($-0.2512$) sugiere una relación menos pronunciada.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{images/residuos_exp.png}
+\caption{Residuos del modelo de potencia inversa para días de semana y fines de semana}
+\label{fig:resid_exp}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{images/qq_exp.png}
+\caption{Gráficos Q-Q de los residuos del modelo de potencia inversa}
+\label{fig:qq_exp}
+\end{figure}
+
+Los gráficos de residuos (\autoref{fig:resid_exp}) muestran una dispersión aleatoria en torno a cero, sin evidencias claras de heterocedasticidad ni patrones sistemáticos, lo que respalda la validez del ajuste no lineal propuesto. En particular, para los días de semana, los residuos muestran una mayor variabilidad con valores extremos más pronunciados (entre -0.15 y 0.3), en comparación con los fines de semana, donde la dispersión es menor (aproximadamente entre -0.1 y 0.15).
+
+Complementariamente, los gráficos Q-Q (\autoref{fig:qq_exp}) revelan una aproximación a la distribución normal de los residuos en ambos casos, aunque con algunas desviaciones. En días de semana, se observan desviaciones notables en ambos extremos, particularmente en los valores positivos más altos, sugiriendo colas más pesadas que la distribución normal. Para los fines de semana, la alineación con la línea teórica es mejor en los valores centrales, con desviaciones más leves en los extremos.
+
+En conjunto, estos resultados indican que el modelo de potencia inversa no solo es estadísticamente significativo, sino que además presenta supuestos de ajuste razonablemente válidos en términos de normalidad de residuos, lo que fortalece la hipótesis de una relación decreciente entre la congestión y la probabilidad de accidentes graves en contextos urbanos.
 
 % Cálculo de la frecuencia por zona
 % Filtro por zona
