@@ -118,7 +118,7 @@ Para obtener los datos necesarios para el análisis, fue necesario generar un me
 
 Existen dos estructuras principales, las alertas (alerts) y las congestiones (jams), el primero registra todos los eventos reportados por usuarios, tales como peligros, accidentes, congestión o rutas cerradas. En el caso de los eventos de congestión, son datos generados automáticamente por Waze, los cuales usando la geolocalización, estiman congestiones en diferentes puntos de la ciudad. Para este proyecto, se utilizó la información de las alertas. Sin embargo, se almacenaron los datos de congestión, para un posterior análisis, que está fuera del alcance de este estudio. Esta estructura se definió con base en los datos relevantes y completos que proporciona la API, los tipos de datos disponibles pueden ser consultados en la documentación de Waze \parencite{waze2024}.
 
-Desde octubre de 2024 hasta Abril de 2025, se han acumulado 40429 alertas, las cuales se analizarán a lo largo de esde estudio.
+Desde octubre de 2024 hasta abril de 2025, se han acumulado 40429 alertas, las cuales se analizarán a lo largo de este estudio.
 
 
 \subsection{Eventos en el espacio y tiempo}
@@ -333,7 +333,7 @@ En conjunto, estos resultados indican que el modelo de potencia inversa no solo 
 
 Para representar conjuntos estáticos de puntos espaciales, se utiliza la estructura cKd-tree, una variante compacta del Kd-tree que codifica distancias relativas mediante spiral codes y las almacena usando Directly Addressable Codes (DACs), optimizando el uso de memoria sin sacrificar eficiencia en consultas espaciales \parencite{gutierrez2023ckdtree}. A cada zona la llamaremos cuadrante o segmento.
 
-En la \autoref{fig:quad_acc} puede verse como se distribuyen los segmentos númericamente, partiendo desde el segmento 1 en la esquina inferior izquierda. La opacidad del color rojo va en relación con la cantidad de accidentes por segmento.
+En la \autoref{fig:quad_acc} se puede ver cómo se distribuyen los segmentos numéricamente, comenzando desde el segmento 1 en la esquina inferior izquierda. La opacidad del color rojo está relacionada con la cantidad de accidentes por segmento.
 
 \begin{figure}[H]
     \centering
@@ -363,9 +363,9 @@ Tomamos la media de accidentes diarios, los agrupamos por segmento, definimos qu
 
 % Machine learning (XGBoost)
 
-\subsection{Selección del modelo}
+\subsection{Selección del modelo de Machine Learning}
 
-Se evaluaron distintos algoritmos de clasificación para abordar el problema planteado. Inicialmente se probaron modelos clásicos como \textit{Logistic Regression}, \textit{K-Nearest Neighbors}, \textit{Decision Tree}, entre otros. Sin embargo, estos no mostraron mejoras relevantes en las métricas evaluadas, por lo que se descartaron para la fase de ajuste de hiperparámetros.
+Se evaluaron distintos algoritmos de clasificación para abordar el problema planteado. Inicialmente, se probaron modelos clásicos como \textit{Logistic Regression}, \textit{K-Nearest Neighbors}, \textit{Decision Tree}, entre otros. Sin embargo, estos no mostraron mejoras relevantes en las métricas evaluadas, por lo que se descartaron para la fase de ajuste de hiperparámetros.
 
 Se procedió entonces a aplicar una búsqueda exhaustiva (\textit{GridSearchCV}) sobre dos modelos con buen desempeño preliminar: \textbf{Random Forest} y \textbf{XGBoost}.
 
@@ -443,7 +443,7 @@ En el \autoref{tab:model-comparison} se puede observar la comparación de ambos 
 \end{table}
 
 
-\subsection{Generación de eventos negativos simulados}
+\subsection{Generación de eventos negativos simulados} \label{ssec:class_balancing}
 
 Dado que el conjunto original contenía únicamente eventos positivos (ocurridos), fue necesario generar instancias negativas (no ocurridos) para entrenar un modelo de clasificación binaria. Para ello, se implementó una estrategia inspirada en el enfoque de generación de eventos negativos artificiales propuesto por Goedertier et al. (2009), que permite representar problemas secuenciales como tareas de clasificación supervisada.
 
@@ -469,7 +469,7 @@ La versión final del modelo (\texttt{v6}) se entrenó utilizando los hiperpará
 El modelo utiliza codificación \textit{one-hot} y un esquema de clasificación binaria (\texttt{binary:logistic}), con una semilla aleatoria (\texttt{random\_state = 42}) para garantizar la reproducibilidad.
 
 
-\noindent En cuanto al rendimiento, se obtuvieron los siguientes resultados para una muestra de 64.708 eventos, con un 50\% de eventos ocurridos y un 50\% de no ocurridos. Esta proporción se logró mediante la simulación de eventos negativos sobre una grilla temporal de 5 minutos, generando combinaciones posibles de tiempo, localización y tipo de evento que no están presentes en los datos originales. Esto permite evaluar el modelo en condiciones balanceadas, facilitando la interpretación de métricas como \texttt{precision}, \texttt{recall} y \texttt{F1-score}.
+\noindent En cuanto al rendimiento, se obtuvieron los siguientes resultados para una muestra de 64.708 eventos, con un 50\% de eventos ocurridos y un 50\% de no ocurridos. Esta proporción se logró mediante la simulación de eventos negativos sobre una grilla temporal de 5 minutos, generando combinaciones posibles de tiempo, localización y tipo de evento que no están presentes en los datos originales (\autoref{ssec:class_balancing}). Esto permite evaluar el modelo en condiciones balanceadas, facilitando la interpretación de métricas como \texttt{precision}, \texttt{recall} y \texttt{F1-score}.
 
 \begin{itemize}
     \item \textbf{Accuracy}: 0.8795
@@ -488,7 +488,7 @@ El modelo utiliza codificación \textit{one-hot} y un esquema de clasificación 
     \item Falsos negativos: 595
 \end{itemize}
 
-Estas métricas evidencian un modelo con excelente capacidad para identificar correctamente los casos positivos, sin sacrificar precisión ni balance. La validación cruzada muestra estabilidad a lo largo de los distintos folds, lo que refuerza la robustez del modelo final.
+Estas métricas evidencian un modelo con excelente capacidad para identificar correctamente los casos positivos, sin sacrificar precisión ni equilibrio. La validación cruzada muestra estabilidad a lo largo de los distintos folds, lo que refuerza la robustez del modelo final y confirma que no hubo sobreentrenamiento.
 
 \subsection{Curva de aprendizaje del modelo}
 
@@ -502,8 +502,25 @@ La \autoref{fig:learning_curve} muestra la curva de aprendizaje del modelo XGBoo
     \label{fig:learning_curve}
 \end{figure}
 
-
 % Aplicación implementacióñ (dashboard online y ML)
+
+\subsection{Despliegue y mantenimiento del modelo}
+
+Para entregar una interfaz que permita al usuario final interactuar con los datos, se desarrolló un tablero de control utilizando Dash \parencite{dashboard2024}, un marco de trabajo especializado en la presentación de datos gráficos mediante Python. La arquitectura del sistema se diseñó considerando dos componentes principales: un servidor implementado en Rust y un cliente en Python, como se muestra en la \autoref{fig:architecture}. El servidor se encarga de las operaciones intensivas como la captura, transformación, almacenamiento y gestión del caché de los datos, mientras que el cliente maneja la interacción con el usuario, la actualización de datos desde el servidor, el entrenamiento del modelo y la generación del tablero de control.
+
+El ciclo de vida del modelo se gestiona mediante APScheduler, una biblioteca de Python especializada en la programación de tareas asíncronas. Esta herramienta permite automatizar el reentrenamiento periódico del modelo con nuevos datos, garantizando su actualización y adaptación a los cambios en los patrones de tráfico. El proceso incluye la validación automática del rendimiento del modelo, comparando las métricas clave (precisión, recall, F1-score) con los umbrales establecidos, y solo se despliega una nueva versión si representa una mejora significativa.
+
+La implementación del servidor en Rust aprovecha las ventajas del lenguaje en cuanto a eficiencia y seguridad en el manejo de memoria. Se utiliza Memcached como sistema de caché para optimizar el acceso a los datos frecuentemente consultados, implementando una estrategia de almacenamiento que prioriza la unicidad de los datos para minimizar el uso de memoria. En el lado del cliente, se implementa un sistema de workers múltiples que comparten una única instancia de los datos en memoria, protegida mediante un mutex para garantizar la integridad en las operaciones de lectura concurrentes.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/dashboard.png}
+    \caption{Arquitectura del sistema}
+    \label{fig:architecture}
+\end{figure}
+
+El entrenamiento del modelo está programado para realizarse cada 30 días, utilizando los nuevos datos. Los datos del dashboard se actualizan cada 5 minutos.
+
 
 % \section{Resultados}
 
