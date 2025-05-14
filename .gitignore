@@ -33,6 +33,7 @@ mlflow.db
 *.bbl
 *.blg
 *.bcf
+*.toc
 *.run.xml
 !thesis/images
 analisis/**/*.html
