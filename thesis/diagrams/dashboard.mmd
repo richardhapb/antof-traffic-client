@@ -1,0 +1,36 @@
+flowchart TD
+    subgraph API["Waze Cities API"]
+        WA[Alertas]
+        WJ[Congestiones]
+    end
+
+    subgraph Servidor["Servidor (Rust)"]
+        direction TB
+        API --> |JSON| ETL[ETL]
+        ETL --> DB[(PostgreSQL)]
+        ETL --> Cache[("Memcached - Cache")]
+        DB <--> Cache
+        Cache --> API_Server[API REST]
+    end
+
+    subgraph Cliente["Cliente (Python)"]
+        direction TB
+        API_Server --> |HTTP| Data[Gestor de Datos]
+        Data --> |Entrenamiento| ML[XGBoost - Modelo ML]
+        Data --> Dash[Dashboard Web]
+        ML --> Dash
+        APSched[APScheduler] --> |Actualización| ML
+        APSched --> |Actualización| Data
+    end
+
+    Cliente --> |Interfaz Web| Users((Usuarios))
+
+    classDef api fill:#e0e7ff,stroke:#2c3e50,stroke-width:1.5px
+    classDef server fill:#d1fae5,stroke:#2c3e50,stroke-width:1.5px
+    classDef client fill:#fef9c3,stroke:#2c3e50,stroke-width:1.5px
+    classDef users fill:#ffffff,stroke:#2c3e50,stroke-width:1.5px
+
+    class API api
+    class Servidor server
+    class Cliente client
+    class Users users
