@@ -27,6 +27,9 @@
 \usepackage{parskip}
 \usepackage[spanish]{cleveref}
 
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
 \usepackage[caption = true]{subfig}
 
 \usepackage[backend=biber,style=apa,language=spanish]{biblatex}
@@ -127,6 +130,44 @@ Existen dos estructuras principales, las alertas (alerts) y las congestiones (ja
 
 Desde octubre de 2024 hasta abril de 2025, se han acumulado 40429 alertas, las cuales se analizarán a lo largo de este estudio.
 
+\subsection{Consideraciones de los datos}
+
+Las alertas pueden contener duplicados, debido a que un diferentes usuarios pueden reportar el mismo evento. Para evitar esto, se filtraron los datos agrupándolos por segmento (\autoref{ssec:freq_zone}) y periodos de tiempo eliminando grupos duplicados en un periodo de tiempo de 120 minutos, es decir, todo evento que se reportó con el mismo tipo, en el mismo segmento, dentro de un periodo de dos horas, será considerado como un solo evento. Para esto se usó el siguiente algoritmo detallado en Algorithm \autoref{alg:filter}
+
+\begin{algorithm}
+\caption{Filtrado de eventos por grupo y tiempo}
+\label{alg:filter}
+\begin{algorithmic}[1]
+\Require datos\_entrada, intervalo\_minutos
+\State datos\_filtrados $\gets \emptyset$
+
+\If{datos\_entrada = $\emptyset$ \textbf{or} no existe pub\_millis}
+    \Return datos\_filtrados
+\EndIf
+
+\State datos $\gets$ Copiar(datos\_entrada)
+\State paso $\gets$ intervalo\_minutos $\times$ 60000 \Comment{Convertir a milisegundos}
+
+\ForAll{evento \textbf{in} datos}
+    \If{NO EsEntero(evento.pub\_millis)}
+        \State evento.pub\_millis $\gets$ Redondear(evento.pub\_millis / 1000000)
+    \EndIf
+    \State inicio\_intervalo $\gets$ $\lfloor$evento.pub\_millis / paso$\rfloor$ $\times$ paso
+    \State evento.inicio\_intervalo $\gets$ ConvertirAFecha(inicio\_intervalo)
+\EndFor
+
+\State ConvertirTipo(datos.grupo, ENTERO)
+\State ConvertirTipo(datos.tipo, TEXTO)
+
+\State datos\_filtrados $\gets$ EliminarDuplicados(datos, [inicio\_intervalo, grupo, tipo])
+\State EliminarColumna(datos\_filtrados, inicio\_intervalo)
+\State ConvertirAFecha(datos\_filtrados.pub\_millis)
+\State ReiniciarÍndices(datos\_filtrados)
+
+\Return datos\_filtrados
+\end{algorithmic}
+\end{algorithm}
+
 
 \subsection{Eventos en el espacio y tiempo}
 
@@ -169,7 +210,7 @@ Para el análisis temporal, los eventos se agruparon por hora del día, calculan
 
 \subsection{Modelo de correlación lineal}
 
-Los resultados de la regresión lineal entre accidentes y reportes de congestión, presentados en la \autoref{fig:corr_lineal}, indican una fuerte correlación positiva durante los días de semana ($R^2 = 0.92$), lo que sugiere que a mayor número de reportes de congestión, también aumenta el número de accidentes. En cambio, durante los fines de semana la relación es más débil ($R^2 = 0.56$), aunque aún presente.
+Los resultados de la regresión lineal entre accidentes y reportes de congestión, presentados en la \autoref{fig:corr_lineal}, indican una fuerte correlación positiva durante los días de semana ($R^2 = 0.90$), lo que sugiere que a mayor número de reportes de congestión, también aumenta el número de accidentes. En cambio, durante los fines de semana la relación es más débil ($R^2 = 0.67$), aunque aún presente.
 
 Estos resultados permiten postular una relación directa entre el flujo vehicular y la ocurrencia de accidentes, especialmente bajo condiciones de alta actividad urbana.
 
@@ -213,22 +254,22 @@ El análisis estadístico del modelo lineal entregó resultados significativos t
 \begin{itemize}
     \item Para días de semana:
     \begin{itemize}
-        \item El modelo ajustado fue $y = 0.1054x + 0.1824$
-        \item Se obtuvo un $R^2 = 0.92$, explicando el 92\% de la variabilidad
-        \item El coeficiente de correlación de Pearson fue $r = 0.96$ con IC 95\%: [0.91, 0.98]
-        \item La significancia global fue $F(1, 22) = 256.29$, $p < 0.0001$
+        \item El modelo ajustado fue $y = 0.1673x + 0.0996$
+        \item Se obtuvo un $R^2 = 0.90$, explicando el 90\% de la variabilidad
+        \item El coeficiente de correlación de Pearson fue $r = 0.95$ con IC 95\%: [0.89, 0.98]
+        \item La significancia global fue $F(1, 22) = 203.33$, $p < 0.0001$
         \item Los parámetros fueron estadísticamente significativos con $p < 0.001$
-        \item El estadístico $t$ para la prueba de correlación fue $t = 16.01$, $p < 0.0001$
+        \item El estadístico $t$ para la prueba de correlación fue $t = 14.26$, $p < 0.0001$
     \end{itemize}
 
     \item Para fines de semana:
     \begin{itemize}
-        \item El modelo ajustado fue $y = 0.1042x + 0.1078$
-        \item Se obtuvo un $R^2 = 0.56$, explicando el 56\% de la variabilidad
-        \item El coeficiente de correlación de Pearson fue $r = 0.75$ con IC 95\%: [0.49, 0.88]
-        \item La significancia global fue $F(1, 22) = 27.74$, $p < 0.0001$
+        \item El modelo ajustado fue $y = 0.1365x + 0.0748$
+        \item Se obtuvo un $R^2 = 0.67$, explicando el 67\% de la variabilidad
+        \item El coeficiente de correlación de Pearson fue $r = 0.82$ con IC 95\%: [0.62, 0.92]
+        \item La significancia global fue $F(1, 22) = 44.42$, $p < 0.0001$
         \item Los parámetros fueron estadísticamente significativos con $p < 0.0001$
-        \item El estadístico $t$ para la prueba de correlación fue $t = 5.27$, $p < 0.0001$
+        \item El estadístico $t$ para la prueba de correlación fue $t = 6.66$, $p < 0.0001$
     \end{itemize}
 \end{itemize}
 
@@ -248,16 +289,16 @@ Estos resultados permiten rechazar la hipótesis nula con un nivel de confianza 
 \label{fig:qq_lin}
 \end{figure}
 
-Los gráficos Q-Q (\autoref{fig:qq_lin}) muestran una aproximación razonable a la distribución normal en ambos períodos. Para los días de semana, los puntos siguen la línea de referencia bastante bien, con pequeñas desviaciones en los extremos. En el caso de fin de semana, aunque también hay una tendencia lineal, se observan algunas desviaciones más notables en los valores centrales.
+Los gráficos Q-Q (\autoref{fig:qq_lin}) muestran una aproximación razonable a la distribución normal en ambos períodos. Para los días de semana, los puntos siguen la línea de referencia bastante bien, con algunas desviaciones en los extremos, particularmente en los valores más altos. En el caso de fin de semana, la aproximación a la línea teórica es mejor, con una distribución más cercana a la normal.
 
-Los gráficos de residuos (\autoref{fig:resid_lin}) revelan patrones distintos para cada período. En días de semana, aunque hay cierta dispersión alrededor de cero, se observa variabilidad considerable con algunos residuos positivos destacados (especialmente entre valores ajustados de 0.5 y 1.25) y residuos negativos pronunciados en valores extremos. Para fines de semana, los residuos muestran menor magnitud global pero un patrón menos aleatorio, sugiriendo posible estructura no capturada por el modelo lineal.
+Los gráficos de residuos (\autoref{fig:resid_lin}) revelan patrones distintos para cada período. En días de semana, aunque hay cierta dispersión alrededor de cero, se observa variabilidad considerable con algunos residuos positivos destacados (especialmente entre valores ajustados de 0.5 y 0.6) y residuos negativos pronunciados alrededor de 0.8. Para fines de semana, los residuos muestran menor magnitud global pero un patrón menos aleatorio, sugiriendo posible estructura no capturada por el modelo lineal.
 
-En resumen, el análisis confirma una relación lineal significativa entre congestión y accidentes, considerablemente más fuerte durante días laborables ($R^2 = 0.92$) que en fines de semana ($R^2 = 0.56$). Los patrones observados en los residuos, particularmente para fines de semana, sugieren la pertinencia de explorar modelos no lineales que podrían capturar mejor las relaciones subyacentes en los datos.
+En resumen, el análisis confirma una relación lineal significativa entre congestión y accidentes, considerablemente más fuerte durante días laborables ($R^2 = 0.90$) que en fines de semana ($R^2 = 0.67$). Los patrones observados en los residuos, particularmente para fines de semana, sugieren la pertinencia de explorar modelos no lineales que podrían capturar mejor las relaciones subyacentes en los datos.
 
 
 \subsection{Modelo de correlación exponencial inversa}
 
-Dado que la relación entre congestión y accidentes no necesariamente es lineal en todos los contextos —especialmente bajo alta densidad vehicular— se propuso un modelo de potencia inversa. Este considera que, a medida que aumenta la congestión (y por ende, disminuye la velocidad promedio), podría reducirse la probabilidad de accidentes graves.
+Dado que la relación entre congestión y accidentes no necesariamente es lineal en todos los contextos —especialmente bajo alta densidad vehicular— se propuso un modelo de potencia inversa. Este considera que, a medida que aumenta la congestión (y por ende, disminuye la velocidad promedio), podría reducirse la probabilidad de accidentes.
 
 El modelo propuesto se ajusta a la siguiente forma funcional:
 
@@ -295,22 +336,22 @@ El análisis estadístico del modelo de potencia inversa entregó resultados sig
 \begin{itemize}
     \item Para días de semana:
     \begin{itemize}
-        \item El modelo ajustado fue $y = 0.2962/x^{0.6415}$
-        \item Se obtuvo un $R^2 = 0.96$, explicando el 96\% de la variabilidad
-        \item La significancia global fue $F(2, 22) = 263.68$, $p < 0.0001$
+        \item El modelo ajustado fue $y = 0.3119/x^{-0.6319}$
+        \item Se obtuvo un $R^2 = 0.94$, explicando el 94\% de la variabilidad
+        \item La significancia global fue $F(2, 22) = 158.81$, $p < 0.0001$
         \item Los parámetros fueron estadísticamente significativos con $p < 0.0001$
     \end{itemize}
 
     \item Para fines de semana:
     \begin{itemize}
-        \item El modelo ajustado fue $y = 0.2206/x^{0.2512}$
-        \item Se obtuvo un $R^2 = 0.55$, explicando el 55\% de la variabilidad
-        \item La significancia global fue $F(2, 22) = 13.41$, $p < 0.001$
+        \item El modelo ajustado fue $y = 0.1826/x^{-0.2776}$
+        \item Se obtuvo un $R^2 = 0.71$, explicando el 71\% de la variabilidad
+        \item La significancia global fue $F(2, 22) = 27.19$, $p < 0.001$
         \item Los parámetros fueron estadísticamente significativos con $p < 0.001$
     \end{itemize}
 \end{itemize}
 
-Este análisis revela diferencias importantes en la dinámica de la relación congestión-accidentes entre períodos. Durante los días de semana, el exponente negativo de mayor magnitud ($-0.6415$) indica una relación más sensible entre las variables, mientras que en fines de semana el exponente menor ($-0.2512$) sugiere una relación menos pronunciada.
+Este análisis revela diferencias importantes en la dinámica de la relación congestión-accidentes entre períodos. Durante los días de semana, el exponente negativo de mayor magnitud ($-0.6319$) indica una relación más sensible entre las variables, mientras que en fines de semana el exponente menor ($-0.2776$) sugiere una relación menos pronunciada.
 
 \begin{figure}[H]
 \centering
@@ -326,17 +367,17 @@ Este análisis revela diferencias importantes en la dinámica de la relación co
 \label{fig:qq_exp}
 \end{figure}
 
-Los gráficos de residuos (\autoref{fig:resid_exp}) muestran una dispersión aleatoria en torno a cero, sin evidencias claras de heterocedasticidad ni patrones sistemáticos, lo que respalda la validez del ajuste no lineal propuesto. En particular, para los días de semana, los residuos muestran una mayor variabilidad con valores extremos más pronunciados (entre -0.15 y 0.3), en comparación con los fines de semana, donde la dispersión es menor (aproximadamente entre -0.1 y 0.15).
+Los gráficos de residuos (\autoref{fig:resid_exp}) muestran una dispersión relativamente aleatoria en torno a cero, sin evidencias claras de heterocedasticidad ni patrones sistemáticos, lo que respalda la validez del ajuste no lineal propuesto. En particular, para los días de semana, los residuos muestran una distribución bastante uniforme con algunos valores extremos (entre -0.1 y 0.2), mientras que para los fines de semana, la dispersión es menor y más equilibrada (aproximadamente entre -0.05 y 0.05).
 
-Complementariamente, los gráficos Q-Q (\autoref{fig:qq_exp}) revelan una aproximación a la distribución normal de los residuos en ambos casos, aunque con algunas desviaciones. En días de semana, se observan desviaciones notables en ambos extremos, particularmente en los valores positivos más altos, sugiriendo colas más pesadas que la distribución normal. Para los fines de semana, la alineación con la línea teórica es mejor en los valores centrales, con desviaciones más leves en los extremos.
+Complementariamente, los gráficos Q-Q (\autoref{fig:qq_exp}) revelan una aproximación a la distribución normal de los residuos en ambos casos, aunque con algunas desviaciones. En días de semana, se observan algunas desviaciones en los valores extremos, particularmente un punto notable en el extremo positivo. Para los fines de semana, la alineación con la línea teórica es excepcional, indicando una distribución muy cercana a la normal.
 
-En conjunto, estos resultados indican que el modelo de potencia inversa no solo es estadísticamente significativo, sino que además presenta supuestos de ajuste razonablemente válidos en términos de normalidad de residuos, lo que fortalece la hipótesis de una relación decreciente entre la congestión y la probabilidad de accidentes graves en contextos urbanos.
+En conjunto, estos resultados indican que el modelo de potencia inversa no solo es estadísticamente significativo, sino que además presenta un mejor ajuste que el modelo lineal, especialmente para días de semana donde alcanza un $R^2 = 0.94$ comparado con el $R^2 = 0.90$ del modelo lineal. La normalidad de los residuos y su distribución aleatoria fortalecen la hipótesis de que existe una relación no lineal entre la congestión y la probabilidad de accidentes en contextos urbanos, que puede ser modelada adecuadamente mediante una función de potencia inversa.
 
 % Cálculo de la frecuencia por zona
 % Filtro por zona
 %    Algóritmo cKDTree
 
-\subsection{Frecuencia por zona}
+\subsection{Frecuencia por zona} \label{ssec:freq_zone}
 
 Para representar conjuntos estáticos de puntos espaciales, se utiliza la estructura cKd-tree, una variante compacta del Kd-tree que codifica distancias relativas mediante spiral codes y las almacena usando Directly Addressable Codes (DACs), optimizando el uso de memoria sin sacrificar eficiencia en consultas espaciales \parencite{gutierrez2023ckdtree}. A cada zona la llamaremos cuadrante o segmento.
 
@@ -349,7 +390,7 @@ En la \autoref{fig:quad_acc} se puede ver cómo se distribuyen los segmentos num
     \label{fig:quad_acc}
 \end{figure}
 
-Tomamos la media de accidentes diarios, los agrupamos por segmento, definimos que las zonas mayores a 0.8 accidentes por día son considerados críticos, construimos un mapa según la criticidad (\autoref{fig:quad_mean_day}), si tomamos la suma de los accidentes, tenemos la \autoref{fig:quad_acc_total} que muestra la cantidad de accidentes reportados en el segmento en el periodo de estudio, que a su vez se clasifican como críticos si poseen más de 140 accidentes.
+Tomamos la media de accidentes diarios, los agrupamos por segmento, definimos que las zonas mayores a 0.5 accidentes por día son considerados críticos, construimos un mapa según la criticidad (\autoref{fig:quad_mean_day}), si tomamos la suma de los accidentes, tenemos la \autoref{fig:quad_acc_total} que muestra la cantidad de accidentes reportados en el segmento en el periodo de estudio, que a su vez se clasifican como críticos si poseen más de 90 accidentes.
 
 
 \begin{figure}[H]

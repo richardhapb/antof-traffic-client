@@ -123,36 +123,39 @@ class Alerts:
 
         if self.data is None or "pub_millis" not in self.data.columns:
             return pd.DataFrame()
-        if not inplace:
-            self.data = self.data.copy()
 
-        if not isinstance(self.data["pub_millis"].iloc[0], np.integer):
-            self.data["pub_millis"] = round(
-                self.data["pub_millis"].astype(np.int64, errors="ignore") / 1_000_000
-            ).astype(np.int64)
+        data = self.data.copy() if not inplace else self.data
+
+        if not isinstance(data["pub_millis"].iloc[0], np.integer):
+            data["pub_millis"] = round(data["pub_millis"].astype(np.int64, errors="ignore") / 1_000_000).astype(
+                np.int64
+            )
 
         step = np.int64(60_000 * timedelta_min)  # step en milisegundos
 
         # Adjust `pub_millis` to the nearest step
-        self.data["interval_start"] = ((self.data["pub_millis"]).to_numpy() // step) * step
+        data["interval_start"] = ((data["pub_millis"]).to_numpy() // step) * step
 
         # Convert 'interval_start' to datetime
-        self.data["interval_start"] = pd.to_datetime(self.data["interval_start"], unit="ms", utc=True)
-        self.data["interval_start"] = self.data["interval_start"].dt.tz_convert(utils.TZ)
+        data["interval_start"] = pd.to_datetime(data["interval_start"], unit="ms", utc=True)
+        data["interval_start"] = data["interval_start"].dt.tz_convert(utils.TZ)
 
         # Ensure consistent types
-        self.data["group"] = self.data["group"].astype(np.int16)
-        self.data["type"] = self.data["type"].astype(str)
+        data["group"] = data["group"].astype(np.int16)
+        data["type"] = data["type"].astype(str)
 
         # Keep only the unique events in the three-dimensional variables
-        grouped_events = self.data.drop_duplicates(subset=["interval_start", "group", "type"])
+        data.drop_duplicates(subset=["interval_start", "group", "type"], inplace=True)
+        data.drop(columns=["interval_start"], inplace=True)
 
-        result = grouped_events.reset_index(drop=True)
+        # Ensure pub_millis is properly converted to datetime
+        if not pd.api.types.is_datetime64_any_dtype(data["pub_millis"]):
+            data["pub_millis"] = pd.to_datetime(data["pub_millis"], unit="ms", utc=True)
+            data["pub_millis"] = data["pub_millis"].dt.tz_convert(utils.TZ)
 
-        result["pub_millis"] = pd.to_datetime(result["pub_millis"], unit="ms", utc=True)
-        result["pub_millis"] = result["pub_millis"].dt.tz_convert(utils.TZ)
+        data.reset_index(drop=True, inplace=True)
 
-        return result
+        return data
 
     def group_by_day(self) -> pd.DataFrame:
         """
