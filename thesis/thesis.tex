@@ -32,8 +32,8 @@
 
 \usepackage[caption = true]{subfig}
 
-\usepackage[backend=biber,style=apa,language=spanish]{biblatex}
-\bibliography{biblio}
+\usepackage{natbib}
+\bibliographystyle{apalike}
 
 \begin{document}
 
@@ -58,12 +58,12 @@ A los profesores apasionados por su trabajo, que no solo transmiten conocimiento
 
 El presente proyecto tiene como propósito desarrollar una herramienta efectiva para analizar y predecir, con alta confiabilidad, el comportamiento del tráfico vehicular en la ciudad de Antofagasta mediante el uso de datos provenientes de la plataforma Waze Cities. Waze, a través de su comunidad de usuarios, ofrece información en tiempo real que permite obtener una visión detallada de los eventos de tráfico que ocurren en la ciudad. Esta investigación genera información relevante para la gestión del tráfico, facilitando la toma de decisiones por parte de las autoridades locales con el fin de mejorar la seguridad vial y optimizar la eficiencia del flujo vehicular. A través del análisis y explotación de estos datos, se identifican patrones y tendencias que, integrados en la planificación urbana, contribuirán a optimizar rutas críticas, reducir la congestión y minimizar la probabilidad de accidentes.
 
-En este estudio se emplearán técnicas de análisis de datos y métodos geoespaciales mediante el uso de la librería GeoPandas en Python. Se aplicarán series temporales para proporcionar visualizaciones claras y comprensibles dirigidas al usuario final \parencite{vanlint2005}. También se implementarán técnicas de aprendizaje automático para realizar predicciones de tráfico, anticipándose a eventos y contribuyendo al desarrollo urbano eficiente y seguro \parencite{barcelo2005}.
+En este estudio se emplearán técnicas de análisis de datos y métodos geoespaciales mediante el uso de la librería GeoPandas en Python. Se aplicarán series temporales para proporcionar visualizaciones claras y comprensibles dirigidas al usuario final \citep{vanlint2005}. También se implementarán técnicas de aprendizaje automático para realizar predicciones de tráfico, anticipándose a eventos y contribuyendo al desarrollo urbano eficiente y seguro \citep{barcelo2005}.
 
 \section{Introducción}
 \subsection{Descripción del problema}
 
-Antofagasta, una ciudad con más de 106,000 vehículos en circulación \parencite{comision2023}, enfrenta desafíos significativos en la gestión de su tráfico vehicular. Durante el año 2023, se registraron 1,715 accidentes, los cuales resultaron en 31 fallecidos y 102 heridos graves \parencite{comision2023}. La infraestructura vial limitada, sumada a la alta concentración de vehículos en un número reducido de arterias principales, agravó la congestión y elevó el riesgo de accidentes. A pesar de la existencia de estos problemas, no se cuenta con sistemas de monitoreo en tiempo real que permitan gestionar el tráfico de manera proactiva \parencite{goodall2019}. Por ello, se aprovecharán fuentes de datos alternativas, como Waze, para recolectar información valiosa que facilite la toma de decisiones en materia de tráfico \parencite{chen2015}.
+Antofagasta, una ciudad con más de 106,000 vehículos en circulación \citep{comision2023}, enfrenta desafíos significativos en la gestión de su tráfico vehicular. Durante el año 2023, se registraron 1,715 accidentes, los cuales resultaron en 31 fallecidos y 102 heridos graves \citep{comision2023}. La infraestructura vial limitada, sumada a la alta concentración de vehículos en un número reducido de arterias principales, agravó la congestión y elevó el riesgo de accidentes. A pesar de la existencia de estos problemas, no se cuenta con sistemas de monitoreo en tiempo real que permitan gestionar el tráfico de manera proactiva \citep{goodall2019}. Por ello, se aprovecharán fuentes de datos alternativas, como Waze, para recolectar información valiosa que facilite la toma de decisiones en materia de tráfico \citep{chen2015}.
 
 \subsection{Objetivo general}
 
@@ -74,13 +74,13 @@ Realizar un análisis exhaustivo del comportamiento del tráfico en la ciudad de
 \begin{itemize}
     \item Obtener datos suficientes y representativos sobre los eventos de tráfico en Antofagasta mediante la API de Waze Cities.
     \item Realizar un análisis descriptivo de los datos recolectados para identificar patrones y tendencias relevantes en el comportamiento del tráfico.
-    \item Presentar información visualmente comprensible y útil para las autoridades de gestión vial, facilitando la implementación de políticas y acciones basadas en datos \parencite{auld2009}.
+    \item Presentar información visualmente comprensible y útil para las autoridades de gestión vial, facilitando la implementación de políticas y acciones basadas en datos \citep{auld2009}.
     \item Utilizar los datos disponibles para desarrollar modelos predictivos de tráfico que permitan anticipar eventos y tomar decisiones proactivas en la gestión vial.
 \end{itemize}
 
 \section{Marco teórico}
 
-El tráfico vehicular en entornos urbanos presenta un comportamiento complejo e impredecible, lo que dificulta su gestión eficiente. No obstante, el avance de las tecnologías móviles y la popularidad de aplicaciones como Waze permiten disponer de datos en tiempo real generados por los propios usuarios. Este proyecto se apoya en técnicas de análisis de datos y aprendizaje de máquinas (Machine Learning) para convertir esta información en herramientas útiles para la gestión vial. La utilización de datos geoespaciales, junto con la automatización de los procesos de recolección, análisis y visualización, constituye una solución costo-efectiva para mejorar la planificación del tráfico \parencite{barcelo2005}.
+El tráfico vehicular en entornos urbanos presenta un comportamiento complejo e impredecible, lo que dificulta su gestión eficiente. No obstante, el avance de las tecnologías móviles y la popularidad de aplicaciones como Waze permiten disponer de datos en tiempo real generados por los propios usuarios. Este proyecto se apoya en técnicas de análisis de datos y aprendizaje de máquinas (Machine Learning) para convertir esta información en herramientas útiles para la gestión vial. La utilización de datos geoespaciales, junto con la automatización de los procesos de recolección, análisis y visualización, constituye una solución costo-efectiva para mejorar la planificación del tráfico \citep{barcelo2005}.
 
 \subsection{Metodología}
 
@@ -98,7 +98,7 @@ En la parte del servidor, se desarrolló en Rust, un lenguaje de programación e
 
 Para el procesado de los datos en el cliente (Dash), se generan multiples workers que permiten servir la aplicación de forma eficiente, y se utiliza solo una instancia en memoria de los datos, compartidos por todos los datos, y para mantener la integridad de los datos, se implementó un Mutex para controlar el acceso de lectura a los mismos desde las tareas asíncronas.
 
-La perspectiva general del flujo de datos se muestra en la \autoref{fig:fuente} y el flujo desde la API de Waze hasta el dashboard se puede observar en la \autoref{fig:wf_dash}
+La perspectiva general del flujo de datos se muestra en la \cref{fig:fuente} y el flujo desde la API de Waze hasta el dashboard se puede observar en la \cref{fig:wf_dash}
 
 \begin{figure}[h]
     \centering
@@ -116,7 +116,7 @@ La perspectiva general del flujo de datos se muestra en la \autoref{fig:fuente} 
 
 \section{Desarrollo}
 
-Para obtener los datos necesarios para el análisis, fue necesario generar un mecanismo para recolectar y almacenar la información de Waze Cities. Se implementó un servidor que se encarga de realizar peticiones a la API de Waze, recolectar los eventos de tráfico y almacenarlos en una base de datos PostgreSQL. Este servidor se ejecutaba de manera continua, actualizando la información cada 2 minutos. La estructura de la base de datos se muestra en la \autoref{fig:db_diagram}.
+Para obtener los datos necesarios para el análisis, fue necesario generar un mecanismo para recolectar y almacenar la información de Waze Cities. Se implementó un servidor que se encarga de realizar peticiones a la API de Waze, recolectar los eventos de tráfico y almacenarlos en una base de datos PostgreSQL. Este servidor se ejecutaba de manera continua, actualizando la información cada 2 minutos. La estructura de la base de datos se muestra en la \cref{fig:db_diagram}.
 
 \begin{figure}[H]
     \centering
@@ -125,13 +125,13 @@ Para obtener los datos necesarios para el análisis, fue necesario generar un me
     \label{fig:db_diagram}
 \end{figure}
 
-Existen dos estructuras principales, las alertas (alerts) y las congestiones (jams), el primero registra todos los eventos reportados por usuarios, tales como peligros, accidentes, congestión o rutas cerradas. En el caso de los eventos de congestión, son datos generados automáticamente por Waze, los cuales usando la geolocalización, estiman congestiones en diferentes puntos de la ciudad. Para este proyecto, se utilizó la información de las alertas. Sin embargo, se almacenaron los datos de congestión, para un posterior análisis, que está fuera del alcance de este estudio. Esta estructura se definió con base en los datos relevantes y completos que proporciona la API, los tipos de datos disponibles pueden ser consultados en la documentación de Waze \parencite{waze2024}.
+Existen dos estructuras principales, las alertas (alerts) y las congestiones (jams), el primero registra todos los eventos reportados por usuarios, tales como peligros, accidentes, congestión o rutas cerradas. En el caso de los eventos de congestión, son datos generados automáticamente por Waze, los cuales usando la geolocalización, estiman congestiones en diferentes puntos de la ciudad. Para este proyecto, se utilizó la información de las alertas. Sin embargo, se almacenaron los datos de congestión, para un posterior análisis, que está fuera del alcance de este estudio. Esta estructura se definió con base en los datos relevantes y completos que proporciona la API, los tipos de datos disponibles pueden ser consultados en la documentación de Waze \citep{waze2024}.
 
 Desde octubre de 2024 hasta abril de 2025, se han acumulado 40429 alertas, las cuales se analizarán a lo largo de este estudio.
 
 \subsection{Consideraciones de los datos}
 
-Las alertas pueden contener duplicados, debido a que un diferentes usuarios pueden reportar el mismo evento. Para evitar esto, se filtraron los datos agrupándolos por segmento (\autoref{ssec:freq_zone}) y periodos de tiempo eliminando grupos duplicados en un periodo de tiempo de 120 minutos, es decir, todo evento que se reportó con el mismo tipo, en el mismo segmento, dentro de un periodo de dos horas, será considerado como un solo evento. Para esto se usó el siguiente algoritmo detallado en Algorithm \autoref{alg:filter}
+Las alertas pueden contener duplicados, debido a que un diferentes usuarios pueden reportar el mismo evento. Para evitar esto, se filtraron los datos agrupándolos por segmento (\cref{ssec:freq_zone}) y periodos de tiempo eliminando grupos duplicados en un periodo de tiempo de 120 minutos, es decir, todo evento que se reportó con el mismo tipo, en el mismo segmento, dentro de un periodo de dos horas, será considerado como un solo evento. Para esto se usó el siguiente algoritmo detallado en Algorithm \cref{alg:filter}
 
 \begin{algorithm}
 \caption{Filtrado de eventos por grupo y tiempo}
@@ -170,7 +170,7 @@ Las alertas pueden contener duplicados, debido a que un diferentes usuarios pued
 
 \subsection{Eventos en el espacio y tiempo}
 
-En la \autoref{fig:dist_events} se observa la distribución espacial de los distintos tipos de eventos en la ciudad. Se aprecia una mayor concentración en las principales avenidas, especialmente en el caso de los accidentes, los cuales tienden a ocurrir con mayor frecuencia en los cruces de estas arterias.
+En la \cref{fig:dist_events} se observa la distribución espacial de los distintos tipos de eventos en la ciudad. Se aprecia una mayor concentración en las principales avenidas, especialmente en el caso de los accidentes, los cuales tienden a ocurrir con mayor frecuencia en los cruces de estas arterias.
 
 \begin{figure}[H]
     \centering
@@ -187,7 +187,7 @@ En la \autoref{fig:dist_events} se observa la distribución espacial de los dist
     \label{fig:dist_events}
 \end{figure}
 
-Para el análisis temporal, los eventos se agruparon por hora del día, calculando el promedio de eventos ocurridos por jornada. En la \autoref{fig:time_events} se evidencia una concentración de accidentes y congestiones durante las horas punta. En contraste, los eventos de tipo peligro presentan una distribución más uniforme a lo largo del día.
+Para el análisis temporal, los eventos se agruparon por hora del día, calculando el promedio de eventos ocurridos por jornada. En la \cref{fig:time_events} se evidencia una concentración de accidentes y congestiones durante las horas punta. En contraste, los eventos de tipo peligro presentan una distribución más uniforme a lo largo del día.
 
 \begin{figure}[H]
     \centering
@@ -209,7 +209,7 @@ Para el análisis temporal, los eventos se agruparon por hora del día, calculan
 
 \subsection{Modelo de correlación lineal}
 
-Los resultados de la regresión lineal entre accidentes y reportes de congestión, presentados en la \autoref{fig:corr_lineal}, indican una fuerte correlación positiva durante los días de semana ($R^2 = 0.90$), lo que sugiere que a mayor número de reportes de congestión, también aumenta el número de accidentes. En cambio, durante los fines de semana la relación es más débil ($R^2 = 0.67$), aunque aún presente.
+Los resultados de la regresión lineal entre accidentes y reportes de congestión, presentados en la \cref{fig:corr_lineal}, indican una fuerte correlación positiva durante los días de semana ($R^2 = 0.90$), lo que sugiere que a mayor número de reportes de congestión, también aumenta el número de accidentes. En cambio, durante los fines de semana la relación es más débil ($R^2 = 0.67$), aunque aún presente.
 
 Estos resultados permiten postular una relación directa entre el flujo vehicular y la ocurrencia de accidentes, especialmente bajo condiciones de alta actividad urbana.
 
@@ -287,9 +287,9 @@ Estos resultados permiten rechazar la hipótesis nula con un nivel de confianza 
 \label{fig:qq_lin}
 \end{figure}
 
-Los gráficos Q-Q (\autoref{fig:qq_lin}) muestran una aproximación razonable a la distribución normal en ambos períodos. Para los días de semana, los puntos siguen la línea de referencia, con algunas desviaciones en los extremos, particularmente en los valores más altos. En el caso de fin de semana, la aproximación a la línea teórica es mejor, con una distribución más cercana a la normal.
+Los gráficos Q-Q (\cref{fig:qq_lin}) muestran una aproximación razonable a la distribución normal en ambos períodos. Para los días de semana, los puntos siguen la línea de referencia, con algunas desviaciones en los extremos, particularmente en los valores más altos. En el caso de fin de semana, la aproximación a la línea teórica es mejor, con una distribución más cercana a la normal.
 
-Los gráficos de residuos (\autoref{fig:resid_lin}) revelan patrones distintos para cada período. En días de semana, aunque hay cierta dispersión alrededor de cero, se observa variabilidad considerable con algunos residuos positivos destacados (especialmente entre valores ajustados de 0.5 y 0.6) y residuos negativos pronunciados alrededor de 0.8. Para fines de semana, los residuos muestran menor magnitud global pero un patrón menos aleatorio, sugiriendo posible estructura no capturada por el modelo lineal.
+Los gráficos de residuos (\cref{fig:resid_lin}) revelan patrones distintos para cada período. En días de semana, aunque hay cierta dispersión alrededor de cero, se observa variabilidad considerable con algunos residuos positivos destacados (especialmente entre valores ajustados de 0.5 y 0.6) y residuos negativos pronunciados alrededor de 0.8. Para fines de semana, los residuos muestran menor magnitud global pero un patrón menos aleatorio, sugiriendo posible estructura no capturada por el modelo lineal.
 
 En resumen, el análisis confirma una relación lineal significativa entre congestión y accidentes, considerablemente más fuerte durante días laborables ($R^2 = 0.90$) que en fines de semana ($R^2 = 0.67$). Los patrones observados en los residuos, particularmente para fines de semana, sugieren la pertinencia de explorar modelos no lineales que podrían capturar mejor las relaciones subyacentes en los datos.
 
@@ -313,7 +313,7 @@ donde:
 
 Este modelo fue aplicado tanto a los días de semana como a los fines de semana. En ambos casos, se observó un ajuste visual considerable, respaldando la hipótesis de una relación decreciente no lineal entre ambas variables bajo ciertas condiciones de tráfico.
 
-Los resultados del ajuste se presentan en la \autoref{fig:corr_exp}, mostrando un ajuste significativo del modelo a los datos.
+Los resultados del ajuste se presentan en la \cref{fig:corr_exp}, mostrando un ajuste significativo del modelo a los datos.
 
 \begin{figure}[H]
     \centering
@@ -365,9 +365,9 @@ Este análisis revela diferencias importantes en la dinámica de la relación co
 \label{fig:qq_exp}
 \end{figure}
 
-Los gráficos de residuos (\autoref{fig:resid_exp}) muestran una dispersión relativamente aleatoria en torno a cero, sin evidencias claras de heterocedasticidad ni patrones sistemáticos, lo que respalda la validez del ajuste no lineal propuesto. En particular, para los días de semana, los residuos muestran una distribución uniforme con algunos valores extremos (entre -0.1 y 0.2), mientras que para los fines de semana, la dispersión es menor y más equilibrada (aproximadamente entre -0.05 y 0.05).
+Los gráficos de residuos (\cref{fig:resid_exp}) muestran una dispersión relativamente aleatoria en torno a cero, sin evidencias claras de heterocedasticidad ni patrones sistemáticos, lo que respalda la validez del ajuste no lineal propuesto. En particular, para los días de semana, los residuos muestran una distribución uniforme con algunos valores extremos (entre -0.1 y 0.2), mientras que para los fines de semana, la dispersión es menor y más equilibrada (aproximadamente entre -0.05 y 0.05).
 
-Complementariamente, los gráficos Q-Q (\autoref{fig:qq_exp}) revelan una aproximación a la distribución normal de los residuos en ambos casos, aunque con algunas desviaciones. En días de semana, se observan algunas desviaciones en los valores extremos, particularmente un punto notable en el extremo positivo. Para los fines de semana, la alineación con la línea teórica es excepcional, indicando una distribución muy cercana a la normal.
+Complementariamente, los gráficos Q-Q (\cref{fig:qq_exp}) revelan una aproximación a la distribución normal de los residuos en ambos casos, aunque con algunas desviaciones. En días de semana, se observan algunas desviaciones en los valores extremos, particularmente un punto notable en el extremo positivo. Para los fines de semana, la alineación con la línea teórica es excepcional, indicando una distribución muy cercana a la normal.
 
 En conjunto, estos resultados indican que el modelo exponencial inverso no solo es estadísticamente significativo, sino que además presenta un mejor ajuste que el modelo lineal, especialmente para días de semana donde alcanza un $R^2 = 0.94$ comparado con el $R^2 = 0.90$ del modelo lineal. La normalidad de los residuos y su distribución aleatoria fortalecen la hipótesis de que existe una relación no lineal entre la congestión y la probabilidad de accidentes en contextos urbanos, que puede ser modelada adecuadamente mediante una función exponencial inversa.
 
@@ -377,9 +377,9 @@ En conjunto, estos resultados indican que el modelo exponencial inverso no solo 
 
 \subsection{Frecuencia por zona} \label{ssec:freq_zone}
 
-Para representar conjuntos estáticos de puntos espaciales, se utiliza la estructura cKd-tree, una variante compacta del Kd-tree que codifica distancias relativas mediante spiral codes y las almacena usando Directly Addressable Codes (DACs), optimizando el uso de memoria sin sacrificar eficiencia en consultas espaciales \parencite{gutierrez2023ckdtree}. A cada zona la llamaremos cuadrante o segmento.
+Para representar conjuntos estáticos de puntos espaciales, se utiliza la estructura cKd-tree, una variante compacta del Kd-tree que codifica distancias relativas mediante spiral codes y las almacena usando Directly Addressable Codes (DACs), optimizando el uso de memoria sin sacrificar eficiencia en consultas espaciales \citep{gutierrez2023ckdtree}. A cada zona la llamaremos cuadrante o segmento.
 
-En la \autoref{fig:quad_acc} se puede ver cómo se distribuyen los segmentos numéricamente, comenzando desde el segmento 1 en la esquina inferior izquierda. La opacidad del color rojo está relacionada con la cantidad de accidentes por segmento.
+En la \cref{fig:quad_acc} se puede ver cómo se distribuyen los segmentos numéricamente, comenzando desde el segmento 1 en la esquina inferior izquierda. La opacidad del color rojo está relacionada con la cantidad de accidentes por segmento.
 
 \begin{figure}[H]
     \centering
@@ -388,7 +388,7 @@ En la \autoref{fig:quad_acc} se puede ver cómo se distribuyen los segmentos num
     \label{fig:quad_acc}
 \end{figure}
 
-Tomamos la media de accidentes diarios, los agrupamos por segmento, definimos que las zonas mayores a 0.5 accidentes por día son considerados críticos, construimos un mapa según la criticidad (\autoref{fig:quad_mean_day}), si tomamos la suma de los accidentes, tenemos la \autoref{fig:quad_acc_total} que muestra la cantidad de accidentes reportados en el segmento en el periodo de estudio, que a su vez se clasifican como críticos si poseen más de 90 accidentes.
+Tomamos la media de accidentes diarios, los agrupamos por segmento, definimos que las zonas mayores a 0.5 accidentes por día son considerados críticos, construimos un mapa según la criticidad (\cref{fig:quad_mean_day}), si tomamos la suma de los accidentes, tenemos la \cref{fig:quad_acc_total} que muestra la cantidad de accidentes reportados en el segmento en el periodo de estudio, que a su vez se clasifican como críticos si poseen más de 90 accidentes.
 
 
 \begin{figure}[H]
@@ -454,7 +454,7 @@ Se aplicaron múltiples rondas de \textit{grid search} con distintos rangos de h
 
 Este modelo logró una métrica de validación cruzada de \textbf{0.8665}, superando significativamente al resto de las alternativas evaluadas. Por este motivo, \textbf{XGBoost fue seleccionado como modelo final}.
 
-En el \autoref{tab:model-comparison} se puede observar la comparación de ambos modelos.
+En el \cref{tab:model-comparison} se puede observar la comparación de ambos modelos.
 
 \begin{table}[H]
 \centering
@@ -495,7 +495,7 @@ Dado que el conjunto original contenía únicamente eventos positivos (ocurridos
 
 En nuestro caso, la generación se basa en una grilla temporal con intervalos de 5 minutos, sobre la cual se combinan todas las posibles ubicaciones (\texttt{segmento}) y tipos de evento. Luego, se identifican aquellas combinaciones que no se encuentran en los datos originales (es decir, donde no ocurrió un evento) y se etiquetan como eventos negativos (\texttt{happen} = 0). Estas instancias se muestrean de forma aleatoria para igualar la cantidad de eventos positivos, logrando así un conjunto balanceado con un 50\% de eventos positivos y 50\% de negativos.
 
-Este enfoque permite mantener la estructura temporal y geoespacial de los datos reales, evitando introducir ruido aleatorio, y facilitando la evaluación robusta de métricas como \texttt{recall} y \texttt{precision} \parencite{goedertier2009robust}.
+Este enfoque permite mantener la estructura temporal y geoespacial de los datos reales, evitando introducir ruido aleatorio, y facilitando la evaluación robusta de métricas como \texttt{recall} y \texttt{precision} \citep{goedertier2009robust}.
 
 
 \subsection{Resultados del modelo seleccionado}
@@ -505,7 +505,7 @@ La versión final del modelo (\texttt{v6}) se entrenó utilizando los hiperpará
 El modelo utiliza codificación \textit{one-hot} y un esquema de clasificación binaria (\texttt{binary:logistic}), con una semilla aleatoria (\texttt{random\_state = 42}) para garantizar la reproducibilidad.
 
 
-\noindent En cuanto al rendimiento, se obtuvieron los siguientes resultados para una muestra de 64.708 eventos, con un 50\% de eventos ocurridos y un 50\% de no ocurridos. Esta proporción se logró mediante la simulación de eventos negativos sobre una grilla temporal de 5 minutos, generando combinaciones posibles de tiempo, localización y tipo de evento que no están presentes en los datos originales (\autoref{ssec:class_balancing}). Esto permite evaluar el modelo en condiciones balanceadas, facilitando la interpretación de métricas como \texttt{precision}, \texttt{recall} y \texttt{F1-score}.
+\noindent En cuanto al rendimiento, se obtuvieron los siguientes resultados para una muestra de 64.708 eventos, con un 50\% de eventos ocurridos y un 50\% de no ocurridos. Esta proporción se logró mediante la simulación de eventos negativos sobre una grilla temporal de 5 minutos, generando combinaciones posibles de tiempo, localización y tipo de evento que no están presentes en los datos originales (\cref{ssec:class_balancing}). Esto permite evaluar el modelo en condiciones balanceadas, facilitando la interpretación de métricas como \texttt{precision}, \texttt{recall} y \texttt{F1-score}.
 
 \begin{itemize}
     \item \textbf{Accuracy}: 0.8795
@@ -528,7 +528,7 @@ Estas métricas evidencian un modelo con excelente capacidad para identificar co
 
 \subsection{Curva de aprendizaje del modelo}
 
-La \autoref{fig:learning_curve} muestra la curva de aprendizaje del modelo XGBoost entrenado. Se observa un rendimiento alto y consistente tanto en el conjunto de entrenamiento como en el de validación (aproximadamente 0.88–0.90), con una brecha mínima entre ambas curvas. Esto indica que el modelo generaliza adecuadamente, sin presentar sobreajuste ni subajuste. Además, el comportamiento plano de ambas curvas sugiere que incrementar el tamaño del conjunto de entrenamiento no tendría un impacto significativo en el rendimiento, lo cual evidencia una saturación en la capacidad de aprendizaje del modelo con las características actuales.
+La \cref{fig:learning_curve} muestra la curva de aprendizaje del modelo XGBoost entrenado. Se observa un rendimiento alto y consistente tanto en el conjunto de entrenamiento como en el de validación (aproximadamente 0.88–0.90), con una brecha mínima entre ambas curvas. Esto indica que el modelo generaliza adecuadamente, sin presentar sobreajuste ni subajuste. Además, el comportamiento plano de ambas curvas sugiere que incrementar el tamaño del conjunto de entrenamiento no tendría un impacto significativo en el rendimiento, lo cual evidencia una saturación en la capacidad de aprendizaje del modelo con las características actuales.
 
 
 \begin{figure}[H]
@@ -542,7 +542,7 @@ La \autoref{fig:learning_curve} muestra la curva de aprendizaje del modelo XGBoo
 
 \subsection{Despliegue y mantenimiento del modelo}
 
-Para entregar una interfaz que permita al usuario final interactuar con los datos, se desarrolló un tablero de control utilizando Dash \parencite{dashboard2024}, un marco de trabajo especializado en la presentación de datos gráficos mediante Python. La arquitectura del sistema se diseñó considerando dos componentes principales: un servidor implementado en Rust y un cliente en Python, como se muestra en la \autoref{fig:architecture}. El servidor se encarga de las operaciones intensivas como la captura, transformación, almacenamiento y gestión del caché de los datos, mientras que el cliente maneja la interacción con el usuario, la actualización de datos desde el servidor, el entrenamiento del modelo y la generación del tablero de control.
+Para entregar una interfaz que permita al usuario final interactuar con los datos, se desarrolló un tablero de control utilizando Dash \citep{dashboard2024}, un marco de trabajo especializado en la presentación de datos gráficos mediante Python. La arquitectura del sistema se diseñó considerando dos componentes principales: un servidor implementado en Rust y un cliente en Python, como se muestra en la \cref{fig:architecture}. El servidor se encarga de las operaciones intensivas como la captura, transformación, almacenamiento y gestión del caché de los datos, mientras que el cliente maneja la interacción con el usuario, la actualización de datos desde el servidor, el entrenamiento del modelo y la generación del tablero de control.
 
 El ciclo de vida del modelo se gestiona mediante APScheduler, una biblioteca de Python especializada en la programación de tareas asíncronas. Esta herramienta permite automatizar el reentrenamiento periódico del modelo con nuevos datos, garantizando su actualización y adaptación a los cambios en los patrones de tráfico. El proceso incluye la validación automática del rendimiento del modelo, comparando las métricas clave (precisión, recall, F1-score) con los umbrales establecidos, y solo se despliega una nueva versión si representa una mejora significativa.
 
@@ -560,9 +560,9 @@ El entrenamiento del modelo está programado para realizarse cada 30 días, util
 
 \section{Resultados}
 
-Los análisis espaciales y temporales realizados permitieron identificar patrones críticos en la ocurrencia de accidentes en Antofagasta. En la \autoref{fig:quad_acc_total} se observan las zonas con mayor concentración de accidentes, destacando claramente los segmentos ubicados en el eje de la avenida Pedro Aguirre Cerda, especialmente en el cruce con Nicolás Tirado (segmentos 106 a 109). Este corredor vial presenta una densidad particularmente alta, lo que lo posiciona como un foco de atención prioritaria.
+Los análisis espaciales y temporales realizados permitieron identificar patrones críticos en la ocurrencia de accidentes en Antofagasta. En la \cref{fig:quad_acc_total} se observan las zonas con mayor concentración de accidentes, destacando claramente los segmentos ubicados en el eje de la avenida Pedro Aguirre Cerda, especialmente en el cruce con Nicolás Tirado (segmentos 106 a 109). Este corredor vial presenta una densidad particularmente alta, lo que lo posiciona como un foco de atención prioritaria.
 
-Asimismo, se identificó un segundo punto crítico en la intersección entre la Avenida Salvador Allende y Edmundo Pérez Zujovic, donde convergen flujos de alto volumen provenientes del norte y del centro de la ciudad. Esta área (segmentos 84 y 103) también mostró una alta frecuencia de accidentes diarios, como se observa en la \autoref{fig:quad_mean_day}.
+Asimismo, se identificó un segundo punto crítico en la intersección entre la Avenida Salvador Allende y Edmundo Pérez Zujovic, donde convergen flujos de alto volumen provenientes del norte y del centro de la ciudad. Esta área (segmentos 84 y 103) también mostró una alta frecuencia de accidentes diarios, como se observa en la \cref{fig:quad_mean_day}.
 
 El centro de la ciudad, particularmente en segmento 82, evidenció una densidad considerable de accidentes.
 
@@ -598,14 +598,14 @@ A partir de los resultados obtenidos, se proponen las siguientes recomendaciones
     \item \textbf{Intervención en zonas críticas}: Priorizar acciones de ingeniería vial, señalización y fiscalización en los segmentos identificados como críticos, particularmente en el eje Pedro Aguirre Cerda, Salvador Allende y el centro de la ciudad.
     \item \textbf{Monitoreo continuo}: Mantener y escalar el sistema de recolección y análisis de datos, integrando nuevas fuentes (sensores, cámaras) para enriquecer el modelo.
     \item \textbf{Validación en terreno}: Complementar los hallazgos con estudios de campo para confirmar condiciones geométricas, flujos vehiculares y comportamiento de los usuarios en las zonas críticas.
-    \item \textbf{Extensión del sistema}: Replicar esta metodología en otras ciudades de tamaño medio que carezcan de infraestructura de monitoreo formal \parencite{berhanu2024}.
+    \item \textbf{Extensión del sistema}: Replicar esta metodología en otras ciudades de tamaño medio que carezcan de infraestructura de monitoreo formal \citep{berhanu2024}.
     \item \textbf{Nuevas líneas de investigación}: Incorporar variables climáticas, de infraestructura o comportamiento humano para enriquecer los modelos predictivos y explorar algoritmos más avanzados (LSTM, transformers, modelos causales).
 \end{itemize}
 
 Estas recomendaciones apuntan a fortalecer una gestión vial basada en datos, proactiva y centrada en la seguridad de los ciudadanos.
 
 \newpage
-\printbibliography
 
+\bibliography{biblio}
 \end{document}
 
