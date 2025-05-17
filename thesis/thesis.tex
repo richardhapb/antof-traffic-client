@@ -58,12 +58,12 @@ A los profesores apasionados por su trabajo, que no solo transmiten conocimiento
 
 El presente proyecto tiene como propósito desarrollar una herramienta efectiva para analizar y predecir, con alta confiabilidad, el comportamiento del tráfico vehicular en la ciudad de Antofagasta mediante el uso de datos provenientes de la plataforma Waze Cities. Waze, a través de su comunidad de usuarios, ofrece información en tiempo real que permite obtener una visión detallada de los eventos de tráfico que ocurren en la ciudad. Esta investigación genera información relevante para la gestión del tráfico, facilitando la toma de decisiones por parte de las autoridades locales con el fin de mejorar la seguridad vial y optimizar la eficiencia del flujo vehicular. A través del análisis y explotación de estos datos, se identifican patrones y tendencias que, integrados en la planificación urbana, contribuirán a optimizar rutas críticas, reducir la congestión y minimizar la probabilidad de accidentes.
 
-En este estudio se emplearán técnicas de análisis de datos y métodos geoespaciales mediante el uso de la librería GeoPandas en Python, además de la aplicación de series temporales para proporcionar visualizaciones claras y comprensibles dirigidas al usuario final. Adicionalmente, se implementarán técnicas de aprendizaje automático para realizar predicciones de tráfico, anticipándose a eventos y contribuyendo al desarrollo urbano eficiente y seguro \parencite{barcelo2005}.
+En este estudio se emplearán técnicas de análisis de datos y métodos geoespaciales mediante el uso de la librería GeoPandas en Python. Se aplicarán series temporales para proporcionar visualizaciones claras y comprensibles dirigidas al usuario final \parencite{vanlint2005}. También se implementarán técnicas de aprendizaje automático para realizar predicciones de tráfico, anticipándose a eventos y contribuyendo al desarrollo urbano eficiente y seguro \parencite{barcelo2005}.
 
 \section{Introducción}
 \subsection{Descripción del problema}
 
-Antofagasta, una ciudad con más de 106,000 vehículos en circulación \parencite{comision2023}, enfrenta desafíos significativos en la gestión de su tráfico vehicular. Durante el año 2023, se registraron 1,715 accidentes, los cuales resultaron en 31 fallecidos y 102 heridos graves \parencite{comision2023}. La infraestructura vial limitada, sumada a la alta concentración de vehículos en un número reducido de arterias principales, agravó la congestión y elevó el riesgo de accidentes. A pesar de la existencia de estos problemas, no se cuenta con sistemas de monitoreo en tiempo real que permitan gestionar el tráfico de manera proactiva. Por ello, se aprovecharán fuentes de datos alternativas, como Waze, para recolectar información valiosa que facilite la toma de decisiones en materia de tráfico \parencite{chen2015}.
+Antofagasta, una ciudad con más de 106,000 vehículos en circulación \parencite{comision2023}, enfrenta desafíos significativos en la gestión de su tráfico vehicular. Durante el año 2023, se registraron 1,715 accidentes, los cuales resultaron en 31 fallecidos y 102 heridos graves \parencite{comision2023}. La infraestructura vial limitada, sumada a la alta concentración de vehículos en un número reducido de arterias principales, agravó la congestión y elevó el riesgo de accidentes. A pesar de la existencia de estos problemas, no se cuenta con sistemas de monitoreo en tiempo real que permitan gestionar el tráfico de manera proactiva \parencite{goodall2019}. Por ello, se aprovecharán fuentes de datos alternativas, como Waze, para recolectar información valiosa que facilite la toma de decisiones en materia de tráfico \parencite{chen2015}.
 
 \subsection{Objetivo general}
 
@@ -74,7 +74,6 @@ Realizar un análisis exhaustivo del comportamiento del tráfico en la ciudad de
 \begin{itemize}
     \item Obtener datos suficientes y representativos sobre los eventos de tráfico en Antofagasta mediante la API de Waze Cities.
     \item Realizar un análisis descriptivo de los datos recolectados para identificar patrones y tendencias relevantes en el comportamiento del tráfico.
-    \item Identificar los factores clave que influyen en la seguridad vial y la eficiencia del tráfico en la ciudad.
     \item Presentar información visualmente comprensible y útil para las autoridades de gestión vial, facilitando la implementación de políticas y acciones basadas en datos \parencite{auld2009}.
     \item Utilizar los datos disponibles para desarrollar modelos predictivos de tráfico que permitan anticipar eventos y tomar decisiones proactivas en la gestión vial.
 \end{itemize}
@@ -89,7 +88,7 @@ Una de las principales limitaciones en el análisis de fenómenos es la ausencia
 
 Se realizó un análisis geoespacial con el objetivo de identificar puntos críticos, como vías principales, calles secundarias y zonas de alto tráfico. Este análisis se llevó a cabo utilizando GeoPandas, una herramienta de Python especializada en operaciones geoespaciales. Además, se analizaron series temporales para detectar patrones y tendencias del tráfico, identificando estacionalidades en el comportamiento. Los resultados se presentaron mediante técnicas de visualización que permitieron interpretar las tendencias y puntos de interés de manera efectiva.
 
-El pipeline de datos incluyó una base de datos relacional para almacenar los datos, un flujo ETL (Extract, Transform, Load) para procesarlos y un servidor web para visualizarlos. Se utilizó PostgreSQL como base de datos, APScheduler para la programación de tareas y Dash como herramienta de visualización. Este enfoque permitió automatizar el flujo de datos y garantizar la actualización constante de la información.
+El pipeline de datos incluyó una base de datos relacional para almacenar los datos, un flujo ETL (Extract, Transform, Load) para procesarlos y un servidor web para visualizarlos. Se utilizó PostgreSQL como base de datos, Memcached como administra de caché, APScheduler para la programación de tareas y Dash como herramienta de visualización. Este enfoque permitió automatizar el flujo de datos y garantizar la actualización constante de la información.
 
 Adicionalmente, se entrenó un modelo de clasificación para determinar la probabilidad de ocurrencia de accidentes en diferentes puntos de la ciudad. El modelo seleccionado fue XGBoost, el cual fue seleccionado utilizando técnicas de validación cruzada y optimización de hiperparámetros. Los resultados obtenidos permitieron identificar las variables más influyentes en la ocurrencia de accidentes, así como la probabilidad de ocurrencia en diferentes condiciones de tráfico. Para la selección de variables se utilizó GridSearchCV, una técnica de búsqueda de hiperparámetros que permite encontrar la mejor combinación de variables para el modelo, se compararon modelos de regresión logística, árboles de decisión y XGBoost, siendo este último el que presentó el mejor desempeño en términos de precisión y sensibilidad.
 
@@ -256,7 +255,6 @@ El análisis estadístico del modelo lineal entregó resultados significativos t
     \begin{itemize}
         \item El modelo ajustado fue $y = 0.1673x + 0.0996$
         \item Se obtuvo un $R^2 = 0.90$, explicando el 90\% de la variabilidad
-        \item El coeficiente de correlación de Pearson fue $r = 0.95$ con IC 95\%: [0.89, 0.98]
         \item La significancia global fue $F(1, 22) = 203.33$, $p < 0.0001$
         \item Los parámetros fueron estadísticamente significativos con $p < 0.001$
         \item El estadístico $t$ para la prueba de correlación fue $t = 14.26$, $p < 0.0001$
@@ -273,7 +271,7 @@ El análisis estadístico del modelo lineal entregó resultados significativos t
     \end{itemize}
 \end{itemize}
 
-Estos resultados permiten rechazar la hipótesis nula con un nivel de confianza del 99\%, confirmando la existencia de una relación lineal estadísticamente significativa entre el número de reportes de congestión y la cantidad de accidentes registrados por hora.
+Estos resultados permiten rechazar la hipótesis nula con un nivel de confianza del 99\% para los días de semana, confirmando la existencia de una relación lineal estadísticamente significativa entre el número de reportes de congestión y la cantidad de accidentes registrados por hora.
 
 \begin{figure}[H]
 \centering
@@ -289,7 +287,7 @@ Estos resultados permiten rechazar la hipótesis nula con un nivel de confianza 
 \label{fig:qq_lin}
 \end{figure}
 
-Los gráficos Q-Q (\autoref{fig:qq_lin}) muestran una aproximación razonable a la distribución normal en ambos períodos. Para los días de semana, los puntos siguen la línea de referencia bastante bien, con algunas desviaciones en los extremos, particularmente en los valores más altos. En el caso de fin de semana, la aproximación a la línea teórica es mejor, con una distribución más cercana a la normal.
+Los gráficos Q-Q (\autoref{fig:qq_lin}) muestran una aproximación razonable a la distribución normal en ambos períodos. Para los días de semana, los puntos siguen la línea de referencia, con algunas desviaciones en los extremos, particularmente en los valores más altos. En el caso de fin de semana, la aproximación a la línea teórica es mejor, con una distribución más cercana a la normal.
 
 Los gráficos de residuos (\autoref{fig:resid_lin}) revelan patrones distintos para cada período. En días de semana, aunque hay cierta dispersión alrededor de cero, se observa variabilidad considerable con algunos residuos positivos destacados (especialmente entre valores ajustados de 0.5 y 0.6) y residuos negativos pronunciados alrededor de 0.8. Para fines de semana, los residuos muestran menor magnitud global pero un patrón menos aleatorio, sugiriendo posible estructura no capturada por el modelo lineal.
 
@@ -298,7 +296,7 @@ En resumen, el análisis confirma una relación lineal significativa entre conge
 
 \subsection{Modelo de correlación exponencial inversa}
 
-Dado que la relación entre congestión y accidentes no necesariamente es lineal en todos los contextos —especialmente bajo alta densidad vehicular— se propuso un modelo de potencia inversa. Este considera que, a medida que aumenta la congestión (y por ende, disminuye la velocidad promedio), podría reducirse la probabilidad de accidentes.
+Dado que la relación entre congestión y accidentes no necesariamente es lineal en todos los contextos —especialmente bajo alta densidad vehicular— se propuso un modelo exponencial inverso. Este considera que, a medida que aumenta la congestión (y por ende, disminuye la velocidad promedio), podría reducirse la probabilidad de accidentes.
 
 El modelo propuesto se ajusta a la siguiente forma funcional:
 
@@ -313,7 +311,7 @@ donde:
     \item $\alpha$, $\beta$ y $\gamma$ son parámetros ajustados mediante regresión no lineal.
 \end{itemize}
 
-Este modelo fue aplicado tanto a los días de semana como a los fines de semana. En ambos casos, se observó un buen ajuste visual, respaldando la hipótesis de una relación decreciente no lineal entre ambas variables bajo ciertas condiciones de tráfico.
+Este modelo fue aplicado tanto a los días de semana como a los fines de semana. En ambos casos, se observó un ajuste visual considerable, respaldando la hipótesis de una relación decreciente no lineal entre ambas variables bajo ciertas condiciones de tráfico.
 
 Los resultados del ajuste se presentan en la \autoref{fig:corr_exp}, mostrando un ajuste significativo del modelo a los datos.
 
@@ -327,11 +325,11 @@ Los resultados del ajuste se presentan en la \autoref{fig:corr_exp}, mostrando u
         \includegraphics[width=0.9\textwidth]{images/corr_exp_fs.png}
     }
     \newline
-    \caption{Correlación de potencia inversa entre accidentes y congestión}
+    \caption{Correlación exponencial inversa entre accidentes y congestión}
     \label{fig:corr_exp}
 \end{figure}
 
-El análisis estadístico del modelo de potencia inversa entregó resultados significativos tanto para días de semana como para fin de semana:
+El análisis estadístico del modelo exponencial inverso entregó resultados significativos tanto para días de semana como para fin de semana:
 
 \begin{itemize}
     \item Para días de semana:
@@ -356,22 +354,22 @@ Este análisis revela diferencias importantes en la dinámica de la relación co
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{images/residuos_exp.png}
-\caption{Residuos del modelo de potencia inversa para días de semana y fines de semana}
+\caption{Residuos del modelo de exponencial inverso para días de semana y fines de semana}
 \label{fig:resid_exp}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{images/qq_exp.png}
-\caption{Gráficos Q-Q de los residuos del modelo de potencia inversa}
+\caption{Gráficos Q-Q de los residuos del modelo exponencial inverso}
 \label{fig:qq_exp}
 \end{figure}
 
-Los gráficos de residuos (\autoref{fig:resid_exp}) muestran una dispersión relativamente aleatoria en torno a cero, sin evidencias claras de heterocedasticidad ni patrones sistemáticos, lo que respalda la validez del ajuste no lineal propuesto. En particular, para los días de semana, los residuos muestran una distribución bastante uniforme con algunos valores extremos (entre -0.1 y 0.2), mientras que para los fines de semana, la dispersión es menor y más equilibrada (aproximadamente entre -0.05 y 0.05).
+Los gráficos de residuos (\autoref{fig:resid_exp}) muestran una dispersión relativamente aleatoria en torno a cero, sin evidencias claras de heterocedasticidad ni patrones sistemáticos, lo que respalda la validez del ajuste no lineal propuesto. En particular, para los días de semana, los residuos muestran una distribución uniforme con algunos valores extremos (entre -0.1 y 0.2), mientras que para los fines de semana, la dispersión es menor y más equilibrada (aproximadamente entre -0.05 y 0.05).
 
 Complementariamente, los gráficos Q-Q (\autoref{fig:qq_exp}) revelan una aproximación a la distribución normal de los residuos en ambos casos, aunque con algunas desviaciones. En días de semana, se observan algunas desviaciones en los valores extremos, particularmente un punto notable en el extremo positivo. Para los fines de semana, la alineación con la línea teórica es excepcional, indicando una distribución muy cercana a la normal.
 
-En conjunto, estos resultados indican que el modelo de potencia inversa no solo es estadísticamente significativo, sino que además presenta un mejor ajuste que el modelo lineal, especialmente para días de semana donde alcanza un $R^2 = 0.94$ comparado con el $R^2 = 0.90$ del modelo lineal. La normalidad de los residuos y su distribución aleatoria fortalecen la hipótesis de que existe una relación no lineal entre la congestión y la probabilidad de accidentes en contextos urbanos, que puede ser modelada adecuadamente mediante una función de potencia inversa.
+En conjunto, estos resultados indican que el modelo exponencial inverso no solo es estadísticamente significativo, sino que además presenta un mejor ajuste que el modelo lineal, especialmente para días de semana donde alcanza un $R^2 = 0.94$ comparado con el $R^2 = 0.90$ del modelo lineal. La normalidad de los residuos y su distribución aleatoria fortalecen la hipótesis de que existe una relación no lineal entre la congestión y la probabilidad de accidentes en contextos urbanos, que puede ser modelada adecuadamente mediante una función exponencial inversa.
 
 % Cálculo de la frecuencia por zona
 % Filtro por zona
@@ -396,11 +394,11 @@ Tomamos la media de accidentes diarios, los agrupamos por segmento, definimos qu
 \begin{figure}[H]
     \centering
     \subfloat[Media de accidentes por día]{
-        \includegraphics[width=0.5\textwidth]{images/quad_mean_day_color.png}
+        \includegraphics[width=0.4\textwidth]{images/quad_mean_day_color.png}
         \label{fig:quad_mean_day}
     }
     \subfloat[Total accidentes]{
-        \includegraphics[width=0.5\textwidth]{images/quad_acc_color.png}
+        \includegraphics[width=0.4\textwidth]{images/quad_acc_color.png}
         \label{fig:quad_acc_total}
     }
     \caption{Accidentes por segmento}
@@ -495,7 +493,7 @@ En el \autoref{tab:model-comparison} se puede observar la comparación de ambos 
 
 Dado que el conjunto original contenía únicamente eventos positivos (ocurridos), fue necesario generar instancias negativas (no ocurridos) para entrenar un modelo de clasificación binaria. Para ello, se implementó una estrategia inspirada en el enfoque de generación de eventos negativos artificiales propuesto por Goedertier et al. (2009), que permite representar problemas secuenciales como tareas de clasificación supervisada.
 
-En nuestro caso, la generación se basa en una grilla temporal con intervalos de 5 minutos, sobre la cual se combinan todas las posibles ubicaciones (\texttt{group}) y tipos de evento. Luego, se identifican aquellas combinaciones que no se encuentran en los datos originales (es decir, donde no ocurrió un evento) y se etiquetan como eventos negativos (\texttt{happen} = 0). Estas instancias se muestrean de forma aleatoria para igualar la cantidad de eventos positivos, logrando así un conjunto balanceado con un 50\% de eventos positivos y 50\% de negativos.
+En nuestro caso, la generación se basa en una grilla temporal con intervalos de 5 minutos, sobre la cual se combinan todas las posibles ubicaciones (\texttt{segmento}) y tipos de evento. Luego, se identifican aquellas combinaciones que no se encuentran en los datos originales (es decir, donde no ocurrió un evento) y se etiquetan como eventos negativos (\texttt{happen} = 0). Estas instancias se muestrean de forma aleatoria para igualar la cantidad de eventos positivos, logrando así un conjunto balanceado con un 50\% de eventos positivos y 50\% de negativos.
 
 Este enfoque permite mantener la estructura temporal y geoespacial de los datos reales, evitando introducir ruido aleatorio, y facilitando la evaluación robusta de métricas como \texttt{recall} y \texttt{precision} \parencite{goedertier2009robust}.
 
@@ -503,16 +501,6 @@ Este enfoque permite mantener la estructura temporal y geoespacial de los datos 
 \subsection{Resultados del modelo seleccionado}
 
 La versión final del modelo (\texttt{v6}) se entrenó utilizando los hiperparámetros obtenidos durante la etapa de validación cruzada. El modelo fue registrado y versionado mediante \textit{MLflow}, permitiendo un seguimiento detallado de sus parámetros y métricas.
-
-\noindent Los parámetros más relevantes del modelo fueron:
-
-\begin{itemize}
-    \item \texttt{max\_depth} = 20
-    \item \texttt{n\_estimators} = 80
-    \item \texttt{learning\_rate} = 0.1
-    \item \texttt{gamma} = 0.8
-    \item \texttt{colsample\_bytree} = 0.7
-\end{itemize}
 
 El modelo utiliza codificación \textit{one-hot} y un esquema de clasificación binaria (\texttt{binary:logistic}), con una semilla aleatoria (\texttt{random\_state = 42}) para garantizar la reproducibilidad.
 
@@ -610,7 +598,7 @@ A partir de los resultados obtenidos, se proponen las siguientes recomendaciones
     \item \textbf{Intervención en zonas críticas}: Priorizar acciones de ingeniería vial, señalización y fiscalización en los segmentos identificados como críticos, particularmente en el eje Pedro Aguirre Cerda, Salvador Allende y el centro de la ciudad.
     \item \textbf{Monitoreo continuo}: Mantener y escalar el sistema de recolección y análisis de datos, integrando nuevas fuentes (sensores, cámaras) para enriquecer el modelo.
     \item \textbf{Validación en terreno}: Complementar los hallazgos con estudios de campo para confirmar condiciones geométricas, flujos vehiculares y comportamiento de los usuarios en las zonas críticas.
-    \item \textbf{Extensión del sistema}: Replicar esta metodología en otras ciudades de tamaño medio que carezcan de infraestructura de monitoreo formal.
+    \item \textbf{Extensión del sistema}: Replicar esta metodología en otras ciudades de tamaño medio que carezcan de infraestructura de monitoreo formal \parencite{berhanu2024}.
     \item \textbf{Nuevas líneas de investigación}: Incorporar variables climáticas, de infraestructura o comportamiento humano para enriquecer los modelos predictivos y explorar algoritmos más avanzados (LSTM, transformers, modelos causales).
 \end{itemize}
 
