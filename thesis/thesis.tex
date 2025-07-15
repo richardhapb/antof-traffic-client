@@ -123,7 +123,7 @@ En este estudio se empleó un modelo supervisado de clasificación, con el objet
 
 Para evaluar el rendimiento del modelo se utilizan métricas comunes en problemas de clasificación, tales como la precisión (accuracy), la precisión positiva (precision), la recuperación (recall) y la medida F1 (F1-score). Estas métricas permiten analizar diferentes aspectos del desempeño del modelo, como su capacidad para predecir correctamente eventos positivos, evitar falsos positivos o equilibrar ambos aspectos. Además, se construyó una matriz de confusión que permitió visualizar con mayor claridad los aciertos y errores del modelo en cada clase. Esta evaluación es fundamental para entender las limitaciones del modelo y su aplicabilidad en contextos reales de predicción de accidentes.
 
-Para evaluar el rendimiento del modelo se utilizaron métricas ampliamente empleadas en problemas de clasificación binaria, tales como la exactitud (\textit{accuracy}), la precisión (\textit{precision}), la sensibilidad (\textit{recall}) y la medida F1 (\textit{F1-score}) \cite{manning2008}. La exactitud representa el porcentaje total de predicciones correctas sobre el total de casos evaluados. La precisión corresponde a la proporción de casos positivos correctamente identificados por el modelo, es decir, el número de verdaderos positivos dividido por el total de predicciones positivas. Por su parte, la sensibilidad —también conocida como \textit{recall}— mide la capacidad del modelo para identificar correctamente todos los casos positivos reales, dividiendo los verdaderos positivos por el total de casos positivos reales. La medida F1, en tanto, es la media armónica entre precisión y sensibilidad, y proporciona una visión equilibrada del desempeño del modelo cuando es necesario considerar tanto los errores por omisión como los errores por comisión.
+Para evaluar el rendimiento del modelo se utilizaron métricas ampliamente empleadas en problemas de clasificación binaria, tales como la exactitud (\textit{accuracy}), la precisión (\textit{precision}), la sensibilidad (\textit{recall}) y la medida F1 (\textit{F1-score}) \citep{manning2008}. La exactitud representa el porcentaje total de predicciones correctas sobre el total de casos evaluados. La precisión corresponde a la proporción de casos positivos correctamente identificados por el modelo, es decir, el número de verdaderos positivos dividido por el total de predicciones positivas. Por su parte, la sensibilidad —también conocida como \textit{recall}— mide la capacidad del modelo para identificar correctamente todos los casos positivos reales, dividiendo los verdaderos positivos por el total de casos positivos reales. La medida F1, en tanto, es la media armónica entre precisión y sensibilidad, y proporciona una visión equilibrada del desempeño del modelo cuando es necesario considerar tanto los errores por omisión como los errores por comisión.
 
 Además, se construyó una matriz de confusión, la cual permite observar el número de aciertos y errores cometidos en cada clase —“ocurre” y “no ocurre”— lo que facilita una evaluación más detallada del comportamiento del modelo. Este análisis es clave para comprender sus limitaciones y fortalezas, especialmente en aplicaciones reales relacionadas con la predicción de accidentes de tránsito.
 
@@ -142,6 +142,26 @@ donde \( TP \) son los verdaderos positivos, \( TN \) los verdaderos negativos, 
 
 
 \subsection{Análisis geoespacial}
+
+
+Waze entrega las coordenadas geoespaciales de los eventos de tráfico en el sistema de referencia \textbf{EPSG:4326}. Este sistema corresponde al datum geodésico global \textbf{WGS84 (World Geodetic System 1984)}, ampliamente utilizado en aplicaciones de posicionamiento global (GPS) y cartografía digital \citep{epsg4326}. En EPSG:4326, las coordenadas están expresadas en grados decimales de latitud y longitud, lo que es adecuado para visualización pero no para cálculos métricos directos.
+
+Para poder realizar análisis espaciales precisos, como cálculos de distancia, área o densidad de eventos, fue necesario transformar dichas coordenadas a un sistema proyectado con unidades métricas. Esta transformación se realizó mediante la función \texttt{to\_crs} de la biblioteca \texttt{GeoPandas}, la cual internamente utiliza la librería \texttt{Pyproj} como interfaz con la biblioteca PROJ \citep{gdal_proj, pyproj, geopandas}.
+
+En este caso, se utilizó el sistema \textbf{EPSG:3857}, también conocido como \emph{Web Mercator}, que es una proyección cartográfica de tipo cilíndrica basada en el modelo esférico de la Tierra. La proyección convierte las coordenadas geográficas en coordenadas planas (en metros) mediante las siguientes fórmulas:
+
+\[
+x = R \cdot \lambda,\quad
+y = R \cdot \ln\left(\tan\left(\frac{\pi}{4} + \frac{\phi}{2}\right)\right)
+\]
+
+donde $\lambda$ es la longitud y $\phi$ la latitud (en radianes), y $R$ es el radio de la Tierra, establecido convencionalmente en $6378137$ metros para esta proyección. Esta transformación permite trabajar con distancias métricas directamente sobre el plano proyectado, lo que resulta esencial para los análisis desarrollados en este estudio.
+
+[OPTION]
+Cabe destacar que, aunque EPSG:3857 es ampliamente utilizado en aplicaciones de mapas web como Google Maps y OpenStreetMap, introduce distorsiones en las áreas a medida que se incrementa la latitud. Sin embargo, su uso es aceptable en estudios locales como el presente, centrado en una zona urbana acotada \citep{epsg3857}.
+
+[OPTION]
+La proyección EPSG:3857 aplica una transformación basada en un modelo esférico de la Tierra, lo cual introduce errores crecientes en la medida que se incrementa la latitud. En el caso de Antofagasta (latitud aproximada -23.65°), este error es menor a 1 km y no afecta significativamente los análisis espaciales realizados en zonas urbanas acotadas. No obstante, para estudios que requieren alta precisión métrica, se recomienda el uso de proyecciones locales basadas en el modelo elipsoidal, como EPSG:32719 (UTM zona 19S), que reduce estas distorsiones al mínimo en el territorio chileno \cite{epsg3857}.
 
 
 \subsection{Aprendizaje automático}
