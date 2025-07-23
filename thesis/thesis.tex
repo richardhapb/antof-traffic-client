@@ -90,7 +90,9 @@ Realizar un análisis exhaustivo del comportamiento del tráfico en la ciudad de
 
 \subsection{Alcances}
 
-Los datos utilizados corresponden al periodo desde octubre de 2024 hasta abril de 2025, en el sector urbano de la ciudad de Antofagasta, desde la zona norte urbana actual, sector Costa Laguna, hasta la zona sur, salida a camino de la minería, excluyendo el camino a puerto Coloso. [COORDENADAS?]
+Los datos utilizados corresponden al periodo desde octubre de 2024 hasta abril de 2025, en el sector urbano de la ciudad de Antofagasta, desde la zona norte urbana actual, sector Costa Laguna, hasta la zona sur, salida a camino de la minería, excluyendo el camino a puerto Coloso.
+
+% [COORDENADAS?]
 
 \section{Marco teórico}
 
@@ -143,28 +145,24 @@ donde \( TP \) son los verdaderos positivos, \( TN \) los verdaderos negativos, 
 
 \subsection{Análisis geoespacial}
 
+Waze entrega las coordenadas geoespaciales de los eventos de tráfico en el sistema de referencia \textbf{EPSG:4326}. Este sistema corresponde al datum geodésico global \textbf{WGS84 (World Geodetic System 1984)}, ampliamente utilizado en aplicaciones de posicionamiento global (GPS) y cartografía digital \citep{epsg4326, wgs84_nima}. En EPSG:4326, las coordenadas están expresadas en grados decimales de latitud y longitud, lo cual es adecuado para visualización, pero no para realizar cálculos métricos directos como distancias o áreas.
 
-Waze entrega las coordenadas geoespaciales de los eventos de tráfico en el sistema de referencia \textbf{EPSG:4326}. Este sistema corresponde al datum geodésico global \textbf{WGS84 (World Geodetic System 1984)}, ampliamente utilizado en aplicaciones de posicionamiento global (GPS) y cartografía digital \citep{epsg4326}. En EPSG:4326, las coordenadas están expresadas en grados decimales de latitud y longitud, lo que es adecuado para visualización pero no para cálculos métricos directos.
+Para llevar a cabo análisis espaciales cuantitativos sobre los eventos reportados por Waze —incluyendo cálculos de distancia, densidad y agrupación geográfica— fue necesario transformar dichas coordenadas a un sistema proyectado con unidades métricas.
 
-Para poder realizar análisis espaciales precisos, como cálculos de distancia, área o densidad de eventos, fue necesario transformar dichas coordenadas a un sistema proyectado con unidades métricas. Esta transformación se realizó mediante la función \texttt{to\_crs} de la biblioteca \texttt{GeoPandas}, la cual internamente utiliza la librería \texttt{Pyproj} como interfaz con la biblioteca PROJ \citep{gdal_proj, pyproj, geopandas}.
+La transformación se realizó utilizando la proyección Transversa de Mercator (Transverse Mercator), en su implementación como zona UTM 19 Sur (EPSG:32719). Esta proyección es conforme y está basada en el elipsoide WGS84, con un meridiano central en $\lambda_0 = -69^\circ$, un factor de escala $k_0 = 0.9996$, y un falso este de $500\,000$ m. Para el hemisferio sur, además, se aplica una corrección vertical de $10\,000\,000$ m a la coordenada norte. Esto se detalla en el Apéndice~\ref{ap:utm}.
 
-En este caso, se utilizó el sistema \textbf{EPSG:3857}, también conocido como \emph{Web Mercator}, que es una proyección cartográfica de tipo cilíndrica basada en el modelo esférico de la Tierra. La proyección convierte las coordenadas geográficas en coordenadas planas (en metros) mediante las siguientes fórmulas:
+Esta transformación se aplicó mediante la función \texttt{to\_crs} de la librería \texttt{GeoPandas}, la cual utiliza internamente la librería \texttt{Pyproj} como interfaz con la librería PROJ \citep{gdal_proj, pyproj, geopandas}.
 
-\[
-x = R \cdot \lambda,\quad
-y = R \cdot \ln\left(\tan\left(\frac{\pi}{4} + \frac{\phi}{2}\right)\right)
-\]
-
-donde $\lambda$ es la longitud y $\phi$ la latitud (en radianes), y $R$ es el radio de la Tierra, establecido convencionalmente en $6378137$ metros para esta proyección. Esta transformación permite trabajar con distancias métricas directamente sobre el plano proyectado, lo que resulta esencial para los análisis desarrollados en este estudio.
-
-[OPTION]
-Cabe destacar que, aunque EPSG:3857 es ampliamente utilizado en aplicaciones de mapas web como Google Maps y OpenStreetMap, introduce distorsiones en las áreas a medida que se incrementa la latitud. Sin embargo, su uso es aceptable en estudios locales como el presente, centrado en una zona urbana acotada \citep{epsg3857}.
-
-[OPTION]
-La proyección EPSG:3857 aplica una transformación basada en un modelo esférico de la Tierra, lo cual introduce errores crecientes en la medida que se incrementa la latitud. En el caso de Antofagasta (latitud aproximada -23.65°), este error es menor a 1 km y no afecta significativamente los análisis espaciales realizados en zonas urbanas acotadas. No obstante, para estudios que requieren alta precisión métrica, se recomienda el uso de proyecciones locales basadas en el modelo elipsoidal, como EPSG:32719 (UTM zona 19S), que reduce estas distorsiones al mínimo en el territorio chileno \cite{epsg3857}.
-
+La elección de EPSG:32719 permite minimizar la distorsión local, ya que el sistema UTM divide el globo en zonas longitudinales estrechas, optimizando la precisión en cada región. Al ser una proyección conforme y métrica, asegura que las distancias, áreas y densidades calculadas sobre el plano proyectado sean válidas y consistentes con el Sistema Internacional de Unidades \citep{epsg32719}.
 
 \subsection{Aprendizaje automático}
+
+A medida que los datos van aumentando, el modelo debe generar nuevos parámetros a través de los mismos. Esto permité generar un nuevo aprendizaje a través de los mismos, además de adaptarse a las variaciones que haya tenido el tráfico vehicular a lo largo del tiempo [CITA]. La frecuencia de re-entrenamiento se determinó para realizarse cada un mes, esto permite que los nuevos datos sean incorporados al modelo.
+
+Para la gestión de los modelos se utilizó \texttt{MLFlow}, un framework que permite gestionar las versiones de los modelos y almacenarlos en una base de datos, asegurando la persistencia de los mismos. También permite almacenar las diferentes métricas de cada versión del modelo \citep{mlflow2025}.
+
+Para la gestión del modelo, en cuanto a su implementación, mantenimiento y actualización, se programó con \testtt{APSCheduler}, una librería de tareas asíncronas en Python \citep{apscheduler2025}.
+
 \subsection{Investigaciones previas}
 
 \subsection{Metodología}
@@ -692,6 +690,63 @@ A partir de los resultados obtenidos, se proponen las siguientes recomendaciones
 Estas recomendaciones apuntan a fortalecer una gestión vial basada en datos, proactiva y centrada en la seguridad de los ciudadanos.
 
 \newpage
+
+\appendix
+\section{Transformación de coordenadas UTM}
+\label{ap:utm}
+
+La proyección UTM utilizada en este estudio (EPSG:32719) se basa en la proyección Transversa de Mercator, adaptada al hemisferio sur y centrada en el meridiano $\lambda_0 = -69^\circ$. Esta proyección es conforme y está diseñada para minimizar la distorsión métrica en una zona longitudinal específica (zona 19S), siendo especialmente adecuada para representar regiones como Antofagasta.
+
+A continuación se presentan las fórmulas que permiten convertir coordenadas geográficas $(\phi, \lambda)$ —latitud y longitud en radianes— a coordenadas planas proyectadas $(x, y)$ en metros, basadas en el elipsoide WGS84:
+
+\subsection*{Parámetros del elipsoide WGS84}
+
+\begin{itemize}
+  \item Semieje mayor: $a = 6378137.0$ m
+  \item Aplanamiento: $f = \frac{1}{298.257223563}$
+  \item Excentricidad: $e^2 = 2f - f^2$
+  \item Factor de escala: $k_0 = 0.9996$
+  \item Falso este: $E_0 = 500\,000$ m
+  \item Falso norte (hemisferio sur): $N_0 = 10\,000\,000$ m
+\end{itemize}
+
+\subsection*{Variables intermedias}
+
+\begin{align*}
+e'^2 &= \frac{e^2}{1 - e^2} \\
+N &= \frac{a}{\sqrt{1 - e^2 \sin^2 \phi}} \\
+T &= \tan^2 \phi \\
+C &= e'^2 \cos^2 \phi \\
+A &= (\lambda - \lambda_0) \cos \phi
+\end{align*}
+
+\subsection*{Cálculo del arco meridiano}
+
+\begin{align*}
+M &= a \cdot \left[
+(1 - \frac{e^2}{4} - \frac{3e^4}{64} - \frac{5e^6}{256}) \phi \right. \\
+&\quad - (\frac{3e^2}{8} + \frac{3e^4}{32} + \frac{45e^6}{1024}) \sin(2\phi) \\
+&\quad + (\frac{15e^4}{256} + \frac{45e^6}{1024}) \sin(4\phi) \\
+&\quad \left. - (\frac{35e^6}{3072}) \sin(6\phi)
+\right]
+\end{align*}
+
+\subsection*{Coordenadas proyectadas}
+
+\begin{align*}
+x &= E_0 + k_0 N \left[ A + \frac{A^3}{6}(1 - T + C) + \frac{A^5}{120}(5 - 18T + T^2 + 72C - 58e'^2) \right] \\
+y &= N_0 + k_0 \left[ M + N \tan \phi \left( \frac{A^2}{2} + \frac{A^4}{24}(5 - T + 9C + 4C^2) + \frac{A^6}{720}(61 - 58T + T^2 + 600C - 330e'^2) \right) \right]
+\end{align*}
+
+Estas expresiones corresponden a un desarrollo en serie basado en una expansión de Taylor, que permite una transformación precisa desde la superficie curva del elipsoide a un plano cartesiano. Estas fórmulas son utilizadas internamente por la biblioteca PROJ, y fueron documentadas formalmente por Snyder \citep{snyder_tm}.
+
+\subsection*{Nota}
+
+La implementación computacional de estas fórmulas puede realizarse utilizando bibliotecas como \texttt{Pyproj}, que encapsulan estos desarrollos y gestionan automáticamente los parámetros de cada sistema de referencia (CRS).
+
+
+\newpage
+
 
 \bibliography{biblio}
 \end{document}
