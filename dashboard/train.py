@@ -24,7 +24,7 @@ def train() -> bool:
         logger.exception("Error retrieving data from server")
         return False
 
-    logger.info("Data found: %i", alerts.data.shape[1])
+    logger.info("Data found: %i", alerts.data.shape[0])
 
     # Best params tested with GridSearch
     model = XGBClassifier(

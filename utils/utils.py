@@ -97,25 +97,47 @@ def generate_aggregate_data(data: pd.DataFrame) -> Alerts:
     Args:
         data: Data that ask for aggregate data
 
+    Returns:
+        Alerts object containing aggregated data
+
+    Raises:
+        requests.ConnectionError: If server URL is not defined or connection fails
+        SerializeError: If data cannot be serialized
+
     """
     if config.SERVER_URL is None:
-        msg = "Server URL don't defined"
+        msg = "Server URL doesn't defined"
         raise requests.ConnectionError(msg)
 
     url = f"{config.SERVER_URL}/aggregate"
 
-    try:
-        response = requests.post(url, json=serialize_data(data), timeout=10)
-        response.raise_for_status()
-        response_data = response.json()
+    # Batch size for requests (adjust as needed)
+    batch_size = 1000
+    total_rows = len(data)
 
-        return Alerts.new_instance(response_data.get("alerts", []))
+    try:
+        all_alerts = []
+
+        # Process data in batches
+        for start_idx in range(0, total_rows, batch_size):
+            end_idx = min(start_idx + batch_size, total_rows)
+            batch = data.iloc[start_idx:end_idx]
+
+            logger.debug("Processing batch %d-%d of %d", start_idx, end_idx, total_rows)
+            response = requests.post(url, json=serialize_data(batch), timeout=10)
+            response.raise_for_status()
+            response_data = response.json()
+
+            all_alerts.extend(response_data.get("alerts", []))
+
+        return Alerts.new_instance(all_alerts)
+
     except requests.JSONDecodeError:
         logger.exception("Error decoding JSON from request")
     except requests.ConnectTimeout:
         logger.exception("Server not respond")
     except requests.ConnectionError:
-        logger.exception("Error requesting the data, ensure that server is running: %s")
+        logger.exception("Error requesting the data, ensure that server is running")
     except SerializeError:
         logger.exception("Error serializing data")
 
@@ -126,7 +148,7 @@ def generate_aggregate_data(data: pd.DataFrame) -> Alerts:
 def serialize_data(data: pd.DataFrame) -> dict:
     """Convert the GeoDataFrame instance to a JSON string"""
 
-    if not hasattr(data, "pub_millis") or not hasattr(data, "end_pub_millis"):
+    if not hasattr(data, "pub_millis"):
         raise SerializeError(data)
 
     has_timezone = data.pub_millis.dt.tz is not None

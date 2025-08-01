@@ -220,15 +220,14 @@ class ML:
         result = merged[["pub_millis", geodata, "type", "happen"]]
 
         if not isinstance(self.data["pub_millis"].iloc[0], np.integer):
-            result["pub_millis"] = pd.to_datetime((result["pub_millis"] * 1_000_000), unit="ms")
-        else:
-            result["pub_millis"] = result["pub_millis"]
+            result["pub_millis"] = pd.to_datetime((result["pub_millis"]), unit="ms")
 
         happen_data = result.get("happen", {})
         result.drop(columns=["happen"], inplace=True)
 
-        alerts = utils.generate_aggregate_data(result)
+        result.reset_index(drop=True, inplace=True)
 
+        alerts = utils.generate_aggregate_data(result)
         self.total_events = alerts.data
         self.total_events["happen"] = happen_data
 
@@ -287,14 +286,30 @@ class ML:
             columns_x: List of feature column names to keep
             column_y: Name of the target column
 
+        Raises:
+            ValueError: If required columns don't exist in the dataset
+
         """
 
         self.columns_x = columns_x
         self.column_y = column_y
 
-        # Clean the data
+        # Verify required columns exist in the primary dataset
+        missing_cols = [col for col in [*columns_x, column_y] if col not in self.data.columns]
+        if missing_cols:
+            msg = f"Missing required columns in data: {missing_cols}"
+            raise ValueError(msg)
+
+        # Clean the primary data
         self.data = self.data.loc[:, [*columns_x, column_y]]
+
+        # Handle total_events if it exists
         if self.total_events is not None:
+            missing_cols = [col for col in [*columns_x, column_y] if col not in self.total_events.columns]
+            if missing_cols:
+                msg = f"Missing required columns in total_events: {missing_cols}"
+                raise ValueError(msg)
+
             self.total_events = self.total_events.loc[:, [*columns_x, column_y]]
 
     def prepare(self, no_features: int | None = None) -> None:
