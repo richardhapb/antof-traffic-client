@@ -111,6 +111,20 @@ Existen diferentes estrategias para la gestión vehicular, desde sistemas manual
 
 La eliminación de la necesidad de transporte, puede ser abordada con estrategias como el fomento del teletrabajo para los puestos que lo permitan, o formas en que las personas se encuentren más cerca de sus trabajos, eliminando la necesidad de transporte en vehículo. La sustitución se genera fomentando el uso de transporte público, el uso de medios alternativos de transporte, como las bicicletas o el uso compartido de vehículos. Las medidas de ingeniería buscan optimizar en cuanto a tránsito y en seguridad el flujo vehicular, puede ser el rediseño del plano urbano, el diseño de vehículos más seguros, monitoreo a través de radares, cámaras y GPS, planificación de rutas y nuevas vías de tránsito. Como medidas administrativas se encuentran la educación vial, la señalización y los límites de velocidad. En cuanto a elementos de protección personal, se posiciona el uso de cinturón de seguridad, la instalación de airbags, barreras anti-vuelco y barreras de contención en las vías.
 
+\subsection{Indicadores de bondad y ajuste}
+
+Para evaluar la relación entre variables cuantitativas y validar supuestos estadísticos, se utilizaron indicadores clásicos de ajuste y asociación. En particular, se aplicaron pruebas de hipótesis y el coeficiente de correlación de Pearson, herramientas fundamentales en el análisis estadístico inferencial \citep{devore2011, montgomery2012}.
+
+La \textbf{prueba de hipótesis} permite evaluar si existe suficiente evidencia en los datos para rechazar una afirmación nula sobre una población. En el caso de correlaciones, la hipótesis nula establece que no existe relación lineal entre las variables (\( H_0 : \rho = 0 \)), mientras que la hipótesis alternativa plantea la existencia de una asociación (\( H_1 : \rho \neq 0 \)). El valor-p obtenido indica la probabilidad de observar un estadístico igual o más extremo, bajo el supuesto de que la hipótesis nula es verdadera. Si el valor-p es inferior al nivel de significancia (\( \alpha \)), usualmente fijado en 0{,}05, se rechaza la hipótesis nula \citep{devore2011}.
+
+El \textbf{coeficiente de correlación de Pearson} (\( r \)) mide la intensidad y dirección de la relación lineal entre dos variables cuantitativas. Su valor varía entre $-1$ y $1$, donde valores cercanos a $1$ indican una correlación positiva fuerte, valores cercanos a $-1$ una correlación negativa fuerte, y valores cercanos a $0$ una relación débil o inexistente. Este indicador viene dado por \citep{montgomery2012}:
+
+\begin{equation}
+r = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum_{i=1}^{n}(x_i - \bar{x})^2 \sum_{i=1}^{n}(y_i - \bar{y})^2}}
+\end{equation}
+
+donde \( x_i \) y \( y_i \) representan los valores observados, y \( \bar{x} \) y \( \bar{y} \) sus respectivas medias.
+
 \subsection{Ciencia de datos para el análisis de comportamiento}
 
 Entender el comportamiento del tráfico vehicular, permite desarrollar medidas ingenieriles que disminuyan la probabilidad de accidentes, gestionando diversas variables como la congestión vehicular, los horarios con mayor probabilidad de accidentes y los sectores con mayor frecuencia de accidentes. La ciencia de datos permite, a través del uso de diferentes herramientas estadísticas, predecir con un grado de certeza conocido, la probabilidad de que ocurra un accidente tomando en cuenta variables que puedan ser determinantes para la ocurrencia de los mismos.
@@ -140,6 +154,15 @@ Las fórmulas utilizadas para el cálculo de estas métricas son las siguientes:
 
 donde \( TP \) son los verdaderos positivos, \( TN \) los verdaderos negativos, \( FP \) los falsos positivos y \( FN \) los falsos negativos.
 
+\subsection{Algoritmos de clasificación: Random Forest y XGBoost}
+
+Para abordar problemas de clasificación binaria, como la predicción de ocurrencia o no ocurrencia de eventos de tráfico, se utilizaron algoritmos de aprendizaje supervisado. En particular, se emplearon los métodos \textit{Random Forest} y \textit{XGBoost}, los cuales han demostrado un alto rendimiento en tareas de clasificación estructurada \parencite{friedman2001elements, chen2016xgboost}.
+
+\textbf{Random Forest} es un algoritmo basado en el principio del ensamblado de modelos, específicamente mediante la construcción de múltiples árboles de decisión. Cada árbol es entrenado sobre una muestra aleatoria del conjunto de datos (con reemplazo), y en cada nodo del árbol se selecciona una subdivisión óptima a partir de un subconjunto aleatorio de características. Esta técnica, conocida como \textit{bagging} (bootstrap aggregating), permite reducir la varianza del modelo y mejorar su capacidad de generalización. La predicción final se obtiene mediante votación mayoritaria entre todos los árboles del conjunto \parencite{breiman2001random}.
+
+\textbf{XGBoost} (\textit{Extreme Gradient Boosting}), en cambio, es un algoritmo basado en el método de \textit{boosting}, donde los árboles son construidos de manera secuencial. A diferencia del \textit{bagging}, el \textit{boosting} busca corregir los errores cometidos por los modelos anteriores, ajustando cada nuevo árbol a los residuos del conjunto anterior. XGBoost optimiza una función de pérdida regularizada utilizando técnicas avanzadas como la poda previa, el manejo eficiente de valores faltantes y una implementación paralelizada, lo que lo convierte en uno de los algoritmos más eficientes y precisos en clasificación tabular \parencite{chen2016xgboost}.
+
+Ambos algoritmos permiten capturar relaciones no lineales y complejas entre las variables predictoras y la variable objetivo, siendo adecuados para trabajar con datos heterogéneos, como los recopilados desde fuentes de tráfico urbano. En la etapa de desarrollo se aplicaron ambos modelos para comparar su desempeño predictivo sobre el conjunto de datos estudiado.
 
 \subsection{Análisis geoespacial}
 
@@ -543,7 +566,7 @@ En el \cref{tab:model-comparison} se puede observar la comparación de ambos mod
 
 \begin{table}[H]
 \centering
-\begin{tabular}{|l|p{9cm}|c|}
+\begin{tabular}{|l|p{8cm}|c|}
 \hline
 \textbf{Modelo} & \textbf{Mejores Hiperparámetros} & \textbf{Mejor Score} \\
 \hline
@@ -587,7 +610,7 @@ Este enfoque permite mantener la estructura temporal y geoespacial de los datos 
 
 La versión final del modelo (\texttt{v6}) se entrenó utilizando los hiperparámetros obtenidos durante la etapa de validación cruzada. El modelo fue registrado y versionado mediante \textit{MLflow}, permitiendo un seguimiento detallado de sus parámetros y métricas.
 
-El modelo utiliza codificación \textit{one-hot} y un esquema de clasificación binaria (\texttt{binary:logistic}), con una semilla aleatoria (\texttt{random\_state = 42}) para garantizar la reproducibilidad \citep{geron2019hands}
+El modelo utiliza codificación \textit{one-hot} y un esquema de clasificación binaria (\texttt{binary: logistic}), con una semilla aleatoria (\texttt{random\_state = 42}) para garantizar la reproducibilidad \citep{geron2019hands}
 
 
 \noindent En cuanto al rendimiento, se obtuvieron los siguientes resultados para una muestra de 64.708 eventos, con un 50\% de eventos ocurridos y un 50\% de no ocurridos. Esta proporción se logró mediante la simulación de eventos negativos sobre una grilla temporal de 5 minutos, generando combinaciones posibles de tiempo, localización y tipo de evento que no están presentes en los datos originales (\cref{ssec:class_balancing}). Esto permite evaluar el modelo en condiciones balanceadas, facilitando la interpretación de métricas como \texttt{precision}, \texttt{recall} y \texttt{F1-score}.
@@ -623,7 +646,7 @@ La \cref{fig:learning_curve} muestra la curva de aprendizaje del modelo XGBoost 
     \label{fig:learning_curve}
 \end{figure}
 
-% Aplicación implementacióñ (dashboard online y ML)
+% Aplicación implementación (dashboard online y ML)
 
 \subsection{Despliegue y mantenimiento del modelo}
 
@@ -733,10 +756,12 @@ M &= a \cdot \left[
 
 \subsection*{Coordenadas proyectadas}
 
-\begin{align*}
-x &= E_0 + k_0 N \left[ A + \frac{A^3}{6}(1 - T + C) + \frac{A^5}{120}(5 - 18T + T^2 + 72C - 58e'^2) \right] \\
-y &= N_0 + k_0 \left[ M + N \tan \phi \left( \frac{A^2}{2} + \frac{A^4}{24}(5 - T + 9C + 4C^2) + \frac{A^6}{720}(61 - 58T + T^2 + 600C - 330e'^2) \right) \right]
-\end{align*}
+\begin{equation}
+\begin{split}
+y &= N_0 + k_0 \left[ M + N \tan \phi \left( \frac{A^2}{2} \right.\right. \\
+&\quad \left.\left. + \frac{A^4}{24}(5 - T + 9C + 4C^2) + \frac{A^6}{720}(61 - 58T + T^2 + 600C - 330e'^2) \right) \right]
+\end{split}
+\end{equation}
 
 Estas expresiones corresponden a un desarrollo en serie basado en una expansión de Taylor, que permite una transformación precisa desde la superficie curva del elipsoide a un plano cartesiano. Estas fórmulas son utilizadas internamente por la biblioteca PROJ, y fueron documentadas formalmente por Snyder \citep{snyder_tm}.
 
