@@ -3,6 +3,10 @@
 \documentclass[12pt]{article}
 \usepackage[spanish]{babel}
 
+% Use a new page for each section
+\usepackage{titlesec}
+\newcommand{\sectionbreak}{\clearpage}
+
 % Margenes
 \usepackage{geometry}
 \geometry{
@@ -156,11 +160,11 @@ donde \( TP \) son los verdaderos positivos, \( TN \) los verdaderos negativos, 
 
 \subsection{Algoritmos de clasificación: Random Forest y XGBoost}
 
-Para abordar problemas de clasificación binaria, como la predicción de ocurrencia o no ocurrencia de eventos de tráfico, se utilizaron algoritmos de aprendizaje supervisado. En particular, se emplearon los métodos \textit{Random Forest} y \textit{XGBoost}, los cuales han demostrado un alto rendimiento en tareas de clasificación estructurada \parencite{friedman2001elements, chen2016xgboost}.
+Para abordar problemas de clasificación binaria, como la predicción de ocurrencia o no ocurrencia de eventos de tráfico, se utilizaron algoritmos de aprendizaje supervisado. En particular, se emplearon los métodos \textit{Random Forest} y \textit{XGBoost}, los cuales han demostrado un alto rendimiento en tareas de clasificación estructurada \citep{friedman2001elements, chen2016xgboost}.
 
-\textbf{Random Forest} es un algoritmo basado en el principio del ensamblado de modelos, específicamente mediante la construcción de múltiples árboles de decisión. Cada árbol es entrenado sobre una muestra aleatoria del conjunto de datos (con reemplazo), y en cada nodo del árbol se selecciona una subdivisión óptima a partir de un subconjunto aleatorio de características. Esta técnica, conocida como \textit{bagging} (bootstrap aggregating), permite reducir la varianza del modelo y mejorar su capacidad de generalización. La predicción final se obtiene mediante votación mayoritaria entre todos los árboles del conjunto \parencite{breiman2001random}.
+\textbf{Random Forest} es un algoritmo basado en el principio del ensamblado de modelos, específicamente mediante la construcción de múltiples árboles de decisión. Cada árbol es entrenado sobre una muestra aleatoria del conjunto de datos (con reemplazo), y en cada nodo del árbol se selecciona una subdivisión óptima a partir de un subconjunto aleatorio de características. Esta técnica, conocida como \textit{bagging} (bootstrap aggregating), permite reducir la varianza del modelo y mejorar su capacidad de generalización. La predicción final se obtiene mediante votación mayoritaria entre todos los árboles del conjunto \citep{breiman2001random}.
 
-\textbf{XGBoost} (\textit{Extreme Gradient Boosting}), en cambio, es un algoritmo basado en el método de \textit{boosting}, donde los árboles son construidos de manera secuencial. A diferencia del \textit{bagging}, el \textit{boosting} busca corregir los errores cometidos por los modelos anteriores, ajustando cada nuevo árbol a los residuos del conjunto anterior. XGBoost optimiza una función de pérdida regularizada utilizando técnicas avanzadas como la poda previa, el manejo eficiente de valores faltantes y una implementación paralelizada, lo que lo convierte en uno de los algoritmos más eficientes y precisos en clasificación tabular \parencite{chen2016xgboost}.
+\textbf{XGBoost} (\textit{Extreme Gradient Boosting}), en cambio, es un algoritmo basado en el método de \textit{boosting}, donde los árboles son construidos de manera secuencial. A diferencia del \textit{bagging}, el \textit{boosting} busca corregir los errores cometidos por los modelos anteriores, ajustando cada nuevo árbol a los residuos del conjunto anterior. XGBoost optimiza una función de pérdida regularizada utilizando técnicas avanzadas como la poda previa, el manejo eficiente de valores faltantes y una implementación paralelizada, lo que lo convierte en uno de los algoritmos más eficientes y precisos en clasificación tabular \citep{chen2016xgboost}.
 
 Ambos algoritmos permiten capturar relaciones no lineales y complejas entre las variables predictoras y la variable objetivo, siendo adecuados para trabajar con datos heterogéneos, como los recopilados desde fuentes de tráfico urbano. En la etapa de desarrollo se aplicaron ambos modelos para comparar su desempeño predictivo sobre el conjunto de datos estudiado.
 
@@ -636,13 +640,12 @@ Estas métricas evidencian un modelo con gran capacidad para identificar correct
 
 \subsection{Curva de aprendizaje del modelo}
 
-La \cref{fig:learning_curve} muestra la curva de aprendizaje del modelo XGBoost entrenado. Se observa un rendimiento alto y consistente tanto en el conjunto de entrenamiento como en el de validación (aproximadamente 0.88–0.90), con una brecha mínima entre ambas curvas. Esto indica que el modelo generaliza adecuadamente, sin presentar sobreajuste ni subajuste. Además, el comportamiento plano de ambas curvas sugiere que incrementar el tamaño del conjunto de entrenamiento no tendría un impacto significativo en el rendimiento, lo cual evidencia una saturación en la capacidad de aprendizaje del modelo con las características actuales.
-
+La \cref{fig:learning_curve} muestra la curva de aprendizaje del modelo XGBoost entrenado. Se observa un rendimiento alto y consistente tanto en el conjunto de entrenamiento como en el de validación (aproximadamente 0.88–0.90), con una brecha mínima entre ambas curvas. Esto indica que el modelo generaliza adecuadamente, sin presentar sobreajuste ni subajuste. Además, el comportamiento plano de ambas curvas sugiere que incrementar el tamaño del conjunto de entrenamiento no tendría un impacto significativo en el rendimiento, lo cual evidencia una saturación en la capacidad de aprendizaje del modelo con las características actuales \citep{raschka2018,chen2016}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{images/learning_curve.png}
-    \caption{Identificación de cuadrantes en mapa de Antofagasta}
+    \caption{Curva de aprendizaje del modelo XGBoost: desempeño en entrenamiento y validación.}
     \label{fig:learning_curve}
 \end{figure}
 
@@ -665,52 +668,64 @@ En el servidor se utiliza Memcached como sistema de caché para optimizar el acc
 
 El entrenamiento del modelo está programado para realizarse cada 30 días, utilizando los nuevos datos. Los datos del dashboard se actualizan cada 5 minutos.
 
-
 \section{Discusiones}
 
-Los análisis espaciales y temporales realizados permitieron identificar patrones críticos en la ocurrencia de accidentes en Antofagasta. En la \cref{fig:quad_acc_total} se observan las zonas con mayor concentración de accidentes, destacando los segmentos ubicados en el eje de la avenida Pedro Aguirre Cerda, especialmente en el cruce con Nicolás Tirado (segmentos 106 a 109). Este corredor vial presenta una densidad particularmente alta, lo que lo posiciona como un foco de atención prioritaria.
+\subsection{Patrones espaciales y temporales del tráfico}
 
-Se identificó un segundo punto crítico en la intersección entre la Avenida Salvador Allende y Edmundo Pérez Zujovic, donde convergen flujos de alto volumen provenientes del norte y del centro de la ciudad. Esta área (segmentos 84 y 103) también mostró una alta frecuencia de accidentes diarios, como se observa en la \cref{fig:quad_mean_day}.
+El análisis integrado de datos geoespaciales y temporales permitió identificar patrones críticos de siniestralidad en Antofagasta. Destacan como focos principales los segmentos del eje Pedro Aguirre Cerda, especialmente el cruce con Nicolás Tirado (segmentos 106–109), así como la intersección Salvador Allende–Edmundo Pérez Zujovic (segmentos 84 y 103), donde confluyen flujos significativos de vehículos desde distintos sectores de la ciudad. El centro urbano (segmento 82) también presenta una elevada concentración de incidentes. Estas observaciones concuerdan parcialmente con el conocimiento empírico de la vialidad local y sugieren la influencia de factores estructurales, como la conectividad de ejes troncales y la configuración urbana.
 
-El centro de la ciudad, particularmente en segmento 82, evidenció una densidad considerable de accidentes.
+El análisis temporal evidenció una mayor frecuencia de accidentes en días hábiles y horarios punta, en línea con la literatura sobre tráfico urbano \citep{berhanu2024}. Esto refuerza la importancia de considerar la dinámica diaria y semanal en la gestión vial.
 
-Los modelos estadísticos desarrollados mostraron una fuerte correlación entre congestión y accidentes, especialmente durante los días de semana. El modelo de potencia inversa entregó un mejor ajuste ($R^2 = 0.96$) que el modelo lineal ($R^2 = 0.92$), capturando de mejor forma la dinámica decreciente del riesgo bajo alta congestión.
+\subsection{Desempeño y comparación de modelos predictivos}
 
-Finalmente, el modelo predictivo XGBoost alcanzó un desempeño sobresaliente (\textbf{F1-score = 0.8823}, \textbf{Recall = 0.9076}), confirmando su utilidad como herramienta predictiva y de soporte en la toma de decisiones en gestión vial.
+En la modelación estadística, se observó una correlación significativa entre la congestión reportada y la ocurrencia de accidentes, especialmente en días laborales. El modelo de potencia inversa logró un ajuste superior ($R^2 = 0.96$) respecto al modelo lineal ($R^2 = 0.92$), capturando la reducción marginal del riesgo a medida que aumenta la congestión.
 
-% Observaciones y resultados del estudio
+El modelo XGBoost logró un desempeño destacado en la predicción de accidentes, con un \textbf{F1-score de 0.88} y un \textbf{Recall de 0.91} en el conjunto de validación. Si bien no se realizó una comparación directa y sistemática con todos los modelos clásicos de series temporales, los resultados obtenidos sugieren que los algoritmos de aprendizaje automático como XGBoost pueden capturar relaciones no lineales y complejas entre las variables predictoras. Entre las variables identificadas como más relevantes por el modelo (según el análisis de importancia de características), destacan el volumen horario de reportes, el día de la semana y la proximidad a intersecciones principales, lo que coincide con el análisis exploratorio y el conocimiento experto del contexto urbano.
 
-% \section{Discusión}
+Sin embargo, una limitación inherente a los modelos basados en aprendizaje automático es la menor interpretabilidad directa respecto a métodos estadísticos tradicionales, lo que puede dificultar su aplicación en contextos donde la transparencia de las decisiones es prioritaria.
 
-% Preguntas y posibles soluciones
+\subsection{Aporte del análisis geoespacial}
+
+El enfoque geoespacial permitió visualizar con claridad zonas críticas y patrones de concentración que no serían evidentes mediante análisis tabulares convencionales. Las visualizaciones generadas, como la \cref{fig:quad_acc_total} y \cref{fig:quad_mean_day}, ofrecen una herramienta valiosa para autoridades y planificadores, facilitando la priorización de intervenciones y el diseño de políticas viales focalizadas. Sin embargo, la calidad de estos análisis depende de la completitud y precisión de los datos de referencia, lo cual puede limitar su aplicabilidad en zonas con cartografía incompleta o baja densidad de reportes.
+
+\subsection{Implicancias prácticas y futuras aplicaciones}
+
+El sistema desarrollado evidencia el potencial de los datos colaborativos y el aprendizaje automático para mejorar la gestión del tráfico en ciudades de tamaño medio. Su arquitectura modular y su enfoque basado en datos abiertos facilitan la replicabilidad en otras urbes chilenas. Además, la actualización periódica del modelo y la visualización en tiempo real abren la puerta a su integración con sistemas de gestión vial, aplicaciones móviles o incluso plataformas de respuesta ante emergencias y eventos masivos.
+
+Futuras aplicaciones podrían incluir la incorporación de datos meteorológicos, información de infraestructura o variables de comportamiento humano, así como la exploración de modelos más avanzados (por ejemplo, LSTM o transformers) que capturen mejor la naturaleza secuencial y dinámica del tráfico.
+
+\subsection{Limitaciones del estudio}
+
+El presente trabajo enfrentó diversas restricciones asociadas principalmente a la disponibilidad y calidad de los datos utilizados. Destaca la ausencia de fuentes independientes que permitieran contrastar y validar físicamente los reportes de incidentes, así como la falta de acceso a información relevante sobre la operación de semáforos y las características específicas de los accidentes (por ejemplo, gravedad, causa o participantes involucrados). Esta carencia de datos complementarios limita la posibilidad de validar exhaustivamente los resultados obtenidos. Adicionalmente, no se contó con evidencia en video ni registros visuales que permitieran corroborar la ocurrencia y naturaleza de los eventos reportados.
+
+En términos técnicos, se identificaron desafíos en la integración de fuentes heterogéneas y en la escalabilidad del sistema ante grandes volúmenes de datos. La generalización de los resultados debe abordarse con cautela, considerando las particularidades urbanas y culturales de cada ciudad, así como las posibles limitaciones del enfoque aplicado. Finalmente, la adopción de modelos complejos puede suponer un desafío adicional en cuanto a la transparencia y comprensión de los resultados por parte de los usuarios finales.
 
 \section{Conclusiones}
 
-Este estudio demuestra la factibilidad y el impacto del uso de datos colaborativos para la gestión inteligente del tráfico urbano. A través de una arquitectura eficiente y una metodología robusta, se logró:
+Este estudio demuestra la factibilidad y el impacto del uso de datos colaborativos para la gestión inteligente del tráfico urbano en Antofagasta. Los principales aportes incluyen:
 
 \begin{itemize}
-    \item Identificar zonas críticas con alta concentración de accidentes, como el cruce de Nicolás Tirado con Pedro Aguirre Cerda, la intersección de Salvador Allende con Edmundo Pérez Zujovic, y sectores del centro de Antofagasta.
-    \item Confirmar la existencia de una relación estadísticamente significativa entre los reportes de congestión y los accidentes, siendo más fuerte durante los días de semana.
-    \item Validar el uso de modelos no lineales como herramientas más adecuadas para representar fenómenos de tráfico en contextos urbanos densos.
-    \item Desarrollar un modelo predictivo basado en XGBoost con alto rendimiento, capaz de anticipar la ocurrencia de accidentes con gran precisión.
-    \item Implementar un sistema funcional de monitoreo y visualización que permite actualizar el modelo periódicamente y ofrecer datos en tiempo real a los usuarios finales.
+    \item Identificación precisa de zonas críticas con alta concentración de accidentes, alineada con el conocimiento local y la evidencia empírica.
+    \item Confirmación de una relación estadísticamente significativa entre congestión y accidentes, especialmente durante días laborales.
+    \item Validación de modelos no lineales y de aprendizaje automático como herramientas superiores para la predicción de incidentes en contextos urbanos densos.
+    \item Desarrollo e implementación de un sistema funcional de monitoreo, visualización y actualización periódica del modelo, con potencial de escalabilidad.
 \end{itemize}
 
-Se concluye que el enfoque propuesto no solo es viable, sino escalable, y representa una base sólida para iniciativas de movilidad urbana basadas en datos.
+El enfoque propuesto es viable y adaptable, constituyendo una base sólida para futuras iniciativas de movilidad urbana orientadas a la seguridad y eficiencia.
 
 \section{Recomendaciones}
 
-A partir de los resultados obtenidos, se proponen las siguientes recomendaciones para autoridades locales, planificadores urbanos y futuras investigaciones:
+En base a los hallazgos, se sugiere:
 
 \begin{itemize}
-    \item \textbf{Intervención en zonas críticas}: Priorizar acciones de ingeniería vial, señalización y fiscalización en los segmentos identificados como críticos, particularmente en el eje Pedro Aguirre Cerda, Salvador Allende y el centro de la ciudad.
-    \item \textbf{Monitoreo continuo}: Mantener y escalar el sistema de recolección y análisis de datos, integrando nuevas fuentes (sensores, cámaras) para enriquecer el modelo.
-    \item \textbf{Validación en terreno}: Complementar los hallazgos con estudios de campo para confirmar condiciones geométricas, flujos vehiculares y comportamiento de los usuarios en las zonas críticas.
-    \item \textbf{Extensión del sistema}: Replicar esta metodología en otras ciudades de tamaño medio que carezcan de infraestructura de monitoreo formal \citep{berhanu2024}.
-    \item \textbf{Nuevas líneas de investigación}: Incorporar variables climáticas, de infraestructura o comportamiento humano para enriquecer los modelos predictivos y explorar algoritmos más avanzados (LSTM, transformers, modelos causales).
+    \item \textbf{Intervención focalizada}: Priorizar mejoras de infraestructura, señalización y fiscalización en los segmentos críticos identificados.
+    \item \textbf{Monitoreo y actualización}: Mantener y ampliar la infraestructura de captura y análisis de datos, integrando nuevas fuentes (sensores, cámaras) y promoviendo la actualización continua del modelo.
+    \item \textbf{Validación cruzada}: Complementar los análisis con estudios de campo y encuestas a usuarios para validar y enriquecer los hallazgos.
+    \item \textbf{Escalabilidad}: Replicar y adaptar la metodología a otras ciudades chilenas con características similares, atendiendo a sus particularidades.
+    \item \textbf{Investigación avanzada}: Incorporar nuevas variables (clima, infraestructura, comportamiento humano) y explorar modelos predictivos de mayor complejidad y capacidad explicativa.
 \end{itemize}
 
-Estas recomendaciones apuntan a fortalecer una gestión vial basada en datos, proactiva y centrada en la seguridad de los ciudadanos.
+Estas recomendaciones buscan fortalecer una gestión vial proactiva y basada en datos, orientada a la reducción de accidentes y la mejora sostenida de la movilidad urbana.
 
 \newpage
 
