@@ -62,7 +62,7 @@ A los profesores apasionados por su trabajo, que no solo transmiten conocimiento
 
 El proyecto desarrollado tuvo como propósito la creación de una herramienta efectiva para analizar y predecir, con alta confiabilidad, el comportamiento del tráfico vehicular en la ciudad de Antofagasta, utilizando datos provenientes de la plataforma Waze Cities \citep{wazecities2024}. Esta plataforma, alimentada por su comunidad de usuarios, proporciona información en tiempo real que permite obtener una visión detallada de los eventos de tráfico en la ciudad. La investigación resultante generó información relevante para la gestión del tráfico, facilitando la toma de decisiones por parte de las autoridades locales, con miras a mejorar la seguridad vial y optimizar la eficiencia del flujo vehicular. A partir del análisis y explotación de estos datos, fue posible identificar patrones y tendencias que, al ser integrados en la planificación urbana, permiten optimizar rutas críticas, reducir la congestión y disminuir la probabilidad de accidentes.
 
-Se consiguió obtener un modelo capas de predecir el comportamiento del tráfico con una precisión del 85.83\% y un F1-score de 88.23\%, de acuerdo con el análisis de bondad de ajuste realizado al modelo final, el cual fue entrenado utilizando el algoritmo de clasificación XGBoost. Se utilizaron alrededor de 64.708 eventos para el entrenamiento.
+Se consiguió obtener un modelo capaz de predecir el comportamiento del tráfico con una precisión del 85.83\% y un F1-score de 88.23\%, de acuerdo con el análisis de bondad de ajuste realizado al modelo final, el cual fue entrenado utilizando el algoritmo de clasificación XGBoost. Se utilizaron alrededor de 64.708 eventos para el entrenamiento.
 
 \section{Introducción}
 \subsection{Descripción del problema}
@@ -104,7 +104,7 @@ El tráfico vehicular en entornos urbanos presenta un comportamiento complejo e 
 
 \subsection{Gestión de la seguridad vial}
 
-Existen diferentes estrategias para la gestión vehicular, desde sistemas manuales como la dirección del tránsito por carabineros, o más automatizados, como la gestión inteligente de semáforos. En términos de seguridad, para evitar la ocurrencia de accidentes, podemos aplicar la jerarquía de control de riesgo \cref{fig:jerarquia_riesgos}. Esta busca abordar desde la medida de mayor impacto, hasta la de menor impacto en la exposición al riesgo. Se divide en dos grupos principales, las barreras duras y las barreras blandas (administrativas). El primer grupo consta de la eliminación del agente de riesgo, la sustitución por uno de menor exposición y medidas ingenieriles, que buscan administrar la exposición con algún rediseño u organización. Las medidas administrativas constan de diferentes estrategias que puedan cambiar el comportamiento, el cuidado o la visibilidad de la exposición, por último, los elementos de protección personal, que buscan mitigar el daño ante algún posible accidente \citep{niosh2024}.
+Existen diferentes estrategias para la gestión vehicular, desde sistemas manuales como la dirección del tránsito por carabineros, o más automatizados, como la gestión inteligente de semáforos. En términos de seguridad, para evitar la ocurrencia de accidentes, resulta conveniente aplicar la jerarquía de control de riesgo \cref{fig:jerarquia_riesgos}. Esta busca abordar desde la medida de mayor impacto, hasta la de menor impacto en la exposición al riesgo. Se divide en dos grupos principales, las barreras duras y las barreras blandas (o administrativas). El primer grupo consta de la eliminación del agente de riesgo, la sustitución por uno de menor exposición o medidas ingenieriles, que buscan administrar la exposición con algún rediseño u organización. Las medidas administrativas constan de diferentes estrategias que puedan cambiar el comportamiento, el cuidado o la visibilidad de la exposición, por último, los elementos de protección personal, que buscan mitigar el daño ante algún posible accidente \citep{niosh2024}.
 
 \begin{figure}[h]
     \centering
@@ -113,21 +113,21 @@ Existen diferentes estrategias para la gestión vehicular, desde sistemas manual
     \label{fig:jerarquia_riesgos}
 \end{figure}
 
-La eliminación de la necesidad de transporte, puede ser abordada con estrategias como el fomento del teletrabajo para los puestos que lo permitan, o formas en que las personas se encuentren más cerca de sus trabajos, eliminando la necesidad de transporte en vehículo. La sustitución se genera fomentando el uso de transporte público, el uso de medios alternativos de transporte, como las bicicletas o el uso compartido de vehículos. Las medidas de ingeniería buscan optimizar en cuanto a tránsito y en seguridad el flujo vehicular, puede ser el rediseño del plano urbano, el diseño de vehículos más seguros, monitoreo a través de radares, cámaras y GPS, planificación de rutas y nuevas vías de tránsito. Como medidas administrativas se encuentran la educación vial, la señalización y los límites de velocidad. En cuanto a elementos de protección personal, se posiciona el uso de cinturón de seguridad, la instalación de airbags, barreras anti-vuelco y barreras de contención en las vías.
+La eliminación de la necesidad de transporte, puede ser abordada con estrategias como el fomento del teletrabajo para los puestos que lo permitan, o haciendo que las personas se encuentren más cerca de sus trabajos, eliminando la necesidad de transporte en vehículo. La sustitución se genera fomentando el uso de transporte público, el uso de medios alternativos de transporte, como las bicicletas o el uso compartido de vehículos. Las medidas de ingeniería buscan optimizar el flujo vehicular, puede ser a través del rediseño del plano urbano, el diseño de vehículos más seguros, monitoreo a través de radares, cámaras y GPS, planificación de rutas y nuevas vías de tránsito. Como medidas administrativas se encuentran la educación vial, la señalización y los límites de velocidad. En cuanto a elementos de protección personal, se posiciona el uso de cinturón de seguridad, la instalación de airbags, barreras anti-vuelco y barreras de contención en las vías, entre otras.
 
 \subsection{Indicadores de bondad y ajuste}
 
 Para evaluar la relación entre variables cuantitativas y validar supuestos estadísticos, se utilizaron indicadores clásicos de ajuste y asociación. En particular, se aplicaron pruebas de hipótesis y el coeficiente de correlación de Pearson, herramientas fundamentales en el análisis estadístico inferencial \citep{devore2011, montgomery2012}.
 
-La \textbf{prueba de hipótesis} permite evaluar si existe suficiente evidencia en los datos para rechazar una afirmación nula sobre una población. En el caso de correlaciones, la hipótesis nula establece que no existe relación lineal entre las variables (\( H_0 : \rho = 0 \)), mientras que la hipótesis alternativa plantea la existencia de una asociación (\( H_1 : \rho \neq 0 \)). El valor-p obtenido indica la probabilidad de observar un estadístico igual o más extremo, bajo el supuesto de que la hipótesis nula es verdadera. Si el valor-p es inferior al nivel de significancia (\( \alpha \)), usualmente fijado en 0{,}05, se rechaza la hipótesis nula \citep{devore2011}.
+La \textbf{prueba de hipótesis} permite evaluar si existe suficiente evidencia en los datos para rechazar una afirmación nula sobre una población. En el caso de correlaciones, la hipótesis nula establece que no existe relación lineal entre las variables (\( H_0 : \rho = 0 \)), mientras que la hipótesis alternativa plantea la existencia de una correlación (\( H_1 : \rho \neq 0 \)). El valor-p obtenido indica la probabilidad de observar un estadístico igual o más extremo, bajo el supuesto de que la hipótesis nula es verdadera. Si el valor-p es inferior al nivel de significancia (\( \alpha \)), se rechaza la hipótesis nula \citep{devore2011}.
 
-El \textbf{coeficiente de correlación de Pearson} (\( r \)) mide la intensidad y dirección de la relación lineal entre dos variables cuantitativas. Su valor varía entre $-1$ y $1$, donde valores cercanos a $1$ indican una correlación positiva fuerte, valores cercanos a $-1$ una correlación negativa fuerte, y valores cercanos a $0$ una relación débil o inexistente. Este indicador viene dado por \citep{montgomery2012}:
+El \textbf{coeficiente de correlación de Pearson} (\( r \)) mide la intensidad y dirección de la relación lineal entre dos variables cuantitativas. Su valor varía entre $-1$ y $1$, donde valores cercanos a $1$ indican una correlación positiva fuerte, valores cercanos a $-1$ una correlación negativa fuerte, y valores cercanos a $0$ una relación débil o inexistente. Este indicador viene dado por:
 
 \begin{equation}
 r = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum_{i=1}^{n}(x_i - \bar{x})^2 \sum_{i=1}^{n}(y_i - \bar{y})^2}}
 \end{equation}
 
-donde \( x_i \) y \( y_i \) representan los valores observados, y \( \bar{x} \) y \( \bar{y} \) sus respectivas medias.
+donde \( x_i \) y \( y_i \) representan los valores observados, y \( \bar{x} \) y \( \bar{y} \) sus respectivas medias \citep{montgomery2012}.
 
 \subsection{Ciencia de datos para el análisis de comportamiento}
 
@@ -164,7 +164,7 @@ Para abordar problemas de clasificación binaria, como la predicción de ocurren
 
 \textbf{Random Forest} es un algoritmo basado en el principio del ensamblado de modelos, específicamente mediante la construcción de múltiples árboles de decisión. Cada árbol es entrenado sobre una muestra aleatoria del conjunto de datos (con reemplazo), y en cada nodo del árbol se selecciona una subdivisión óptima a partir de un subconjunto aleatorio de características. Esta técnica, conocida como \textit{bagging} (bootstrap aggregating), permite reducir la varianza del modelo y mejorar su capacidad de generalización. La predicción final se obtiene mediante votación mayoritaria entre todos los árboles del conjunto \citep{breiman2001random}.
 
-\textbf{XGBoost} (\textit{Extreme Gradient Boosting}), en cambio, es un algoritmo basado en el método de \textit{boosting}, donde los árboles son construidos de manera secuencial. A diferencia del \textit{bagging}, el \textit{boosting} busca corregir los errores cometidos por los modelos anteriores, ajustando cada nuevo árbol a los residuos del conjunto anterior. XGBoost optimiza una función de pérdida regularizada utilizando técnicas avanzadas como la poda previa, el manejo eficiente de valores faltantes y una implementación paralelizada, lo que lo convierte en uno de los algoritmos más eficientes y precisos en clasificación tabular \citep{chen2016xgboost}.
+\textbf{XGBoost} (\textit{Extreme Gradient Boosting}), es un algoritmo basado en el método de \textit{boosting}, donde los árboles son construidos de manera secuencial. A diferencia del \textit{bagging}, el \textit{boosting} busca corregir los errores cometidos por los modelos anteriores, ajustando cada nuevo árbol a los residuos del conjunto anterior. XGBoost optimiza una función de pérdida regularizada utilizando técnicas avanzadas como la poda previa, el manejo eficiente de valores faltantes y una implementación paralelizada, lo que lo convierte en uno de los algoritmos más eficientes y precisos en clasificación tabular \citep{chen2016xgboost}.
 
 Ambos algoritmos permiten capturar relaciones no lineales y complejas entre las variables predictoras y la variable objetivo, siendo adecuados para trabajar con datos heterogéneos, como los recopilados desde fuentes de tráfico urbano. En la etapa de desarrollo se aplicaron ambos modelos para comparar su desempeño predictivo sobre el conjunto de datos estudiado.
 
@@ -182,7 +182,7 @@ La elección de EPSG:32719 permite minimizar la distorsión local, ya que el sis
 
 \subsection{Aprendizaje automático}
 
-A medida que la cantidad de datos aumenta, el modelo requiere ser reentrenado para incorporar los nuevos registros y así actualizar sus parámetros. Este proceso de aprendizaje continuo permite que el modelo se adapte a las variaciones que puedan presentarse en los patrones de tráfico vehicular a lo largo del tiempo. Para asegurar esta adaptabilidad, se programó una frecuencia de reentrenamiento mensual, lo que implica la incorporación de aproximadamente 9.244 nuevos datos al modelo cada mes. El reentrenamiento periódico resulta fundamental para mantener la vigencia y precisión del modelo, ya que permite integrar las tendencias más recientes y responder oportunamente a los cambios en las condiciones del tráfico \citep{gama2014concept}.
+A medida que la cantidad de datos aumenta, el modelo requiere ser reentrenado para incorporar los nuevos registros y así actualizar sus parámetros. Este proceso de aprendizaje continuo permite que el modelo se adapte a las variaciones que puedan presentarse en los patrones de tráfico vehicular a lo largo del tiempo. Para asegurar esta adaptabilidad, se programó una frecuencia de reentrenamiento mensual, lo que implica la incorporación de aproximadamente 9,244 nuevos datos al modelo cada mes. El reentrenamiento periódico resulta fundamental para mantener la vigencia y precisión del modelo, ya que permite integrar las tendencias más recientes y responder oportunamente a los cambios en las condiciones del tráfico \citep{gama2014concept}.
 
 
 Para la gestión de los modelos se utilizó \texttt{MLFlow}, un \texttt{framework} que permite gestionar las versiones de los modelos y almacenarlos en una base de datos, asegurando la persistencia de los mismos. También permite almacenar las diferentes métricas de cada versión del modelo \citep{mlflow2025}.
@@ -199,13 +199,13 @@ Más recientemente, \citet{berhanu2024} aplicaron aprendizaje automático y aná
 
 \subsection{Metodología}
 
-Se realiza un análisis geoespacial con el objetivo de identificar puntos críticos, como vías principales, calles secundarias y zonas de alto tráfico. Este análisis se llevó a cabo utilizando \texttt{GeoPandas}. Además, se analizan series temporales para detectar patrones y tendencias del tráfico, identificando estacionalidades en el comportamiento. Los resultados se presentan mediante técnicas de visualización que permitien interpretar las tendencias y puntos de interés de manera efectiva.
+Se realiza un análisis geoespacial con el objetivo de identificar puntos críticos, como vías principales, calles secundarias y zonas de alto tráfico. Este análisis se llevó a cabo utilizando \texttt{GeoPandas}. Los resultados se presentan mediante técnicas de visualización que permitien interpretar las tendencias y puntos de interés de manera efectiva.
 
-El pipeline de datos incluye una base de datos relacional para almacenar los datos, un flujo ETL (Extract, Transform, Load) para procesarlos y un servidor web para visualizarlos. Se utilizó PostgreSQL \citep{postgres2025} como base de datos, Memcached  \citep{memcached2025} como base de datos de caché, APScheduler para la programación de tareas y Dash \citep{dash2025} como herramienta de visualización. Este enfoque permitió automatizar el flujo de datos y garantizar la actualización constante de la información.
+El pipeline de datos incluye una base de datos relacional para almacenarlos, un flujo ETL (Extract, Transform, Load) para procesarlos y un servidor web para visualizarlos. Se utilizó PostgreSQL \citep{postgres2025} como base de datos, Memcached  \citep{memcached2025} como base de datos de caché, APScheduler para la programación de tareas y Dash \citep{dash2025} como herramienta de visualización. Este enfoque permitió automatizar el flujo de datos y garantizar la actualización constante de la información.
 
-Adicionalmente, se entrenó un modelo de clasificación para determinar la probabilidad de ocurrencia de accidentes en diferentes puntos de la ciudad. El modelo seleccionado fue XGBoost \citep{chen2016xgboost}, el cual fue seleccionado utilizando técnicas de validación cruzada y optimización de hiperparámetros \citep{geron2019hands}. Los resultados obtenidos permitieron identificar las variables más influyentes en la ocurrencia de accidentes, así como la probabilidad de ocurrencia en diferentes condiciones de tráfico. Para la selección de variables se utilizó GridSearchCV \citep{pedregosa2011scikit, geron2019hands}, una técnica de búsqueda de hiperparámetros que permite encontrar la mejor combinación de variables para el modelo, se compararon modelos de regresión logística, árboles de decisión y XGBoost, siendo este último el que presentó el mejor desempeño en términos de precisión y sensibilidad.
+Adicionalmente, se entrenó un modelo de clasificación para determinar la probabilidad de ocurrencia de accidentes en diferentes puntos de la ciudad. El modelo seleccionado fue XGBoost \citep{chen2016xgboost}, el cual fue seleccionado utilizando técnicas de validación cruzada y optimización de hiperparámetros \citep{geron2019hands}. Los resultados obtenidos permitieron identificar las variables más influyentes en la ocurrencia de accidentes, así como la probabilidad de ocurrencia en diferentes condiciones de tráfico. Para la selección de variables se utilizó GridSearchCV \citep{pedregosa2011scikit, geron2019hands}, una técnica de búsqueda de hiperparámetros que permite encontrar la mejor combinación de variables para el modelo, se compararon modelos de regresión logística, árboles de decisión y XGBoost.
 
-Para la gestión del modelo, en cuanto a su implementación, mantenimiento y actualización, se programó con APSCheduler, para ejecutar tareas periódicas que permiten gestionar el ciclo de vida de los modelos de aprendizaje automático, desde su entrenamiento hasta su despliegue en producción y versionado.
+Para la gestión del modelo, en cuanto a su implementación, mantenimiento y actualización, se programó APSCheduler, para ejecutar tareas periódicas que permiten gestionar el ciclo de vida de los modelos de aprendizaje automático, desde su entrenamiento hasta su despliegue en producción y versionado.
 
 El servidor se desarrolló en \texttt{Rust} \citep{rust2025}, un lenguaje de programación enfocado en la eficiencia en el uso de memoria y seguridad en el uso de la misma. Se utilizó \texttt{Memcached} para generar un caché de los datos y de esta forma poder servirlos de manera más eficiente y rápida \citep{fitzpatrick2004memcached}, debido al volumen de datos, se priorizó la unicidad de los mismos, evitando generar copias, para no aumentar el uso de memoria.
 
@@ -214,14 +214,14 @@ Para el procesado de los datos en el cliente —\texttt{Dash}—, se generan mú
 
 La perspectiva general del flujo de datos se muestra en la \cref{fig:fuente} y el flujo desde la API de Waze hasta el dashboard se puede observar en la \cref{fig:wf_dash}
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{images/fuente_datos.png}
     \caption{Pipeline general de datos}
     \label{fig:fuente}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{images/wf_dash.png}
     \caption{Flujo de información en dashboard}
@@ -230,7 +230,7 @@ La perspectiva general del flujo de datos se muestra en la \cref{fig:fuente} y e
 
 \section{Desarrollo}
 
-Se diseña una estrategia de recolección de datos que garantiza información con un nivel adecuado de certeza. La API de Waze Cities, que proporciona información en tiempo real sobre eventos activos, fue la fuente principal de datos. Para lograr un volumen de datos representativo, se implementó un servidor encargado de recopilar y almacenar esta información de manera continua. El servidor fue desarrollado en \texttt{Rust}, utilizando la librería reqwest \citep{reqwest2025} para extraer los datos desde la API de Waze Cities. Se recolectan los eventos de tráfico y se almacenan en una base de datos PostgreSQL. Este servidor se ejecuta de manera continua, actualizando la información cada 2 minutos. La estructura de la base de datos se muestra en la \cref{fig:db_diagram}.
+Se diseña una estrategia de recolección de datos que garantiza información con un nivel adecuado de certeza. La API de Waze Cities, que proporciona información en tiempo real sobre eventos activos, fue la fuente principal de datos. Para lograr un volumen de datos representativo, se implementó un servidor encargado de recopilar y almacenar esta información de manera continua. El servidor fue desarrollado en \texttt{Rust}, utilizando la librería reqwest \citep{reqwest2025} para extraer los datos desde la API de Waze Cities. Se recolectan los eventos de tráfico y se almacenan en una base de datos PostgreSQL. Este servidor se ejecuta de manera continua actualizando la información cada 2 minutos. La estructura de la base de datos se muestra en la \cref{fig:db_diagram}.
 
 \begin{figure}[H]
     \centering
@@ -239,13 +239,13 @@ Se diseña una estrategia de recolección de datos que garantiza información co
     \label{fig:db_diagram}
 \end{figure}
 
-Existen dos estructuras principales, las alertas —\texttt{alerts}— y las congestiones —\texttt{jams}—, el primero registra todos los eventos reportados por usuarios, tales como peligros, accidentes, congestión o rutas cerradas. En el caso de los eventos de congestión, son datos generados automáticamente por Waze, los cuales usando la geolocalización, estiman congestiones en diferentes puntos de la ciudad. Para este proyecto, se utiliza la información de las alertas. Sin embargo, se almacenaron los datos de congestión, para un posterior análisis, que está fuera del alcance de este estudio. Esta estructura se definió con base en los datos relevantes y completos que proporciona la API, los tipos de datos disponibles pueden ser consultados en la documentación de Waze \citep{waze2024}.
+Existen dos estructuras principales, las alertas (\texttt{alerts}) y las congestiones (\texttt{jams}), el primero registra todos los eventos reportados por usuarios, tales como peligros, accidentes, congestión o rutas cerradas. En el caso de los eventos de congestión, son datos generados automáticamente por Waze, los cuales usando la geolocalización, estiman congestiones en diferentes puntos de la ciudad. Para este proyecto, se utiliza la información de las alertas. Sin embargo, se almacenaron los datos de congestión, para un posterior análisis, que está fuera del alcance de este estudio. Esta estructura se definió con base en los datos relevantes y completos que proporciona la API, los tipos de datos disponibles pueden ser consultados en la documentación de Waze \citep{waze2024}.
 
-Desde octubre de 2024 hasta abril de 2025, se capturan 64.708 alertas, las cuales se analizarán a lo largo de este estudio.
+Desde octubre de 2024 hasta abril de 2025, se capturan 64,708 alertas, las cuales se analizarán a lo largo de este estudio.
 
 \subsection{Consideraciones de los datos}
 
-Las alertas pueden contener duplicados, debido a que diferentes usuarios pueden reportar el mismo evento. Para evitar esto, se filtraron los datos agrupándolos por segmento (\cref{ssec:freq_zone}) y periodos de tiempo, eliminando grupos duplicados en una ventana de tiempo de 120 minutos, es decir, todo evento que se reportó con el mismo tipo, en el mismo segmento, dentro de un periodo de dos horas, será considerado como un solo evento. Para esto se utiliza el siguiente Algoritmo \cref{alg:filter}
+Las alertas pueden contener duplicados, debido a que diferentes usuarios pueden reportar el mismo evento. Para evitar esto, se filtraron los datos agrupándolos por segmento (\cref{ssec:freq_zone}) y periodos de tiempo, eliminando grupos duplicados en una ventana de tiempo de 120 minutos, es decir, todo evento que se reportó con el mismo tipo, en el mismo segmento, dentro de un periodo de dos horas, será considerado como un solo evento. Para esto se utiliza un algoritmo de filtrado \cref{alg:filter}.
 
 \begin{algorithm}
 \caption{Filtrado de eventos por grupo y tiempo}
@@ -360,13 +360,13 @@ t = \frac{r \sqrt{n - 2}}{\sqrt{1 - r^2}}
 
 donde $r$ es el coeficiente de correlación muestral y $n$ el número de observaciones. El valor resultante se contrasta con la distribución t de Student con $n - 2$ grados de libertad.
 
-El análisis estadístico del modelo lineal entregó resultados significativos tanto para días de semana como para fin de semana:
+El análisis estadístico del modelo lineal entregó los siguientes resultados:
 
 \begin{itemize}
     \item Para días de semana:
     \begin{itemize}
         \item El modelo ajustado fue $y = 0.1673x + 0.0996$
-        \item Se obtuvo un $R^2 = 0.90$, explicando el 90\% de la variabilidad
+        \item Se obtuvo un $R^2 = 0.90$
         \item La significancia global fue $F(1, 22) = 203.33$, $p < 0.0001$
         \item Los parámetros fueron estadísticamente significativos con $p < 0.001$
         \item El estadístico $t$ para la prueba de correlación fue $t = 14.26$, $p < 0.0001$
@@ -375,7 +375,7 @@ El análisis estadístico del modelo lineal entregó resultados significativos t
     \item Para fines de semana:
     \begin{itemize}
         \item El modelo ajustado fue $y = 0.1365x + 0.0748$
-        \item Se obtuvo un $R^2 = 0.67$, explicando el 67\% de la variabilidad
+        \item Se obtuvo un $R^2 = 0.67$
         \item El coeficiente de correlación de Pearson fue $r = 0.82$ con IC 95\%: [0.62, 0.92]
         \item La significancia global fue $F(1, 22) = 44.42$, $p < 0.0001$
         \item Los parámetros fueron estadísticamente significativos con $p < 0.0001$
@@ -384,6 +384,13 @@ El análisis estadístico del modelo lineal entregó resultados significativos t
 \end{itemize}
 
 Estos resultados permiten rechazar la hipótesis nula con un nivel de confianza del 99\% para los días de semana, confirmando la existencia de una relación lineal estadísticamente significativa entre el número de reportes de congestión y la cantidad de accidentes registrados por hora.
+
+Los gráficos Q-Q (\cref{fig:qq_lin}) muestran una aproximación razonable a la distribución normal en ambos períodos. Para los días de semana, los puntos siguen la línea de referencia, con algunas desviaciones en los extremos, particularmente en los valores más altos. En el caso de fin de semana, la aproximación a la línea teórica es más consistente, con una distribución más cercana a la normal.
+
+Los gráficos de residuos (\cref{fig:resid_lin}) revelan patrones distintos para cada período. En días de semana, aunque hay cierta dispersión alrededor de cero, se observa variabilidad considerable con algunos residuos positivos destacados (especialmente entre valores ajustados de 0.5 y 0.6) y residuos negativos pronunciados alrededor de 0.8. Para fines de semana, los residuos muestran menor magnitud global, pero un patrón menos aleatorio, sugiriendo posible estructura no capturada por el modelo lineal.
+
+En resumen, el análisis confirma una relación lineal significativa entre congestión y accidentes, considerablemente más fuerte durante días laborables ($R^2 = 0.90$) que en fines de semana ($R^2 = 0.67$). Los patrones observados en los residuos, particularmente para fines de semana, sugieren la pertinencia de explorar modelos no lineales que podrían capturar mejor las relaciones subyacentes en los datos.
+
 
 \begin{figure}[H]
 \centering
@@ -398,12 +405,6 @@ Estos resultados permiten rechazar la hipótesis nula con un nivel de confianza 
 \caption{Gráficos Q-Q de los residuos del modelo lineal}
 \label{fig:qq_lin}
 \end{figure}
-
-Los gráficos Q-Q (\cref{fig:qq_lin}) muestran una aproximación razonable a la distribución normal en ambos períodos. Para los días de semana, los puntos siguen la línea de referencia, con algunas desviaciones en los extremos, particularmente en los valores más altos. En el caso de fin de semana, la aproximación a la línea teórica es más consistente, con una distribución más cercana a la normal.
-
-Los gráficos de residuos (\cref{fig:resid_lin}) revelan patrones distintos para cada período. En días de semana, aunque hay cierta dispersión alrededor de cero, se observa variabilidad considerable con algunos residuos positivos destacados (especialmente entre valores ajustados de 0.5 y 0.6) y residuos negativos pronunciados alrededor de 0.8. Para fines de semana, los residuos muestran menor magnitud global, pero un patrón menos aleatorio, sugiriendo posible estructura no capturada por el modelo lineal.
-
-En resumen, el análisis confirma una relación lineal significativa entre congestión y accidentes, considerablemente más fuerte durante días laborables ($R^2 = 0.90$) que en fines de semana ($R^2 = 0.67$). Los patrones observados en los residuos, particularmente para fines de semana, sugieren la pertinencia de explorar modelos no lineales que podrían capturar mejor las relaciones subyacentes en los datos.
 
 
 \subsection{Modelo de correlación exponencial inversa}
@@ -447,7 +448,7 @@ El análisis estadístico del modelo exponencial inverso entregó resultados sig
     \item Para días de semana:
     \begin{itemize}
         \item El modelo ajustado fue $y = 0.3119/x^{-0.6319}$
-        \item Se obtuvo un $R^2 = 0.94$, explicando el 94\% de la variabilidad
+        \item Se obtuvo un $R^2 = 0.94$
         \item La significancia global fue $F(2, 22) = 158.81$, $p < 0.0001$
         \item Los parámetros fueron estadísticamente significativos con $p < 0.0001$
     \end{itemize}
@@ -455,13 +456,20 @@ El análisis estadístico del modelo exponencial inverso entregó resultados sig
     \item Para fines de semana:
     \begin{itemize}
         \item El modelo ajustado fue $y = 0.1826/x^{-0.2776}$
-        \item Se obtuvo un $R^2 = 0.71$, explicando el 71\% de la variabilidad
+        \item Se obtuvo un $R^2 = 0.71$
         \item La significancia global fue $F(2, 22) = 27.19$, $p < 0.001$
         \item Los parámetros fueron estadísticamente significativos con $p < 0.001$
     \end{itemize}
 \end{itemize}
 
 Este análisis revela diferencias importantes en la dinámica de la relación congestión-accidentes entre períodos. Durante los días de semana, el exponente negativo de mayor magnitud ($-0.6319$) indica una relación más sensible entre las variables, mientras que en fines de semana el exponente menor ($-0.2776$) sugiere una relación menos pronunciada.
+
+Los gráficos de residuos (\cref{fig:resid_exp}) muestran una dispersión relativamente aleatoria en torno a cero, sin evidencias claras de heterocedasticidad ni patrones sistemáticos, lo que respalda la validez del ajuste no lineal propuesto. En particular, para los días de semana, los residuos muestran una distribución uniforme con algunos valores extremos (entre -0.1 y 0.2), mientras que para los fines de semana, la dispersión es menor y más equilibrada (aproximadamente entre -0.05 y 0.05).
+
+Complementariamente, los gráficos Q-Q (\cref{fig:qq_exp}) revelan una aproximación a la distribución normal de los residuos en ambos casos, aunque con algunas desviaciones. En días de semana, se observan algunas desviaciones en los valores extremos, particularmente un punto notable en el extremo positivo. Para los fines de semana, la alineación con la línea teórica es excepcional, indicando una distribución muy cercana a la normal.
+
+En conjunto, estos resultados indican que el modelo exponencial inverso no solo es estadísticamente significativo, sino que además presenta un mejor ajuste que el modelo lineal, especialmente para días de semana donde alcanza un $R^2 = 0.94$ comparado con el $R^2 = 0.90$ del modelo lineal. La normalidad de los residuos y su distribución aleatoria fortalecen la hipótesis de que existe una relación no lineal entre la congestión y la probabilidad de accidentes en contextos urbanos, que puede ser modelada adecuadamente mediante una función exponencial inversa.
+
 
 \begin{figure}[H]
 \centering
@@ -476,12 +484,6 @@ Este análisis revela diferencias importantes en la dinámica de la relación co
 \caption{Gráficos Q-Q de los residuos del modelo exponencial inverso}
 \label{fig:qq_exp}
 \end{figure}
-
-Los gráficos de residuos (\cref{fig:resid_exp}) muestran una dispersión relativamente aleatoria en torno a cero, sin evidencias claras de heterocedasticidad ni patrones sistemáticos, lo que respalda la validez del ajuste no lineal propuesto. En particular, para los días de semana, los residuos muestran una distribución uniforme con algunos valores extremos (entre -0.1 y 0.2), mientras que para los fines de semana, la dispersión es menor y más equilibrada (aproximadamente entre -0.05 y 0.05).
-
-Complementariamente, los gráficos Q-Q (\cref{fig:qq_exp}) revelan una aproximación a la distribución normal de los residuos en ambos casos, aunque con algunas desviaciones. En días de semana, se observan algunas desviaciones en los valores extremos, particularmente un punto notable en el extremo positivo. Para los fines de semana, la alineación con la línea teórica es excepcional, indicando una distribución muy cercana a la normal.
-
-En conjunto, estos resultados indican que el modelo exponencial inverso no solo es estadísticamente significativo, sino que además presenta un mejor ajuste que el modelo lineal, especialmente para días de semana donde alcanza un $R^2 = 0.94$ comparado con el $R^2 = 0.90$ del modelo lineal. La normalidad de los residuos y su distribución aleatoria fortalecen la hipótesis de que existe una relación no lineal entre la congestión y la probabilidad de accidentes en contextos urbanos, que puede ser modelada adecuadamente mediante una función exponencial inversa.
 
 % Cálculo de la frecuencia por zona
 % Filtro por zona
@@ -617,7 +619,7 @@ La versión final del modelo (\texttt{v6}) se entrenó utilizando los hiperpará
 El modelo utiliza codificación \textit{one-hot} y un esquema de clasificación binaria (\texttt{binary: logistic}), con una semilla aleatoria (\texttt{random\_state = 42}) para garantizar la reproducibilidad \citep{geron2019hands}
 
 
-\noindent En cuanto al rendimiento, se obtuvieron los siguientes resultados para una muestra de 64.708 eventos, con un 50\% de eventos ocurridos y un 50\% de no ocurridos. Esta proporción se logró mediante la simulación de eventos negativos sobre una grilla temporal de 5 minutos, generando combinaciones posibles de tiempo, localización y tipo de evento que no están presentes en los datos originales (\cref{ssec:class_balancing}). Esto permite evaluar el modelo en condiciones balanceadas, facilitando la interpretación de métricas como \texttt{precision}, \texttt{recall} y \texttt{F1-score}.
+\noindent En cuanto al rendimiento, se obtuvieron los siguientes resultados para una muestra de 64,708 eventos, con un 50\% de eventos ocurridos y un 50\% de no ocurridos. Esta proporción se logró mediante la simulación de eventos negativos sobre una grilla temporal de 5 minutos, generando combinaciones posibles de tiempo, localización y tipo de evento que no están presentes en los datos originales (\cref{ssec:class_balancing}). Esto permite evaluar el modelo en condiciones balanceadas, facilitando la interpretación de métricas como \texttt{precision}, \texttt{recall} y \texttt{F1-score}.
 
 \begin{itemize}
     \item \textbf{Accuracy}: 0.8795
@@ -672,17 +674,17 @@ El entrenamiento del modelo está programado para realizarse cada 30 días, util
 
 \subsection{Patrones espaciales y temporales del tráfico}
 
-El análisis integrado de datos geoespaciales y temporales permitió identificar patrones críticos de siniestralidad en Antofagasta. Destacan como focos principales los segmentos del eje Pedro Aguirre Cerda, especialmente el cruce con Nicolás Tirado (segmentos 106–109), así como la intersección Salvador Allende–Edmundo Pérez Zujovic (segmentos 84 y 103), donde confluyen flujos significativos de vehículos desde distintos sectores de la ciudad. El centro urbano (segmento 82) también presenta una elevada concentración de incidentes. Estas observaciones concuerdan parcialmente con el conocimiento empírico de la vialidad local y sugieren la influencia de factores estructurales, como la conectividad de ejes troncales y la configuración urbana.
+El análisis integrado de datos geoespaciales y temporales permitió identificar patrones críticos de siniestralidad en Antofagasta. Destacan como focos principales los segmentos del eje Pedro Aguirre Cerda, especialmente el cruce con Nicolás Tirado (segmentos 106–109), así como la intersección Salvador Allende–Edmundo Pérez Zujovic (segmentos 84 y 103), donde confluyen flujos significativos de vehículos desde distintos sectores de la ciudad. El centro urbano (segmento 82) también presenta una elevada concentración de incidentes.
 
-El análisis temporal evidenció una mayor frecuencia de accidentes en días hábiles y horarios punta, en línea con la literatura sobre tráfico urbano \citep{berhanu2024}. Esto refuerza la importancia de considerar la dinámica diaria y semanal en la gestión vial.
+El análisis temporal evidenció una correlación entre la frecuencia de accidentes y la congestión del tráfico, en línea con la literatura sobre tráfico urbano \citep{berhanu2024}. Esto sugiere que podría existir una relación de causalidad entre ambas variables, lo cual debe ser evidenciado utilizando métodos adicionales para la investigación.
 
 \subsection{Desempeño y comparación de modelos predictivos}
 
-En la modelación estadística, se observó una correlación significativa entre la congestión reportada y la ocurrencia de accidentes, especialmente en días laborales. El modelo de potencia inversa logró un ajuste superior ($R^2 = 0.96$) respecto al modelo lineal ($R^2 = 0.92$), capturando la reducción marginal del riesgo a medida que aumenta la congestión.
+En la modelación estadística, se observó una correlación significativa entre la congestión reportada y la ocurrencia de accidentes, especialmente en días laborales. El modelo exponencial inverso logró un ajuste superior ($R^2 = 0.96$) respecto al modelo lineal ($R^2 = 0.92$).
 
-El modelo XGBoost logró un desempeño destacado en la predicción de accidentes, con un \textbf{F1-score de 0.88} y un \textbf{Recall de 0.91} en el conjunto de validación. Si bien no se realizó una comparación directa y sistemática con todos los modelos clásicos de series temporales, los resultados obtenidos sugieren que los algoritmos de aprendizaje automático como XGBoost pueden capturar relaciones no lineales y complejas entre las variables predictoras. Entre las variables identificadas como más relevantes por el modelo (según el análisis de importancia de características), destacan el volumen horario de reportes, el día de la semana y la proximidad a intersecciones principales, lo que coincide con el análisis exploratorio y el conocimiento experto del contexto urbano.
+El modelo XGBoost logró un desempeño destacado en la predicción de accidentes, con un \textbf{F1-score de 0.88} y un \textbf{Recall de 0.91} en el conjunto de validación. Si bien no se realizó una comparación directa y sistemática con todos los modelos clásicos de series temporales, los resultados obtenidos sugieren que los algoritmos de aprendizaje automático como XGBoost pueden capturar relaciones no lineales y complejas entre las variables predictoras. Entre las variables identificadas como más relevantes por el modelo (según el análisis de importancia de características), destacan el volumen horario de reportes, el día de la semana y la proximidad a intersecciones principales, lo que coincide con el análisis exploratorio.
 
-Sin embargo, una limitación inherente a los modelos basados en aprendizaje automático es la menor interpretabilidad directa respecto a métodos estadísticos tradicionales, lo que puede dificultar su aplicación en contextos donde la transparencia de las decisiones es prioritaria.
+El análisis temporal sugiere una mayor frecuencia de accidentes en días hábiles y horarios punta. Lo cual sugiere contrastar esta relación utilizando nuevas fuentes de información como puede ser la visión por computadora o evaluaciones en terreno.
 
 \subsection{Aporte del análisis geoespacial}
 
@@ -698,16 +700,16 @@ Futuras aplicaciones podrían incluir la incorporación de datos meteorológicos
 
 El presente trabajo enfrentó diversas restricciones asociadas principalmente a la disponibilidad y calidad de los datos utilizados. Destaca la ausencia de fuentes independientes que permitieran contrastar y validar físicamente los reportes de incidentes, así como la falta de acceso a información relevante sobre la operación de semáforos y las características específicas de los accidentes (por ejemplo, gravedad, causa o participantes involucrados). Esta carencia de datos complementarios limita la posibilidad de validar exhaustivamente los resultados obtenidos. Adicionalmente, no se contó con evidencia en video ni registros visuales que permitieran corroborar la ocurrencia y naturaleza de los eventos reportados.
 
-En términos técnicos, se identificaron desafíos en la integración de fuentes heterogéneas y en la escalabilidad del sistema ante grandes volúmenes de datos. La generalización de los resultados debe abordarse con cautela, considerando las particularidades urbanas y culturales de cada ciudad, así como las posibles limitaciones del enfoque aplicado. Finalmente, la adopción de modelos complejos puede suponer un desafío adicional en cuanto a la transparencia y comprensión de los resultados por parte de los usuarios finales.
+La generalización de los resultados debe abordarse con cautela, considerando las particularidades urbanas y culturales de cada ciudad, así como las limitaciones del enfoque aplicado. Finalmente, la adopción de modelos complejos puede suponer un desafío adicional en cuanto a la transparencia y comprensión de los resultados por parte de los usuarios finales.
 
 \section{Conclusiones}
 
 Este estudio demuestra la factibilidad y el impacto del uso de datos colaborativos para la gestión inteligente del tráfico urbano en Antofagasta. Los principales aportes incluyen:
 
 \begin{itemize}
-    \item Identificación precisa de zonas críticas con alta concentración de accidentes, alineada con el conocimiento local y la evidencia empírica.
-    \item Confirmación de una relación estadísticamente significativa entre congestión y accidentes, especialmente durante días laborales.
-    \item Validación de modelos no lineales y de aprendizaje automático como herramientas superiores para la predicción de incidentes en contextos urbanos densos.
+    \item Identificación precisa de zonas críticas con alta concentración de accidentes.
+    \item Confirmación de una correlación estadísticamente significativa entre congestión y accidentes, especialmente durante días laborales.
+    \item Validación de modelos no lineales y de aprendizaje automático como herramientas para la predicción de incidentes en contextos urbanos densos.
     \item Desarrollo e implementación de un sistema funcional de monitoreo, visualización y actualización periódica del modelo, con potencial de escalabilidad.
 \end{itemize}
 
