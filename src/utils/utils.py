@@ -28,6 +28,7 @@ TZ = "America/Santiago"
 LOGGER_FORMAT = "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
 
 ALERTS_BEGIN_TIMESTAMP = 1727740800000  # 2024/10/01
+ALERTS_END_TIMESTAMP = 1746057600000  # 2025/05/01
 # Time to retrieve last singleton instance between graphics
 
 MINUTES_BETWEEN_UPDATES_FROM_API = 2
@@ -72,7 +73,7 @@ def get_data(
             return alerts
 
         args = f"since={since if since else ALERTS_BEGIN_TIMESTAMP}"
-        args += f"&until={until}" if until else ""
+        args += f"&until={until if until else ALERTS_END_TIMESTAMP}"
 
         url = f"{config.SERVER_URL}/get-data?{args}"
 
