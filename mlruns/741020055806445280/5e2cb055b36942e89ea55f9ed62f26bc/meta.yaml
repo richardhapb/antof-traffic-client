@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/741020055806445280/5e2cb055b36942e89ea55f9ed62f26bc/artifacts
+end_time: 1758258538289
+entry_point_name: ''
+experiment_id: '741020055806445280'
+lifecycle_stage: active
+run_id: 5e2cb055b36942e89ea55f9ed62f26bc
+run_name: able-ray-610
+run_uuid: 5e2cb055b36942e89ea55f9ed62f26bc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1758258532463
+status: 3
+tags: []
+user_id: richard

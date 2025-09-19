@@ -1,0 +1,35 @@
+artifact_path: waze_data
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.12.4
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.5.2
+mlflow_version: 2.18.0
+model_size_bytes: 3994618
+model_uuid: 61fa2bf9fca14406a168fb0cc2a4ff32
+run_id: 4358ce904a4d469283b602f8f297192b
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "long", "name": "group", "required": true}, {"type": "long",
+    "name": "hour", "required": true}, {"type": "long", "name": "day_type", "required":
+    true}, {"type": "long", "name": "week_day", "required": true}, {"type": "long",
+    "name": "day", "required": true}, {"type": "double", "name": "type_ACCIDENT",
+    "required": true}, {"type": "double", "name": "type_HAZARD", "required": true},
+    {"type": "double", "name": "type_JAM", "required": true}, {"type": "double", "name":
+    "type_ROAD_CLOSED", "required": true}]'
+  outputs: '[{"type": "tensor", "tensor-spec": {"dtype": "int64", "shape": [-1]}}]'
+  params: null
+utc_time_created: '2025-09-19 04:04:05.887579'

@@ -182,7 +182,7 @@ class ML:
 
         """
 
-        events2 = self.data.copy()
+        events2 = self.data
 
         if not isinstance(events2["pub_millis"].iloc[0], np.integer):
             events2["pub_millis"] = events2["pub_millis"].astype(np.int64, errors="ignore") / 1_000_000

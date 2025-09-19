@@ -1,0 +1,16 @@
+artifact_uri: mlflow-artifacts:/741020055806445280/4358ce904a4d469283b602f8f297192b/artifacts
+deleted_time: 1758255238488
+end_time: 1758254651434
+entry_point_name: ''
+experiment_id: '741020055806445280'
+lifecycle_stage: deleted
+run_id: 4358ce904a4d469283b602f8f297192b
+run_name: fearless-swan-167
+run_uuid: 4358ce904a4d469283b602f8f297192b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1758254645545
+status: 4
+tags: []
+user_id: richard

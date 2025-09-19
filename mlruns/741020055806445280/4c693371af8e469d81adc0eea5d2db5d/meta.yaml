@@ -1,0 +1,16 @@
+artifact_uri: mlflow-artifacts:/741020055806445280/4c693371af8e469d81adc0eea5d2db5d/artifacts
+deleted_time: 1758255238487
+end_time: null
+entry_point_name: ''
+experiment_id: '741020055806445280'
+lifecycle_stage: deleted
+run_id: 4c693371af8e469d81adc0eea5d2db5d
+run_name: skittish-finch-319
+run_uuid: 4c693371af8e469d81adc0eea5d2db5d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1758255006216
+status: 1
+tags: []
+user_id: richard
