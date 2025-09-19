@@ -168,7 +168,7 @@ def update_ml(  # noqa: PLR0913, PLR0917
     ]
 
     if points:
-        gdf = gpd.GeoDataFrame(geometry=points, crs="EPSG:3857")
+        gdf = gpd.GeoDataFrame(geometry=points, crs="EPSG:3857")  # Web Mercator
         # Convert to EPSG:4326 (lat/lon)
         gdf = gdf.to_crs(epsg=4326)
 
@@ -790,3 +790,6 @@ app.clientside_callback(
     Output("instructions", "className"),
     Input("toggle_instructions", "n_clicks"),
 )
+
+if __name__ == "__main__":
+    app.run_server(debug=True, port=8050)

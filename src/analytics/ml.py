@@ -2,6 +2,7 @@ import os
 from functools import wraps
 from typing import cast
 from collections.abc import Callable
+import uuid
 
 import numpy as np
 import pandas as pd
@@ -23,7 +24,7 @@ from xgboost import XGBClassifier
 import mlflow
 from mlflow.models import infer_signature
 from utils import utils
-from utils.utils import logger
+from utils.utils import join_coords, logger
 
 
 MODEL_NAME = "XGBClassifier"
@@ -46,6 +47,7 @@ def init_mlflow() -> None:
 
 def mlflow_logger(func: Callable):  # noqa: ANN201
     """Wrap for log data of a MLFlow run"""
+
     @wraps(func)
     def mlflow_wrapper(*args, **kwargs):  # noqa: ANN202
         with mlflow.start_run():
@@ -114,7 +116,7 @@ class ML:
         self.data_labeled: GeoDataFrame | pd.DataFrame | None = None
         self.x_train: list | pd.DataFrame | None = None
         self.x_test: list | pd.DataFrame | None = None
-        self.y_train: list | pd.DataFrame | None = None
+        self.y_train: list | pd.Series | None = None
         self.y_test: list | pd.DataFrame | None = None
         self.onehot: dict[str, OneHotEncoder] | None = None
         self.oe: dict[str, OrdinalEncoder] | None = None  # Ordinal Encoder
@@ -181,19 +183,18 @@ class ML:
         """
 
         events2 = self.data.copy()
-        events2["happen"] = 1
 
         if not isinstance(events2["pub_millis"].iloc[0], np.integer):
             events2["pub_millis"] = events2["pub_millis"].astype(np.int64, errors="ignore") / 1_000_000
 
         step = np.int64(60_000 * 5)
 
-        min_tms = events2["pub_millis"].min()
-        max_tms = events2["pub_millis"].max()
+        min_tms = events2["pub_millis"].to_numpy().min()
+        max_tms = events2["pub_millis"].to_numpy().max()
 
         intervals = np.arange(min_tms, max_tms + step, step)
 
-        events2["interval"] = (events2["pub_millis"].to_numpy() // step) * step
+        events2["interval"] = ((events2["pub_millis"].to_numpy() - min_tms) // step) * step + min_tms
 
         allgroups = events2[geodata].unique()
         alltypes = events2["type"].unique()
@@ -202,8 +203,10 @@ class ML:
             [intervals, allgroups, alltypes], names=["interval", geodata, "type"]
         ).to_frame(index=False)
 
-        event_combinations = events2[["interval", geodata, "type"]]
+        event_combinations = events2[["uuid", "interval", geodata, "type", "x", "y"]]
         event_combinations["happen"] = 1
+
+        event_combinations["location"] = join_coords(event_combinations)
 
         merged = pd.merge(
             combinations,
@@ -212,12 +215,24 @@ class ML:
             how="left",
         )
 
-        merged = merged.sample(events2.shape[0], replace=False, random_state=42)
-        merged["happen"] = merged["happen"].fillna(0).astype(int)
+        merged = merged.sample(events2.shape[0] * 2, replace=False, random_state=42).reset_index(drop=True)
 
+        # Create the location list for the non-event samples
+        locations = event_combinations.loc[:, "location"].values.tolist()
+        mask = merged["happen"].isna()
+        no_n = mask.sum()
+
+        # Repeat and trim the locations list to match the number of non-event samples
+        locations *= (no_n // len(locations) + 1)
+        locations = locations[:no_n]
+
+        np.random.shuffle(locations)
+        merged.loc[mask, "location"] = locations
+
+        merged["happen"] = merged["happen"].fillna(0).astype(int)
         merged["pub_millis"] = merged["interval"]
 
-        result = merged[["pub_millis", geodata, "type", "happen"]]
+        result = merged[["uuid", "pub_millis", geodata, "type", "happen", "location"]]
 
         if not isinstance(self.data["pub_millis"].iloc[0], np.integer):
             result["pub_millis"] = pd.to_datetime((result["pub_millis"]), unit="ms")
@@ -226,6 +241,7 @@ class ML:
         result.drop(columns=["happen"], inplace=True)
 
         result.reset_index(drop=True, inplace=True)
+        result.fillna({"uuid": uuid.uuid4().hex}, inplace=True)
 
         alerts = utils.generate_aggregate_data(result)
         self.total_events = alerts.data
@@ -535,7 +551,7 @@ class ML:
         return confusion_matrix(
             self.y_test,
             self.model.predict(self.x_test),
-            labels=self.y_train.unique,  # type: ignore
+            labels=self.y_train.unique() if isinstance(self.y_train, pd.Series) else self.y_train,
         )
 
     def encode(self, data: pd.DataFrame | gpd.GeoDataFrame, category: str) -> np.ndarray:
@@ -656,9 +672,10 @@ class ML:
 
         """
 
-        client = mlflow.MlflowClient()
+        mlflow_uri = os.getenv("MLFLOW_TRACKING_URI", "http://localhost:8080")
+        mlflow.set_tracking_uri(uri=mlflow_uri)
 
-        model_versions = client.search_model_versions(f"name='{model_name}'")
+        model_versions = mlflow.search_model_versions(None, f"name='{model_name}'")
         latest_version = max(model_versions, key=lambda v: int(v.version))
 
         return int(latest_version.version)

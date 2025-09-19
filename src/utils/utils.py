@@ -125,6 +125,8 @@ def generate_aggregate_data(data: pd.DataFrame) -> Alerts:
 
             logger.debug("Processing batch %d-%d of %d", start_idx, end_idx, total_rows)
             response = requests.post(url, json=serialize_data(batch), timeout=10)
+            if response.status_code == 422:
+                print("422 detail:", response.text)
             response.raise_for_status()
             response_data = response.json()
 
@@ -213,7 +215,7 @@ def freq_nearby(gdf: gpd.GeoDataFrame, nearby_meters: int = 200) -> gpd.GeoDataF
 
     # Ensure the GeoDataFrame is in a projected CRS with units in meters
     if gdf.crs.is_geographic:
-        gdf = gdf.to_crs(epsg=3857)
+        gdf = gdf.to_crs(epsg=32719)
 
     coords = np.vstack((gdf.geometry.x, gdf.geometry.y)).T
 
@@ -245,12 +247,22 @@ def separate_coords(df: pd.DataFrame) -> GeoDataFrame:
 
     # Set the coorinates references system
     dfg = dfg.set_crs(epsg=4326)
-    dfg = dfg.to_crs(epsg=3857)  # For map usage
+    dfg = dfg.to_crs(epsg=32719)  # For map usage
 
     if dfg is None:
         dfg = gpd.GeoDataFrame()
 
     return dfg
+
+
+def join_coords(df: pd.DataFrame) -> pd.Series:
+    """Join coordinates from x and y columns"""
+    if not hasattr(df, "x") or not hasattr(df, "y"):
+        logger.debug("Received empty dataframe, returning the same data")
+        return df["location"] if "location" in df else pd.Series(dtype=object)
+
+    df["location"] = df.apply(lambda row: {"x": row["x"], "y": row["y"]}, axis=1)
+    return df.drop(columns=["x", "y"])["location"]
 
 
 def hourly_group(data: pd.DataFrame | gpd.GeoDataFrame, do_sum: bool = False) -> pd.DataFrame | gpd.GeoDataFrame:
