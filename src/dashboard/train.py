@@ -44,7 +44,7 @@ def train() -> bool:
 
     logger.info("Training the model")
 
-    ml.generate_neg_simulated_data()
+    ml.insert_neg_simulated_data()
     ml.clean(x_vars, y)
     ml.prepare_train()
 

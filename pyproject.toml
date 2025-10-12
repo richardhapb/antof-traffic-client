@@ -87,6 +87,7 @@ dependencies = [
     "retrying==1.3.4",
     "rsa==4.9",
     "scikit-learn==1.5.2",
+    "scikit-learn-stubs>=0.0.3",
     "scipy==1.14.1",
     "setuptools==75.6.0",
     "shapely==2.0.6",
@@ -187,6 +188,10 @@ ignore = [
 "tests/*" = [
     "S101",  # Allow asserts in tests
     "ANN201" # Not return type required
+]
+
+"*.ipynb" = [
+    "S101",  # Allow asserts in notebooks
 ]
 
 # McCabe complexity

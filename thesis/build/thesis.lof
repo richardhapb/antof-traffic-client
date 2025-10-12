@@ -1,0 +1,29 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {figure}{\numberline {1}{\ignorespaces Pipeline general de datos}}{12}{figure.caption.1}%
+\contentsline {figure}{\numberline {2}{\ignorespaces Flujo de información en dashboard}}{12}{figure.caption.2}%
+\contentsline {figure}{\numberline {3}{\ignorespaces Jerarquía de control de riesgos. Fuente: \citet {niosh2024}.}}{15}{figure.caption.3}%
+\contentsline {figure}{\numberline {4}{\ignorespaces Diagrama de la base de datos}}{23}{figure.caption.4}%
+\contentsline {figure}{\numberline {5}{\ignorespaces Distribución espacial de eventos en Antofagasta}}{26}{figure.caption.5}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Accidentes}}}{26}{subfigure.5.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Congestión}}}{26}{subfigure.5.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Peligros}}}{26}{subfigure.5.3}%
+\contentsline {figure}{\numberline {6}{\ignorespaces Eventos según hora del día en Antofagasta}}{27}{figure.caption.6}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Accidentes}}}{27}{subfigure.6.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Congestión}}}{27}{subfigure.6.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Peligros}}}{27}{subfigure.6.3}%
+\contentsline {figure}{\numberline {7}{\ignorespaces Correlación lineal entre accidentes y congestión}}{28}{figure.caption.7}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Día de semana}}}{28}{subfigure.7.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Fin de semana}}}{28}{subfigure.7.2}%
+\contentsline {figure}{\numberline {8}{\ignorespaces Residuos del modelo lineal para días de semana y fines de semana}}{31}{figure.caption.8}%
+\contentsline {figure}{\numberline {9}{\ignorespaces Gráficos Q-Q de los residuos del modelo lineal}}{31}{figure.caption.9}%
+\contentsline {figure}{\numberline {10}{\ignorespaces Correlación exponencial inversa entre accidentes y congestión}}{32}{figure.caption.10}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Día de semana}}}{32}{subfigure.10.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Fin de semana}}}{32}{subfigure.10.2}%
+\contentsline {figure}{\numberline {11}{\ignorespaces Residuos del modelo de exponencial inverso para días de semana y fines de semana}}{34}{figure.caption.11}%
+\contentsline {figure}{\numberline {12}{\ignorespaces Gráficos Q-Q de los residuos del modelo exponencial inverso}}{35}{figure.caption.12}%
+\contentsline {figure}{\numberline {13}{\ignorespaces Identificación de cuadrantes en mapa de Antofagasta}}{36}{figure.caption.13}%
+\contentsline {figure}{\numberline {14}{\ignorespaces Accidentes por segmento}}{37}{figure.caption.14}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Media de accidentes por día}}}{37}{subfigure.14.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Total accidentes}}}{37}{subfigure.14.2}%
+\contentsline {figure}{\numberline {15}{\ignorespaces Curva de aprendizaje del modelo XGBoost: desempeño en entrenamiento y validación.}}{43}{figure.caption.18}%
+\contentsline {figure}{\numberline {16}{\ignorespaces Arquitectura del sistema}}{44}{figure.caption.19}%

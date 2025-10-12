@@ -3,6 +3,7 @@ import json
 import logging
 import warnings
 
+from http import HTTPStatus
 import geopandas as gpd
 import numpy as np
 import pandas as pd
@@ -28,7 +29,7 @@ TZ = "America/Santiago"
 LOGGER_FORMAT = "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
 
 ALERTS_BEGIN_TIMESTAMP = 1727740800000  # 2024/10/01
-ALERTS_END_TIMESTAMP = 1746057600000  # 2025/05/01
+ALERTS_END_TIMESTAMP = 1746057599000  # 2025/04/30 23:59:59
 # Time to retrieve last singleton instance between graphics
 
 MINUTES_BETWEEN_UPDATES_FROM_API = 2
@@ -36,14 +37,14 @@ MINUTES_BETWEEN_UPDATES_FROM_API = 2
 logging.basicConfig(format=LOGGER_FORMAT)
 
 logger = logging.getLogger("antof_traffic")
-logger.setLevel(logging.INFO)
+logger.setLevel(config.LOG_LEVEL)
 
 
 class SerializeError(Exception):
     """Error when serialization is not possible"""
 
     def __init__(self, data: pd.DataFrame | str):
-        if isinstance(data, (pd.DataFrame, gpd.GeoDataFrame)):
+        if isinstance(data, pd.DataFrame | gpd.GeoDataFrame):
             super().__init__(f"Cannot serialize the data, getted columns {data.columns}")
         super().__init__(data)
 
@@ -126,8 +127,8 @@ def generate_aggregate_data(data: pd.DataFrame) -> Alerts:
 
             logger.debug("Processing batch %d-%d of %d", start_idx, end_idx, total_rows)
             response = requests.post(url, json=serialize_data(batch), timeout=10)
-            if response.status_code == 422:
-                print("422 detail:", response.text)
+            if response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY:
+                logger.error("Unprocessable entity, detail: %s", response.text)
             response.raise_for_status()
             response_data = response.json()
 

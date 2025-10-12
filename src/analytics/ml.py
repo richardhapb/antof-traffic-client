@@ -168,7 +168,8 @@ class ML:
 
         return pd.concat([data.drop(categories, axis=1), *labeled], axis=1)
 
-    def generate_neg_simulated_data(self, geodata: str = "group") -> None:
+    @staticmethod
+    def generate_neg_simulated_data(data: pd.DataFrame | GeoDataFrame, geodata: str = "group") -> GeoDataFrame:
         """
         Generate negative samples by simulating non-event data points.
 
@@ -177,35 +178,39 @@ class ML:
         with location groups and event types.
 
         Args:
+            data: Data to process
             geodata: Column name containing geographical grouping information.
                     Defaults to "group".
 
         """
 
-        events2 = self.data
-
-        if not isinstance(events2["pub_millis"].iloc[0], np.integer):
-            events2["pub_millis"] = events2["pub_millis"].astype(np.int64, errors="ignore") / 1_000_000
+        if not isinstance(data["pub_millis"].iloc[0], np.integer):
+            data["pub_millis"] = data["pub_millis"].astype(np.int64, errors="ignore") / 1_000_000
 
         step = np.int64(60_000 * 5)
 
-        min_tms = events2["pub_millis"].to_numpy().min()
-        max_tms = events2["pub_millis"].to_numpy().max()
+        min_tms = data["pub_millis"].to_numpy().min()
+        max_tms = data["pub_millis"].to_numpy().max()
 
         intervals = np.arange(min_tms, max_tms + step, step)
 
-        events2["interval"] = ((events2["pub_millis"].to_numpy() - min_tms) // step) * step + min_tms
+        data["interval"] = ((data["pub_millis"].to_numpy() - min_tms) // step) * step + min_tms
 
-        allgroups = events2[geodata].unique()
-        alltypes = events2["type"].unique()
+        allgroups = data[geodata].unique()
+        alltypes = data["type"].unique()
 
         combinations = pd.MultiIndex.from_product(
             [intervals, allgroups, alltypes], names=["interval", geodata, "type"]
         ).to_frame(index=False)
 
-        event_combinations = events2[["uuid", "interval", geodata, "type", "x", "y"]]
-        event_combinations["happen"] = 1
+        event_combinations = data[["uuid", "interval", geodata, "type", "x", "y"]]
+        logger.debug(
+            "data combinations: %d, simulated combinations: %d. Before resample",
+            event_combinations.shape[0],
+            combinations.shape[0],
+        )
 
+        event_combinations["happen"] = 1
         event_combinations["location"] = join_coords(event_combinations)
 
         merged = pd.merge(
@@ -215,37 +220,56 @@ class ML:
             how="left",
         )
 
-        merged = merged.sample(events2.shape[0] * 2, replace=False, random_state=42).reset_index(drop=True)
+        data.drop(columns=["interval"], inplace=True)
+
+        merged_pos = merged[merged["happen"] == 1]
+        happen_len = merged_pos.shape[0]
+
+        merged_neg = merged[merged["happen"].isna()].sample(
+            happen_len, replace=False, random_state=42
+        ).reset_index(drop=True)
+
+        full_data = cast("pd.DataFrame", pd.concat([merged_pos, merged_neg]))
 
         # Create the location list for the non-event samples
         locations = event_combinations.loc[:, "location"].values.tolist()
-        mask = merged["happen"].isna()
+        mask = full_data["happen"].isna()
         no_n = mask.sum()
 
         # Repeat and trim the locations list to match the number of non-event samples
-        locations *= (no_n // len(locations) + 1)
+        locations *= no_n // len(locations) + 1
         locations = locations[:no_n]
 
         np.random.shuffle(locations)
-        merged.loc[mask, "location"] = locations
+        full_data.loc[mask, "location"] = locations
 
-        merged["happen"] = merged["happen"].fillna(0).astype(int)
-        merged["pub_millis"] = merged["interval"]
+        n_pos = (full_data["happen"] == 1).shape[0]
+        n_neg = (full_data["happen"].isna()).shape[0]
 
-        result = merged[["uuid", "pub_millis", geodata, "type", "happen", "location"]]
+        logger.debug("Balance of classes happen:no-happen, %d:%d", n_pos, n_neg)
 
-        if not isinstance(self.data["pub_millis"].iloc[0], np.integer):
+        full_data["happen"] = full_data["happen"].fillna(0).astype(int)
+        full_data["pub_millis"] = full_data["interval"]
+
+        result = full_data[["uuid", "pub_millis", geodata, "type", "happen", "location"]]
+
+        if not isinstance(data["pub_millis"].iloc[0], np.integer):
             result["pub_millis"] = pd.to_datetime((result["pub_millis"]), unit="ms")
 
-        happen_data = result.get("happen", {})
+        happen_data = result["happen"].to_numpy(copy=False)
         result.drop(columns=["happen"], inplace=True)
 
         result.reset_index(drop=True, inplace=True)
         result.fillna({"uuid": uuid.uuid4().hex}, inplace=True)
 
         alerts = utils.generate_aggregate_data(result)
-        self.total_events = alerts.data
-        self.total_events["happen"] = happen_data
+
+        alerts.data["happen"] = happen_data
+
+        return alerts.data
+
+    def insert_neg_simulated_data(self, geodata: str = "group") -> None:
+        self.total_events = self.generate_neg_simulated_data(self.data, geodata)
 
     def balance_day_type(self) -> None:
         """
@@ -328,7 +352,7 @@ class ML:
 
             self.total_events = self.total_events.loc[:, [*columns_x, column_y]]
 
-    def prepare(self, no_features: int | None = None) -> None:
+    def prepare(self, n_features: int | None = None) -> None:
         """
         Prepare data for model training by applying feature encoding.
 
@@ -338,7 +362,7 @@ class ML:
         - Applying one-hot encoding or feature hashing if specified
 
         Args:
-            no_features: Number of features for feature hashing. Only used if
+            n_features: Number of features for feature hashing. Only used if
                         hash=True. Defaults to 5 if not specified.
 
         Raises:
@@ -379,11 +403,11 @@ class ML:
         elif self.hash:
             labeled = []
             self.hasher = {}
-            no_features = no_features if no_features else 5
+            n_features = n_features if n_features else 5
             if self.categories is None:
                 self.categories = list(self.data.columns)
             for c in self.categories:
-                self.hasher[c] = FeatureHasher(n_features=no_features, input_type="string")
+                self.hasher[c] = FeatureHasher(n_features=n_features, input_type="string")
 
                 # Remove null values and convert to string
                 filtered_events = [str(s) for s in total_events[c] if pd.notnull(s)]
@@ -392,7 +416,7 @@ class ML:
                 labeled.append(
                     pd.DataFrame(
                         hashed.toarray(),
-                        columns=[f"{c}_{i}" for i in range(no_features)],
+                        columns=[f"{c}_{i}" for i in range(n_features)],
                     ).reset_index(drop=True)
                 )
 
