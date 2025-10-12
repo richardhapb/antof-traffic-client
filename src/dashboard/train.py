@@ -20,6 +20,7 @@ def train() -> bool:
 
     try:
         alerts = utils.get_data(ALERTS_BEGIN_TIMESTAMP, now_millis)  # Get all data
+        alerts.filter_by_group_time(120, True)
     except requests.ConnectionError:
         logger.exception("Error retrieving data from server")
         return False
@@ -28,12 +29,18 @@ def train() -> bool:
 
     # Best params tested with GridSearch
     model = XGBClassifier(
-        learning_rate=0.1,
         random_state=42,
-        n_estimators=80,
-        max_depth=20,
+        n_estimators=100,
+        objective="binary:logistic",
+        tree_method="hist",
+        eval_metric="auc",
+        n_jobs=-1,
+        colsample_bytree=0.8,
         gamma=0.8,
-        colsample_bytree=0.7,
+        learning_rate=0.1,
+        max_depth=20,
+        min_child_weight=1,
+        subsample=0.8,
     )
 
     x_vars = ["group", "hour", "day_type", "type", "week_day", "day"]

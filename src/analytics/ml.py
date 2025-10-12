@@ -259,8 +259,8 @@ class ML:
         happen_data = result["happen"].to_numpy(copy=False)
         result.drop(columns=["happen"], inplace=True)
 
-        result.reset_index(drop=True, inplace=True)
         result.fillna({"uuid": uuid.uuid4().hex}, inplace=True)
+        result.reset_index(drop=True, inplace=True)
 
         alerts = utils.generate_aggregate_data(result)
 

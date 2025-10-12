@@ -25,5 +25,7 @@
 \contentsline {figure}{\numberline {14}{\ignorespaces Accidentes por segmento}}{37}{figure.caption.14}%
 \contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Media de accidentes por día}}}{37}{subfigure.14.1}%
 \contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Total accidentes}}}{37}{subfigure.14.2}%
-\contentsline {figure}{\numberline {15}{\ignorespaces Curva de aprendizaje del modelo XGBoost: desempeño en entrenamiento y validación.}}{43}{figure.caption.18}%
-\contentsline {figure}{\numberline {16}{\ignorespaces Arquitectura del sistema}}{44}{figure.caption.19}%
+\contentsline {figure}{\numberline {15}{\ignorespaces Curvas ROC}}{41}{figure.caption.19}%
+\contentsline {figure}{\numberline {16}{\ignorespaces Curvas Precision-Recall}}{41}{figure.caption.20}%
+\contentsline {figure}{\numberline {17}{\ignorespaces Curva de aprendizaje del modelo XGBoost: desempeño en entrenamiento y validación.}}{44}{figure.caption.21}%
+\contentsline {figure}{\numberline {18}{\ignorespaces Arquitectura del sistema}}{46}{figure.caption.22}%

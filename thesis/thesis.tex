@@ -22,11 +22,19 @@
 \setmainfont{Times New Roman}
 \usepackage{csquotes}
 
+\usepackage[final]{microtype}
+\setlength\emergencystretch{3em} % Emergency margin
+
+% CODE
+\usepackage{minted}
+\setminted{fontsize=\footnotesize, breaklines, frame=lines}
+
 \renewcommand{\baselinestretch}{1.5}
 
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{hyperref}
+\hypersetup{breaklinks=true}
 \usepackage{float}
 \usepackage{parskip}
 \usepackage[spanish]{cleveref}
@@ -62,9 +70,9 @@ A los profesores apasionados por su trabajo, que no solo transmiten conocimiento
 
 \section*{Resumen}
 
-El proyecto desarrollado tuvo como propósito la creación de una herramienta efectiva para analizar y predecir, con alta confiabilidad, el comportamiento del tráfico vehicular en la ciudad de Antofagasta, utilizando datos provenientes de la plataforma Waze Cities \citep{wazecities2024}. Esta plataforma, alimentada por su comunidad de usuarios, proporciona información en tiempo real que permite obtener una visión detallada de los eventos de tráfico en la ciudad. La investigación resultante generó información relevante para la gestión del tráfico, facilitando la toma de decisiones por parte de las autoridades locales, con miras a mejorar la seguridad vial y optimizar la eficiencia del flujo vehicular. A partir del análisis y explotación de estos datos, fue posible identificar patrones y tendencias que, al ser integrados en la planificación urbana, permiten optimizar rutas críticas, reducir la congestión y disminuir la probabilidad de accidentes.
+El proyecto desarrollado tuvo como propósito la creación de una herramienta efectiva para analizar y predecir, con alta confiabilidad, el comportamiento del tráfico vehicular en la ciudad de Antofagasta, utilizando datos provenientes de la plataforma Waze Cities. Esta plataforma, alimentada por su comunidad de usuarios, proporciona información en tiempo real que permite obtener una visión detallada de los eventos de tráfico en la ciudad. La investigación resultante generó información relevante para la gestión del tráfico, facilitando la toma de decisiones por parte de las autoridades locales, con miras a mejorar la seguridad vial y optimizar la eficiencia del flujo vehicular. A partir del análisis y explotación de estos datos, fue posible identificar patrones y tendencias que, al ser integrados en la planificación urbana, permiten optimizar rutas críticas, reducir la congestión y disminuir la probabilidad de accidentes.
 
-Se consiguió obtener un modelo capaz de predecir el comportamiento del tráfico con una precisión del 85.83\% y un F1-score de 88.23\%, de acuerdo con el análisis de bondad de ajuste realizado al modelo final, el cual fue entrenado utilizando el algoritmo de clasificación XGBoost. Se utilizaron 64,708 eventos para el entrenamiento.
+Se consiguió obtener un modelo capaz de predecir el comportamiento del tráfico con un F1-score de 83.4\% y volúmen bajo la curva ROC (ROC-AUC) de 91\%, de acuerdo con el análisis de bondad de ajuste realizado al modelo final luego de una prueba \texttt{GridSearchCV} para seleccionar los mejores parámetros del modelo acorde a su curva ROC-AUC final. Se probaron tres modelos de clasificación: RandomForestClassifier, LogisticRegression y XGBBoost, siendo este último el modelo seleccionado debido a que obtuvo el mayor rendimiento de acuerdo con la curva ROC-AUC y su F1-Score. Se utilizaron 52,672 datos para el entrenamiento, 26,336 con datos de eventos reportados por conductores (luego de ser filtrados) y 26,336 datos generados de forma ficticia como no-ocurrencia de eventos para el balanceo de clases, dado la naturaleza de los datos que solo contiene datos de ocurrencia.
 
 \section{Introducción}
 \subsection{Descripción del problema}
@@ -85,14 +93,15 @@ La plataforma Waze Cities, permite a ciudades poder obtener datos para gestionar
 
 Se realiza un análisis geoespacial con el objetivo de identificar puntos críticos, como vías principales, calles secundarias y zonas de alto tráfico. Este análisis se llevó a cabo utilizando \texttt{GeoPandas}. Los resultados se presentan mediante técnicas de visualización que permitien interpretar las tendencias y puntos de interés de manera efectiva.
 
-El pipeline de datos incluye una base de datos relacional para almacenarlos, un flujo ETL (Extract, Transform, Load) para procesarlos y un servidor web para visualizarlos. Se utilizó PostgreSQL \citep{postgres2025} como base de datos, Memcached  \citep{memcached2025} como base de datos de caché, APScheduler para la programación de tareas y Dash \citep{dash2025} como herramienta de visualización. Este enfoque permitió automatizar el flujo de datos y garantizar la actualización constante de la información.
+El pipeline de datos incluye una base de datos relacional para almacenarlos, un flujo ETL (Extract, Transform, Load) para procesarlos y un servidor web para visualizarlos. Se utilizó PostgreSQL \citep{postgres2025} como base de datos principal, Memcached  \citep{memcached2025} como base de datos de caché, APScheduler para la programación de tareas y Dash \citep{dash2025} como herramienta de visualización. Este enfoque permitió automatizar el flujo de datos y garantizar la actualización constante de la información.
+
+Para el proceso de entrenamiento del modelo, se llevó a cabo un balanceo de clases, debido a la naturaleza de los datos, solo contiene datos de la ocurrencia de eventos, esto genera sesgos en el modelo y un sobre-ajuste que hace que el modelo tenga un rendimiento disminuido \citep{he2009learning}.
 
 Adicionalmente, se entrenó un modelo de clasificación para determinar la probabilidad de ocurrencia de accidentes en diferentes puntos de la ciudad. El modelo seleccionado fue XGBoost \citep{chen2016xgboost}, el cual fue seleccionado utilizando técnicas de validación cruzada y optimización de hiperparámetros \citep{geron2019hands}. Para la selección de variables se utilizó GridSearchCV \citep{pedregosa2011scikit, geron2019hands}, una técnica de búsqueda de hiperparámetros que permite encontrar la mejor combinación de variables para el modelo, se compararon modelos de regresión logística, árboles de decisión y XGBoost.
 
 Para la gestión del modelo, en cuanto a su implementación, mantenimiento y actualización, se programó APSCheduler, para ejecutar tareas periódicas que permiten gestionar el ciclo de vida de los modelos de aprendizaje automático, desde su entrenamiento hasta su despliegue en producción y versionado.
 
 El servidor se desarrolló en \texttt{Rust} \citep{rust2025}, un lenguaje de programación enfocado en la eficiencia en el uso de memoria y seguridad en el uso de la misma. Se utilizó \texttt{Memcached} para generar un caché de los datos y de esta forma poder servirlos de manera más eficiente y rápida \citep{fitzpatrick2004memcached}, debido al volumen de datos, se priorizó la unicidad de los mismos, evitando generar copias, para no aumentar el uso de memoria.
-
 
 Para el procesado de los datos en el cliente —\texttt{Dash}—, se generan múltiples workers que permiten servir la aplicación de forma eficiente, y se utiliza solo una instancia en memoria de los datos, compartidos por todos los datos, y para mantener la integridad de los datos, se implementa un \texttt{Mutex} para controlar el acceso de lectura a los mismos desde las tareas asíncronas \citep{ramalho2015fluent}.
 
@@ -174,6 +183,8 @@ Adicionalmente, los modelos pueden clasificarse según el tipo de salida que gen
 
 En este estudio se empleó un modelo supervisado de clasificación, con el objetivo de estimar la probabilidad de ocurrencia de un accidente, considerando dos posibles resultados: “ocurre” o “no ocurre”.
 
+\subsection{Evaluación de los modelos de Machine Learning}
+
 Para evaluar el rendimiento del modelo se utilizaron métricas ampliamente empleadas en problemas de clasificación binaria, tales como la exactitud (\textit{accuracy}), la precisión (\textit{precision}), la sensibilidad (\textit{recall}) y la medida F1 (\textit{F1-score}) \citep{manning2008}. La exactitud representa el porcentaje total de predicciones correctas sobre el total de casos evaluados. La precisión corresponde a la proporción de casos positivos correctamente identificados por el modelo, es decir, el número de verdaderos positivos dividido por el total de predicciones positivas. Por su parte, la sensibilidad —también conocida como \textit{recall}— mide la capacidad del modelo para identificar correctamente todos los casos positivos reales, dividiendo los verdaderos positivos por el total de casos positivos reales. La medida F1, en tanto, es la media armónica entre precisión y sensibilidad, y proporciona una visión equilibrada del desempeño del modelo cuando es necesario considerar tanto los errores por omisión como los errores por comisión.
 
 Además, se construyó una matriz de confusión, la cual permite observar el número de aciertos y errores cometidos en cada clase —“ocurre” y “no ocurre”— lo que facilita una evaluación más detallada del comportamiento del modelo. Este análisis es clave para comprender sus limitaciones y fortalezas, especialmente en aplicaciones reales relacionadas con la predicción de accidentes de tránsito.
@@ -191,7 +202,7 @@ Las fórmulas utilizadas para el cálculo de estas métricas son las siguientes:
 
 donde \( TP \) son los verdaderos positivos, \( TN \) los verdaderos negativos, \( FP \) los falsos positivos y \( FN \) los falsos negativos.
 
-\subsection{Algoritmos de clasificación: Random Forest y XGBoost}
+\subsection{Algoritmos de clasificación: Random Forest, Logistic Regression y XGBoost}
 
 Para abordar problemas de clasificación binaria, como la predicción de ocurrencia o no ocurrencia de eventos de tráfico, se utilizaron algoritmos de aprendizaje supervisado. En particular, se emplearon los métodos \textit{Random Forest} y \textit{XGBoost}, los cuales han demostrado un alto rendimiento en tareas de clasificación estructurada \citep{friedman2001elements, chen2016xgboost}.
 
@@ -245,41 +256,42 @@ Existen dos estructuras principales, las alertas (\texttt{alerts}) y las congest
 
 Desde octubre de 2024 hasta abril de 2025, se capturan 32,354 alertas, las cuales se analizarán a lo largo de este estudio.
 
-\subsection{Consideraciones de los datos}
+\subsection{Filtrado temporal y agrupación de eventos}
 
-Las alertas pueden contener duplicados, debido a que diferentes usuarios pueden reportar el mismo evento. Para evitar esto, se filtraron los datos agrupándolos por segmento (\cref{ssec:freq_zone}) y periodos de tiempo, eliminando grupos duplicados en una ventana de tiempo de 120 minutos, es decir, todo evento que se reportó con el mismo tipo, en el mismo segmento, dentro de un periodo de dos horas, será considerado como un solo evento. Para esto se utiliza un algoritmo de filtrado \cref{alg:filter}.
+Las alertas pueden contener duplicados, debido a que diferentes usuarios pueden reportar el mismo evento. Para evitar esto, se filtraron los datos agrupándolos por segmento (\cref{ssec:freq_zone}) y periodos de tiempo, eliminando grupos duplicados en una ventana de tiempo de 120 minutos, es decir, todo evento que se reportó con el mismo tipo, en el mismo segmento, dentro de un periodo de dos horas, será considerado como un solo evento. Este procedimiento, resumido en el \cref{alg:filter}, permite homogeneizar la granularidad temporal de los eventos y asegurar la consistencia tipológica de los atributos (\texttt{group}, \texttt{type}). El código fuente completo se presenta en el Anexo~\ref{annex:filter_code}.
 
-\begin{algorithm}
-\caption{Filtrado de eventos por grupo y tiempo}
+De este modo, el filtro actúa como un mecanismo de depuración de ruido observacional, preservando un único registro representativo por evento real. Aunque esta consolidación produce una ligera disminución en las métricas de desempeño (\texttt{ROC AUC} y \texttt{F1-score}), el efecto se considera metodológicamente favorable, ya que aumenta la consistencia temporal y evita el sesgo hacia zonas con mayor densidad de usuarios o reportes. En consecuencia, el modelo resultante refleja con mayor precisión la ocurrencia efectiva de incidentes de tráfico, en lugar de su frecuencia de reporte.
+
+
+\begin{algorithm}[H]
+\caption{Filtrado temporal y agrupación de eventos}
 \label{alg:filter}
 \begin{algorithmic}[1]
-\Require datos\_entrada, intervalo\_minutos
-\State datos\_filtrados $\gets \emptyset$
+\Require Conjunto de datos $D$, tamaño de intervalo $\Delta t$ (en minutos)
+\Ensure Conjunto filtrado y agrupado $D'$
 
-\If{datos\_entrada = $\emptyset$ \textbf{or} no existe pub\_millis}
-    \Return datos\_filtrados
+\State $D' \gets \emptyset$
+\If{$D = \emptyset$ \textbf{or} no existe columna \texttt{pub\_millis}}
+    \State \Return $D'$
 \EndIf
 
-\State datos $\gets$ Copiar(datos\_entrada)
-\State paso $\gets$ intervalo\_minutos $\times$ 60000 \Comment{Convertir a milisegundos}
+\State $D' \gets$ Copia de $D$
+\State $paso \gets \Delta t \times 60000$ \Comment{Conversión de minutos a milisegundos}
 
-\ForAll{evento \textbf{in} datos}
-    \If{NO EsEntero(evento.pub\_millis)}
-        \State evento.pub\_millis $\gets$ Redondear(evento.pub\_millis / 1000000)
+\ForAll{evento $\in D'$}
+    \If{\texttt{pub\_millis} no es entero}
+        \State evento.\texttt{pub\_millis} $\gets$ Redondear(evento.\texttt{pub\_millis} / $10^6$)
     \EndIf
-    \State inicio\_intervalo $\gets$ $\lfloor$evento.pub\_millis / paso$\rfloor$ $\times$ paso
-    \State evento.inicio\_intervalo $\gets$ ConvertirAFecha(inicio\_intervalo)
+    \State evento.\texttt{interval\_start} $\gets \lfloor$evento.\texttt{pub\_millis} / paso$\rfloor \times$ paso
 \EndFor
 
-\State ConvertirTipo(datos.grupo, ENTERO)
-\State ConvertirTipo(datos.tipo, TEXTO)
-
-\State datos\_filtrados $\gets$ EliminarDuplicados(datos, [inicio\_intervalo, grupo, tipo])
-\State EliminarColumna(datos\_filtrados, inicio\_intervalo)
-\State ConvertirAFecha(datos\_filtrados.pub\_millis)
-\State ReiniciarÍndices(datos\_filtrados)
-
-\Return datos\_filtrados
+\State Convertir \texttt{interval\_start} a formato fecha-hora (UTC)
+\State Asegurar tipo entero en \texttt{group} y tipo texto en \texttt{type}
+\State Eliminar duplicados en [\texttt{interval\_start}, \texttt{group}, \texttt{type}]
+\State Eliminar columna auxiliar \texttt{interval\_start}
+\State Convertir \texttt{pub\_millis} a formato fecha-hora (zona local)
+\State Reiniciar índices de $D'$
+\State \Return $D'$
 \end{algorithmic}
 \end{algorithm}
 
@@ -506,7 +518,6 @@ En la \cref{fig:quad_acc} se puede ver cómo se distribuyen los segmentos numér
 
 Considerando la media de accidentes diarios, se agrupa por segmento, se define que las zonas mayores a 0.5 accidentes por día son considerados críticos, se construye un mapa según la criticidad (\cref{fig:quad_mean_day}), al tomar la suma de los accidentes, se obtiene la \cref{fig:quad_acc_total} que muestra la cantidad de accidentes reportados en el segmento en el periodo de estudio, que a su vez se clasifican como críticos si poseen más de 90 accidentes.
 
-
 \begin{figure}[H]
     \centering
     \subfloat[Media de accidentes por día]{
@@ -520,11 +531,6 @@ Considerando la media de accidentes diarios, se agrupa por segmento, se define q
     \caption{Accidentes por segmento}
 \end{figure}
 
-
-% Ruta más segura
-
-% Machine learning (XGBoost)
-
 \subsection{Selección del modelo de Machine Learning}
 
 %
@@ -537,24 +543,19 @@ Considerando la media de accidentes diarios, se agrupa por segmento, se define q
 %     "class_weight": [None, "balanced"],
 % }
 %
-% [RandomForest] best params: {'class_weight': None, 'max_depth': None, 'min_samples_leaf': 1, '
-% n_estimators': 500}
+% [RandomForest] best CV ROC-AUC: 0.8414
+% [RandomForest] best params: {'class_weight': None, 'max_depth': 20, 'min_samples_leaf': 3, 'n_estima
+% tors': 500}
 %
 % # LogisticRegression (with scaling in a Pipeline)
 % lr_pipeline = Pipeline([
 %     ("scaler", StandardScaler(with_mean=False)),  # with_mean=False keeps sparse safety if present
 %     ("clf", LogisticRegression(max_iter=2000, random_state=RANDOM_STATE)),
 % ])
-% lr_grid = {
-%     "clf__penalty": ["l2"],
-%     "clf__solver": ["lbfgs", "liblinear"],
-%     "clf__C": [0.1, 1.0, 10.0],
-%     "clf__class_weight": [None, "balanced"],
-% }
 %
-%
-% [LogisticRegression] best params: {'clf__C': 10.0, 'clf__class_weight': 'balanced', 'clf__pena
-% lty': 'l2', 'clf__solver': 'lbfgs'}
+% [LogisticRegression] best CV ROC-AUC: 0.7566
+% [LogisticRegression] best params: {'clf__C': 0.1, 'clf__class_weight': 'balanced', 'clf__penalty': '
+% l2', 'clf__solver': 'lbfgs'}
 %
 % # XGBClassifier
 % xgb = XGBClassifier(
@@ -575,18 +576,35 @@ Considerando la media de accidentes diarios, se agrupa por segmento, se define q
 %     "min_child_weight": [1, 3],
 % }
 %
-% [XGBoost] best params: {'colsample_bytree': 0.8, 'gamma': 0.8, 'learning_rate': 0.1, 'max_dept
-% h': 20, 'min_child_weight': 1, 'n_estimators': 100, 'subsample': 0.8}
+% [XGBoost] best CV ROC-AUC: 0.8480
+% [XGBoost] best params: {'colsample_bytree': 0.8, 'gamma': 1.0, 'learning_rate': 0.1, 'max_depth': 10
+% , 'min_child_weight': 1, 'n_estimators': 80, 'subsample': 0.8}
+%
 %
 %                 model  accuracy  precision    recall        f1   roc_auc    pr_auc
-% 0             XGBoost  0.829609   0.812915  0.856283  0.834036  0.910052  0.899817
-% 1        RandomForest  0.827351   0.804550  0.864786  0.833581  0.907710  0.898675
-% 2  LogisticRegression  0.721181   0.686955  0.812716  0.744563  0.780227  0.714036
+% 0             XGBoost  0.771112   0.738636  0.839156  0.785694  0.843327  0.810811
+% 1        RandomForest  0.766935   0.734552  0.835966  0.781985  0.839358  0.807292
+% 2  LogisticRegression  0.717269   0.672954  0.845383  0.749377  0.746327  0.659040
+%
+% RandomForest — Confusion Matrix
+% [[4595 1989]
+%  [1080 5504]]
+% TN=4595, FP=1989, FN=1080, TP=5504
+%
+% LogisticRegression — Confusion Matrix
+% [[3879 2705]
+%  [1018 5566]]
+% TN=3879, FP=2705, FN=1018, TP=5566
+%
+% XGBoost — Confusion Matrix
+% [[4629 1955]
+%  [1059 5525]]
+% TN=4629, FP=1955, FN=1059, TP=5525
 %
 
-Se evaluaron tres modelos de clasificación para seleccionar el con mejor rendimiento, para ello primero se seleccionaron los mejores hiperparámetros para cada uno basado en la \texxttt{curva ROC-AUC}, realizando una búsqueda exhaustiva (\textit{GridSearchCV}) sobre los tres modelos: \textbf{Random Forest}, \textbf{Logistic Regression} y \textbf{XGBoost}.
+Se evaluaron tres modelos de clasificación para seleccionar el con mejor rendimiento, para ello primero se seleccionaron los mejores hiperparámetros para cada uno basado en la \texttt{curva ROC-AUC}, realizando una búsqueda exhaustiva (\textit{GridSearchCV}) sobre los tres modelos: \textbf{Random Forest}, \textbf{Logistic Regression} y \textbf{XGBoost}.
 
-\paragraph{Random Forest}
+\paragraph{Random Forest.}
 Se evaluaron los siguientes hiperparámetros:
 
 \begin{itemize}
@@ -600,14 +618,14 @@ Los mejores hiperparámetros obtenidos fueron:
 
 \begin{itemize}
     \item \texttt{n\_estimators}: 500
-    \item \texttt{max\_depth}: None
-    \item \texttt{min\_samples\_leaf}: 1
+    \item \texttt{max\_depth}: 20
+    \item \texttt{min\_samples\_leaf}: 3
     \item \texttt{class\_weight}: None
 \end{itemize}
 
-Con estos valores, el modelo alcanzó una puntuación máxima de \textbf{0.7957} en validación cruzada.
+Con estos valores, el modelo alcanzó una puntuación máxima de \textbf{0.8414} en validación cruzada (métrica ROC–AUC).
 
-\paragraph{Logistic Regression}
+\paragraph{Regresión Logística.}
 Se evaluaron los siguientes hiperparámetros:
 
 \begin{itemize}
@@ -621,14 +639,14 @@ Los mejores hiperparámetros obtenidos fueron:
 
 \begin{itemize}
     \item \texttt{clf\_\_penalty}: l2
-    \item \texttt{clf\_\_solver}: 'lbfgs'
-    \item \texttt{clf\_\_C}: 10.0
-    \item \texttt{clf\_\_class\_weight}: 'balanced'
+    \item \texttt{clf\_\_solver}: lbfgs
+    \item \texttt{clf\_\_C}: 0.1
+    \item \texttt{clf\_\_class\_weight}: balanced
 \end{itemize}
 
+El modelo obtuvo una puntuación de \textbf{0.7566} en validación cruzada (ROC–AUC).
 
 \paragraph{XGBoost.}
-
 Se evaluaron los siguientes hiperparámetros:
 
 \begin{itemize}
@@ -645,23 +663,23 @@ Los mejores hiperparámetros obtenidos fueron:
 
 \begin{itemize}
     \item \texttt{colsample\_bytree}: 0.8
-    \item \texttt{gamma}: 0.8
+    \item \texttt{gamma}: 1.0
     \item \texttt{learning\_rate}: 0.1
-    \item \texttt{max\_depth}: 20
+    \item \texttt{max\_depth}: 10
     \item \texttt{min\_child\_weight}: 1
-    \item \texttt{n\_estimators}: 100
+    \item \texttt{n\_estimators}: 80
     \item \texttt{subsample}: 0.8
 \end{itemize}
 
-Este modelo logró una valor de \texttt{curva ROC-AUC} de \textbf{0.910052}, superando al resto de las alternativas evaluadas. Por este motivo, \textbf{XGBoost fue seleccionado como modelo final}.
+Con estos valores, el modelo XGBoost alcanzó la mejor puntuación promedio en validación cruzada, con un \textbf{ROC–AUC de 0.8480}, confirmando su superior capacidad de generalización frente a los otros modelos.
 
 En el \cref{tab:model-comparison} se puede observar la comparación de los modelos.
 
 \begin{table}[H]
 \centering
-\begin{tabular}{|l|p{8cm}|c|}
+\begin{tabular}{|l|p{7.5cm}|c|c|}
 \hline
-\textbf{Modelo} & \textbf{Mejores Hiperparámetros} & \textbf{Mejor Score (ROC AUC)} \\
+\textbf{Modelo} & \textbf{Mejores Hiperparámetros} & \textbf{ROC AUC} & \textbf{PR AUC} \\
 \hline
 \textbf{Random Forest} &
 \begin{tabular}[c]{@{}l@{}}
@@ -672,7 +690,7 @@ En el \cref{tab:model-comparison} se puede observar la comparación de los model
 \texttt{min\_samples\_leaf}: 2\\
 \texttt{n\_estimators}: 100
 \end{tabular}
-& 0.9077 \\
+& 0.8394 & 0.8073 \\
 \hline
 \textbf{XGBoost} &
 \begin{tabular}[c]{@{}l@{}}
@@ -682,7 +700,7 @@ En el \cref{tab:model-comparison} se puede observar la comparación de los model
 \texttt{max\_depth}: 30\\
 \texttt{n\_estimators}: 80
 \end{tabular}
-& \textbf{0.9101} \\
+& \textbf{0.8433} & \textbf{0.8108} \\
 \hline
 \textbf{Regresión Logística} &
 \begin{tabular}[c]{@{}l@{}}
@@ -690,21 +708,58 @@ En el \cref{tab:model-comparison} se puede observar la comparación de los model
 \texttt{solver}: lbfgs\\
 \texttt{max\_iter}: 1000
 \end{tabular}
-& 0.7802 \\
+& 0.7463 & 0.6590 \\
 \hline
 \end{tabular}
-\caption{Comparativa de modelos ajustados con \texttt{GridSearchCV} según el área bajo la curva ROC (ROC AUC).}
+\caption{Comparativa de modelos ajustados con \texttt{GridSearchCV} según el área bajo las curvas ROC y Precision–Recall (PR AUC).}
 \label{tab:model-comparison}
 \end{table}
 
+Los gráficos de la curva ROC están representados en la \cref{fig:ROC} y de la curva Precision-Recall en la \cref{fig:prec-recall}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.38\textwidth]{images/ROC.png}
+    \caption{Curvas ROC}
+    \label{fig:ROC}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.38\textwidth]{images/Precision-Recall.png}
+    \caption{Curvas Precision-Recall}
+    \label{fig:prce-recall}
+\end{figure}
+
 \subsection{Generación de eventos negativos simulados} \label{ssec:class_balancing}
 
-Dado que el conjunto original contiene únicamente eventos positivos (ocurridos), fue necesario generar instancias negativas (no ocurridos) para entrenar un modelo de clasificación binaria. Para ello, se implementó una estrategia inspirada en el enfoque de generación de eventos negativos artificiales propuesto por Goedertier et al. \citep{goedertier2009robust}, que permite representar problemas secuenciales como tareas de clasificación supervisada.
+Dado que el conjunto original contiene únicamente eventos positivos (ocurridos), fue necesario generar instancias negativas (no ocurridos) para entrenar un modelo de clasificación binaria. Para ello, se implementó una estrategia inspirada en el enfoque de generación de eventos negativos artificiales propuesto por Goedertier et al. \citep{goedertier2009robust}, el cual permite representar problemas secuenciales como tareas de clasificación supervisada.
 
-En este caso, la generación se basa en una grilla temporal con intervalos de 5 minutos, sobre la cual se combinan todas las posibles ubicaciones (\texttt{segmento}) y tipos de evento. Se identifican aquellas combinaciones que no se encuentran en los datos originales —donde no ocurrió un evento— y se etiquetan como eventos negativos (\texttt{happen} = 0). Estas instancias se muestrean de forma aleatoria para igualar la cantidad de eventos positivos, logrando así un conjunto balanceado con un 50\% de eventos positivos y 50\% de negativos.
+A diferencia del algoritmo original, en el caso del tráfico vehicular se adoptó una relación 1:1 entre eventos positivos y negativos —esto es, se genera un evento negativo por cada evento positivo—, priorizando la eficiencia mediante operaciones vectorizadas y una estructura de datos matricial. Además, debido a que cada evento es independiente de los demás, no se aplicó la noción de causalidad ni las restricciones de paralelismo introducidas por Goedertier, propias de los procesos secuenciales.
 
-Este enfoque permite mantener la estructura temporal y geoespacial de los datos reales, evitando introducir ruido aleatorio, y facilitando la evaluación robusta de métricas como \texttt{recall} y \texttt{precision}.
+En este contexto, la generación de eventos negativos se basa en una grilla temporal con intervalos de 5 minutos, sobre la cual se combinan todas las posibles ubicaciones (\texttt{segmento}) y tipos de evento. Se identifican aquellas combinaciones que no se encuentran en los datos originales —donde no ocurrió un evento— y se etiquetan como eventos negativos (\texttt{happen} = 0). Estas instancias se muestrean aleatoriamente hasta igualar la cantidad de eventos positivos, obteniendo así un conjunto balanceado con un 50\% de instancias positivas y 50\% negativas.
 
+Este enfoque permite preservar la estructura temporal y geoespacial de los datos reales, evitando introducir ruido artificial y facilitando una evaluación más robusta de métricas de desempeño como \texttt{recall} y \texttt{precision}.
+
+El procedimiento se resume en el \cref{alg:neg_events}. El código completo se incluye en el Anexo~\ref{annex:neg_code}.
+
+\begin{algorithm}[H]
+\caption{Generación de eventos negativos artificiales}
+\label{alg:neg_events}
+\begin{algorithmic}[1]
+\Require Conjunto de eventos positivos $D$, atributo geográfico $g$, tamaño de intervalo $t = 5$ minutos
+\Ensure Conjunto balanceado $D'$ con eventos positivos y negativos
+
+\State Convertir marcas de tiempo a milisegundos y definir intervalos temporales de tamaño $t$
+\State Agrupar eventos por combinación de $(intervalo, g, tipo)$
+\State Generar todas las combinaciones posibles de $(intervalo, g, tipo)$
+\State Identificar combinaciones ausentes en $D$ como eventos negativos (\texttt{happen} = 0)
+\State Muestrear aleatoriamente los eventos negativos hasta igualar la cantidad de positivos
+\State Asignar ubicaciones aleatorias dentro del mismo grupo geográfico $g$
+\State Combinar eventos positivos y negativos en un único conjunto balanceado $D'$
+\State \Return $D'$
+\end{algorithmic}
+\end{algorithm}
 
 \subsection{Resultados del modelo seleccionado}
 
@@ -880,7 +935,94 @@ Estas expresiones corresponden a un desarrollo en serie basado en una expansión
 
 La implementación computacional de estas fórmulas puede realizarse utilizando bibliotecas como \texttt{Pyproj}, que encapsulan estos desarrollos y gestionan automáticamente los parámetros de cada sistema de referencia (CRS).
 
+\section{Código fuente: Generación de eventos negativos}
+\label{annex:neg_code}
 
+\begin{minted}[fontsize=\footnotesize,breaklines,frame=lines]{python}
+def generate_neg_simulated_data(data: pd.DataFrame | GeoDataFrame, geodata: str = "group") -> GeoDataFrame:
+    """
+    Genera datos negativos simulando puntos sin evento.
+    Basado en la adaptación del método de Goedertier et al. (2009).
+    """
+    # Conversión temporal y generación de intervalos de 5 minutos
+    if not isinstance(data["pub_millis"].iloc[0], np.integer):
+        data["pub_millis"] = data["pub_millis"].astype(np.int64, errors="ignore") / 1_000_000
+
+    step = np.int64(60_000 * 5)
+    min_tms = data["pub_millis"].to_numpy().min()
+    max_tms = data["pub_millis"].to_numpy().max()
+    intervals = np.arange(min_tms, max_tms + step, step)
+
+    # Combinación de intervalos, grupos y tipos de evento
+    data["interval"] = ((data["pub_millis"].to_numpy() - min_tms) // step) * step + min_tms
+    allgroups = data[geodata].unique()
+    alltypes = data["type"].unique()
+    combinations = pd.MultiIndex.from_product(
+        [intervals, allgroups, alltypes], names=["interval", geodata, "type"]
+    ).to_frame(index=False)
+
+    # Eventos originales
+    event_combinations = data[["uuid", "interval", geodata, "type", "x", "y"]]
+    event_combinations["happen"] = 1
+    event_combinations["location"] = join_coords(event_combinations)  # función auxiliar
+
+    # Unión y muestreo balanceado
+    merged = pd.merge(combinations, event_combinations, on=["interval", geodata, "type"], how="left")
+    merged_pos = merged[merged["happen"] == 1]
+    merged_neg = merged[merged["happen"].isna()].sample(len(merged_pos), random_state=42)
+    full_data = pd.concat([merged_pos, merged_neg])
+
+    # Agregación y etiquetado
+    full_data["happen"] = full_data["happen"].fillna(0).astype(int)
+    alerts = utils.generate_aggregate_data(full_data)  # módulo auxiliar
+    return alerts.data
+\end{minted}
+
+\noindent\textbf{Nota:}
+Las funciones \texttt{join\_coords()} y \texttt{generate\_aggregate\_data()} son funciones auxiliares definidas en el módulo \texttt{utils}, utilizadas para concatenar coordenadas geográficas y agregar estadísticas por grupo usadas en el modelo final, respectivamente.
+
+\url{https://github.com/richardhapb/antof-traffic-client/blob/main/src/utils/utils.py} \\
+\url{https://github.com/richardhapb/antof-traffic-client/blob/main/src/analytics/ml.py}
+\newpage
+
+\section{Código fuente: Filtrado temporal y agrupación de eventos}
+\label{annex:filter_code}
+
+\begin{minted}[fontsize=\footnotesize,breaklines,frame=lines]{python}
+def filter_by_group_time(self, timedelta_min: int, inplace: bool = False) -> gpd.GeoDataFrame | pd.DataFrame:
+    """
+    Filter and group data by time intervals.
+    """
+    if self.data is None or "pub_millis" not in self.data.columns:
+        return pd.DataFrame()
+
+    data = self.data.copy() if not inplace else self.data
+
+    if not np.issubdtype(data["pub_millis"].dtype, np.integer):
+        data["pub_millis"] = round(data["pub_millis"].astype(np.int64, errors="ignore") / 1_000_000).astype(np.int64)
+
+    step = np.int64(60_000 * timedelta_min)
+    data["interval_start"] = ((data["pub_millis"]).to_numpy() // step) * step
+
+    data["interval_start"] = pd.to_datetime(data["interval_start"], unit="ms", utc=True)
+    data["interval_start"] = data["interval_start"].dt.tz_convert(utils.TZ)
+
+    data["group"] = data["group"].astype(np.int16)
+    data["type"] = data["type"].astype(str)
+
+    data.drop_duplicates(subset=["interval_start", "group", "type"], inplace=True)
+    data.drop(columns=["interval_start"], inplace=True)
+
+    if not pd.api.types.is_datetime64_any_dtype(data["pub_millis"]):
+        data["pub_millis"] = pd.to_datetime(data["pub_millis"], unit="ms", utc=True)
+        data["pub_millis"] = data["pub_millis"].dt.tz_convert(utils.TZ)
+
+    data.reset_index(drop=True, inplace=True)
+    return data
+\end{minted}
+
+\noindent\textbf{Nota:}
+La función utiliza la zona horaria definida en el módulo \texttt{utils.TZ} y mantiene la consistencia tipológica de las columnas de entrada.
 \newpage
 
 

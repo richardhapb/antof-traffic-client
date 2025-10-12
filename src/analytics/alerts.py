@@ -124,6 +124,8 @@ class Alerts:
         if self.data is None or "pub_millis" not in self.data.columns:
             return pd.DataFrame()
 
+        utils.logger.debug("Filtering %d events by time " + "inplace" if inplace else "", self.data.shape[0])
+
         data = self.data.copy() if not inplace else self.data
 
         if not isinstance(data["pub_millis"].iloc[0], np.integer):
@@ -131,7 +133,7 @@ class Alerts:
                 np.int64
             )
 
-        step = np.int64(60_000 * timedelta_min)  # step en milisegundos
+        step = np.int64(60_000 * timedelta_min)  # step in milliseconds
 
         # Adjust `pub_millis` to the nearest step
         data["interval_start"] = ((data["pub_millis"]).to_numpy() // step) * step
@@ -154,6 +156,7 @@ class Alerts:
             data["pub_millis"] = data["pub_millis"].dt.tz_convert(utils.TZ)
 
         data.reset_index(drop=True, inplace=True)
+        utils.logger.debug("Data filtered, remaining %d events", data.shape[0])
 
         return data
 
