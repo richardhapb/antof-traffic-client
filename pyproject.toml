@@ -218,7 +218,6 @@ ignore = [
     "UP007", # Union type syntax - notebooks often use older syntax
     "N999", # Invalid module name - notebook files often have descriptive names
     "INP001", # Implicit namespace package - notebooks aren't packages
-]
 
 # McCabe complexity
 [tool.ruff.lint.mccabe]

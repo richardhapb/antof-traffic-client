@@ -30,8 +30,8 @@ LOGGER_FORMAT = "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
 
 ALERTS_BEGIN_TIMESTAMP = 1727740800000  # 2024/10/01
 ALERTS_END_TIMESTAMP = 1746057599000  # 2025/04/30 23:59:59
-# Time to retrieve last singleton instance between graphics
 
+# Time to retrieve last singleton instance between graphics
 MINUTES_BETWEEN_UPDATES_FROM_API = 2
 
 logging.basicConfig(format=LOGGER_FORMAT)
