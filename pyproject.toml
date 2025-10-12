@@ -218,6 +218,7 @@ ignore = [
     "UP007", # Union type syntax - notebooks often use older syntax
     "N999", # Invalid module name - notebook files often have descriptive names
     "INP001", # Implicit namespace package - notebooks aren't packages
+]
 
 # McCabe complexity
 [tool.ruff.lint.mccabe]
@@ -226,5 +227,34 @@ max-complexity = 10
 [tool.ruff.format]
 indent-style = "space"
 quote-style = "double"
+
+
+[tool.pyright]
+include = ["src"]
+exclude = [
+    "**/__pycache__",
+    ".venv",
+]
+defineConstant = { DEBUG = true }
+
+# Ignores
+typeCheckingMode = "strict"
+reportMissingImports = false # Ignore missing imports
+reportFunctionMemberAccess = false  # Ignores warnings related to accessing unknown attributes or methods on functions, which can occur in dynamically defined methods or patched functions.
+useLibraryCodeForTypes = true
+reportMissingTypeStubs = "none"
+reportUnusedVariable = "none"
+reportUnknownMemberType = "none"
+reportUnknownArgumentType = "warning"
+reportUnknownVariableType = "none"
+reportUnknownParameterType = "warning"
+reportPrivateUsage = "none"  # Private methods that init with `_`
+
+pythonVersion = "3.12"
+pythonPlatform = "Linux"
+
+executionEnvironments = [
+  { root = ["apps", "."], pythonVersion = "3.12", pythonPlatform = "Linux", extraPaths = [ "templates" ], reportMissingImports = "none" },
+]
 
 
