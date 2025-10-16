@@ -215,9 +215,10 @@ def test_freq_nearby():
     nearby = 10
     df = generate_dummy_coord_df(nearby, 15)
 
-    freq_df = utils.freq_nearby(utils.separate_coords(df))
+    df = utils.separate_coords(df)
+    utils.freq_nearby(df)
 
-    assert freq_df["freq"].max() == nearby
+    assert df["freq"].max() == nearby
 
 
 def test_hourly_group():
@@ -231,9 +232,9 @@ def test_hourly_group():
 
     df3 = utils.generate_aggregate_data(df)
 
-    freq_df = utils.freq_nearby(df3.data)
+    utils.freq_nearby(df3.data)
 
-    hourly = utils.hourly_group(freq_df)
+    hourly = utils.hourly_group(df3.data)
     day_hours = 24
 
     assert hourly.shape[0] == day_hours
@@ -250,9 +251,9 @@ def test_daily_group():
 
     df3 = utils.generate_aggregate_data(df)
 
-    freq_df = utils.freq_nearby(df3.data)
+    utils.freq_nearby(df3.data)
 
-    daily = utils.daily_group(freq_df)
+    daily = utils.daily_group(df3.data)
     month_days = 31
 
     assert daily.shape[0] == month_days
@@ -278,59 +279,3 @@ def test_generate_aggregate_data():
     assert hasattr(df3.data, "hour")
     assert hasattr(df3.data, "day_type")
     assert hasattr(df3.data, "week_day")
-
-
-def test_merge_with_interval_precision():
-    """Test that merge operations with float intervals require precision handling"""
-    import pandas as pd
-
-    # Create simple test data
-    events = pd.DataFrame({
-        "interval": [1.73e12, 1.74e12],
-        "group": [106, 82],
-        "type": ["JAM", "HAZARD"],
-        "happen": [1, 1],  # These are our positive examples
-    })
-
-    combos = pd.DataFrame({
-        "interval": [1.73e12, 1.74e12, 1.75e12],  # Same values plus one extra
-        "group": [106, 82, 104],
-        "type": ["JAM", "HAZARD", "JAM"],
-    })
-
-    # Test 1: Perfect match case - should work
-    merged = pd.merge(combos, events, on=["interval", "group", "type"], how="left")
-
-    # In perfect case, two rows should have happen=1, one should be NaN
-    assert merged["happen"].notna().sum() == 2, "Expected 2 matches with exact values"
-    assert merged["happen"].isna().sum() == 1, "Expected 1 non-match with exact values"
-
-    # Test 2: Precision issue case - simulating the actual problem
-    # Create events with tiny floating point differences (simulating real-world data)
-    events_precision = events.copy()
-    events_precision["interval"] = events_precision["interval"] + 0.000000001
-
-    merged_precision = pd.merge(combos, events_precision, on=["interval", "group", "type"], how="left")
-
-    # With precision differences, we expect NO matches
-    assert merged_precision["happen"].isna().sum() == 3, "With precision differences, no matches should occur"
-
-    # Test 3: Solution - round before merging
-    # Apply rounding to both dataframes
-    precision = 3
-    factor = 10**precision
-
-    events_rounded = events_precision.copy()
-    combos_rounded = combos.copy()
-
-    events_rounded["interval"] = (events_rounded["interval"] // factor) * factor
-    combos_rounded["interval"] = (combos_rounded["interval"] // factor) * factor
-
-    merged_rounded = pd.merge(combos_rounded, events_rounded, on=["interval", "group", "type"], how="left")
-
-    # After rounding, we should have matches again
-    assert merged_rounded["happen"].notna().sum() == 2, "Expected 2 matches after rounding"
-    assert merged_rounded["happen"].isna().sum() == 1, "Expected 1 non-match after rounding"
-
-    # Return success message
-    return "Test passed: Rounding solves the floating-point precision issue in merges"

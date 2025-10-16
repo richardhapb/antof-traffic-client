@@ -198,7 +198,7 @@ def convert_timestamp_tz(
     return int(date.timestamp()) * 1000
 
 
-def freq_nearby(gdf: gpd.GeoDataFrame, nearby_meters: int = 200) -> gpd.GeoDataFrame:
+def freq_nearby(gdf: gpd.GeoDataFrame, nearby_meters: int = 200) -> None:
     """
     Count how many nearby points are within a specified radius for each point in the GeoDataFrame.
     Modify data inplace for avoid duplicate data and double memory usage.
@@ -213,7 +213,7 @@ def freq_nearby(gdf: gpd.GeoDataFrame, nearby_meters: int = 200) -> gpd.GeoDataF
     """
     if gdf.crs is None:
         logger.warning("GeoDataFrame `crs` empty")
-        return gdf
+        return
 
     # Ensure the GeoDataFrame is in a projected CRS with units in meters
     if gdf.crs.is_geographic:
@@ -230,8 +230,6 @@ def freq_nearby(gdf: gpd.GeoDataFrame, nearby_meters: int = 200) -> gpd.GeoDataF
 
     # Frequency within the segment
     gdf["freq"] = neighbor_counts
-
-    return gdf
 
 
 def separate_coords(df: pd.DataFrame) -> GeoDataFrame:

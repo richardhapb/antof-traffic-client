@@ -97,7 +97,7 @@ class Alerts:
     def is_empty(self) -> bool:
         return not hasattr(self, "data") or self.data.shape[0] == 0
 
-    def filter_by_group_time(self, timedelta_min: int, inplace: bool = False) -> gpd.GeoDataFrame | pd.DataFrame:
+    def filter_by_group_time(self, timedelta_min: int, inplace: bool = False) -> gpd.GeoDataFrame | pd.DataFrame | None:
         """
         Filter and group data by time intervals.
 
@@ -158,6 +158,8 @@ class Alerts:
         data.reset_index(drop=True, inplace=True)
         utils.logger.debug("Data filtered, remaining %d events", data.shape[0])
 
+        if inplace:
+            return None
         return data
 
     def group_by_day(self) -> pd.DataFrame:

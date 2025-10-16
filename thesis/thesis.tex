@@ -72,20 +72,20 @@ A los profesores apasionados por su trabajo, que no solo transmiten conocimiento
 
 El proyecto desarrollado tuvo como propósito la creación de una herramienta efectiva para analizar y predecir, con alta confiabilidad, el comportamiento del tráfico vehicular en la ciudad de Antofagasta, utilizando datos provenientes de la plataforma Waze Cities. Esta plataforma, alimentada por su comunidad de usuarios, proporciona información en tiempo real que permite obtener una visión detallada de los eventos de tráfico en la ciudad. La investigación resultante generó información relevante para la gestión del tráfico, facilitando la toma de decisiones por parte de las autoridades locales, con miras a mejorar la seguridad vial y optimizar la eficiencia del flujo vehicular. A partir del análisis y explotación de estos datos, fue posible identificar patrones y tendencias que, al ser integrados en la planificación urbana, permiten optimizar rutas críticas, reducir la congestión y disminuir la probabilidad de accidentes.
 
-Se consiguió obtener un modelo capaz de predecir el comportamiento del tráfico con un F1-score de 83.4\% y volúmen bajo la curva ROC (ROC-AUC) de 91\%, de acuerdo con el análisis de bondad de ajuste realizado al modelo final luego de una prueba \texttt{GridSearchCV} para seleccionar los mejores parámetros del modelo acorde a su curva ROC-AUC final. Se probaron tres modelos de clasificación: RandomForestClassifier, LogisticRegression y XGBBoost, siendo este último el modelo seleccionado debido a que obtuvo el mayor rendimiento de acuerdo con la curva ROC-AUC y su F1-Score. Se utilizaron 52,672 datos para el entrenamiento, 26,336 con datos de eventos reportados por conductores (luego de ser filtrados) y 26,336 datos generados de forma ficticia como no-ocurrencia de eventos para el balanceo de clases, dado la naturaleza de los datos que solo contiene datos de ocurrencia.
+Se utilizó el algoritmo \texttt{GridSearchCV} para seleccionar los mejores parámetros del modelo acorde a su curva ROC-AUC final. Se probaron tres modelos de clasificación: RandomForestClassifier, LogisticRegression y XGBBoost, siendo este último el modelo seleccionado debido a que obtuvo el mayor rendimiento, con un F1-score de 78.6\% y volumen bajo la curva ROC (ROC-AUC) de 84.3\%. Se utilizaron 52,672 datos para el entrenamiento, 26,336 datos de eventos reportados por conductores (luego de ser filtrados) y 26,336 datos generados de forma ficticia como no-ocurrencia de eventos para el balanceo de clases, debido a la naturaleza de los datos al contener solo registros de ocurrencias.
 
 \section{Introducción}
 \subsection{Descripción del problema}
 
-Antofagasta, una ciudad con más de 106,000 vehículos en circulación \citep{comision2023}, enfrenta desafíos significativos en la gestión de su tráfico vehicular. Durante el año 2023, se registraron 1,715 accidentes, los cuales resultaron en 31 fallecidos y 102 heridos graves \citep{comision2023}. Tuvo un crecimiento de su parque automotriz de 0.8\% y 3.5\% en los años 2022 y 2023 respectivamente según datos del INE \citep{ine2023}.
+Antofagasta, una ciudad con más de 106,000 vehículos en circulación \citep{comision2023}, enfrenta desafíos significativos en la gestión de su tráfico vehicular. Durante el año 2023, se registraron 1,715 accidentes, los cuales resultaron en 31 fallecidos y 102 heridos graves \citep{comision2023}. Tuvo un crecimiento de su parque automotor de 0.8\% y 3.5\% en los años 2022 y 2023 respectivamente según datos del INE \citep{ine2023}.
 
-La infraestructura vial limitada cuenta con dos arterias principales para poder atravesar la ciudad, la Avenida Edmundo Perez Zujovic y la Avenida Pedro Aguirre Cerda, La segunda solo presente en la mitad del recorrido, por lo que para la otra mitad, se deben utilizar diferentes alternativas en similares alturas de la ciudad, ninguna de estas continuas. Esto posiciona a la Avenida Edmundo Perez Zujovic, la cual en el sector sur de la ciudad se encuentra con Avenida Grecia y Avenida Ejército, como la única vía continua que atraviesa la ciudad completamente. Esta particularidad dada las características geográficas de Antofagasta sumada a la alta concentración de vehículos, genera una alta congestión y  riesgo de accidentes, especialmente en las zonas anteriormente mencionadas.
+La infraestructura vial limitada cuenta con dos arterias principales para poder atravesar la ciudad, la Avenida Edmundo Perez Zujovic y la Avenida Pedro Aguirre Cerda, La segunda solo presente en un una parte del recorrido, por lo que para el resto, se deben utilizar diferentes alternativas en similares alturas de la ciudad, ninguna de estas continuas. Esto posiciona a la Avenida Edmundo Perez Zujovic, la cual en el sector sur de la ciudad se encuentra con Avenida Grecia y Avenida Ejército, como la única vía continua que atraviesa la ciudad completamente. Esta particularidad dada las características geográficas de Antofagasta sumada a la alta concentración de vehículos, genera una alta congestión y  riesgo de accidentes, especialmente en las zonas anteriormente mencionadas.
 
 Actualmente, no existe algún sistema de monitoreo en tiempo real que permitan gestionar el tráfico de manera proactiva. Los sistemas de monitoreo tradicionales, como son la gestión de semáforos y el estudio de vías, es valioso para la administración del flujo vehicular y la estandarización de las intersecciones. Sin embargo, tiene limitaciones por ser estático para la vía en donde el diseño fue realizado. Este tipo de gestión tiene la limitación de no permitir una visión global del flujo vehicular, como también la poca flexibilidad ante los cambios que se generan en el entorno \citep{auld2009}.
 
 Explorar nuevas fuentes de datos, como los eventos vehiculares en la ciudad, o la gestión a través de visión por computadora, son herramientas que permiten gestionar de forma eficiente y efectiva el flujo vehicular, proporcionando datos en tiempo real, también ofrecen opciones de automatización y predictibilidad \citep{chen2015}. Contar con grandes volúmenes de datos permite desarrollar modelos inteligentes para la gestión del tráfico vehicular.
 
-Waze recopila datos de eventos reportados por los usuarios, los cuales cuentan con tres aspectos principales; el tiempo, la ubicación, y el tipo de evento. Esta categorización permite poder desarrollar modelos que detecten patrones y puedan estimar con alta probabilidad eventos futuros, basándose en los datos pasados. Esta opción entrega una visión global de la ciudad, para poder detectar focos de atención en cuanto a la ocurrencia de accidentes y la congestión vehicular. El uso de datos colaborativos, como los reportados por usuarios en Waze, ha demostrado ser una fuente válida para el análisis y predicción de patrones de tráfico urbano, permitiendo detectar focos críticos de congestión y accidentes \citep{ferreira2017waze}.
+Waze recopila datos de eventos reportados por los usuarios, los cuales cuentan con tres aspectos principales; el tiempo, la ubicación, y el tipo de evento. Esta categorización permite poder desarrollar modelos que detecten patrones y puedan estimar la probabilidad de eventos futuros, basándose en datos del pasado. Esta opción entrega una visión global de la ciudad, para poder detectar focos de atención en cuanto a la ocurrencia de accidentes y congestión vehicular. El uso de datos colaborativos, como los reportados por usuarios en Waze, ha demostrado ser una fuente válida para el análisis y predicción de patrones de tráfico urbano, permitiendo detectar focos críticos de congestión y accidentes \citep{ferreira2017waze}.
 
 La plataforma Waze Cities, permite a ciudades poder obtener datos para gestionar el tráfico vehicular con herramientas inteligentes, esto conlleva a mejorar la seguridad y la eficiencia en el tráfico vehicular, usando una fuente de dato ya existente \citep{wazecitiescasestudies2024}.
 
@@ -93,7 +93,7 @@ La plataforma Waze Cities, permite a ciudades poder obtener datos para gestionar
 
 Se realiza un análisis geoespacial con el objetivo de identificar puntos críticos, como vías principales, calles secundarias y zonas de alto tráfico. Este análisis se llevó a cabo utilizando \texttt{GeoPandas}. Los resultados se presentan mediante técnicas de visualización que permitien interpretar las tendencias y puntos de interés de manera efectiva.
 
-El pipeline de datos incluye una base de datos relacional para almacenarlos, un flujo ETL (Extract, Transform, Load) para procesarlos y un servidor web para visualizarlos. Se utilizó PostgreSQL \citep{postgres2025} como base de datos principal, Memcached  \citep{memcached2025} como base de datos de caché, APScheduler para la programación de tareas y Dash \citep{dash2025} como herramienta de visualización. Este enfoque permitió automatizar el flujo de datos y garantizar la actualización constante de la información.
+El pipeline de datos incluye una base de datos relacional para almacenarlos, un flujo ETL (Extract, Transform, Load) para procesarlos y un cliente web para visualizarlos. Se utilizó PostgreSQL \citep{postgres2025} como base de datos SQL, Memcached  \citep{memcached2025} como base de datos de caché, APScheduler para la programación de tareas y Dash \citep{dash2025} como herramienta de visualización. Este enfoque permitió automatizar el flujo de datos y garantizar la actualización constante de la información.
 
 Para el proceso de entrenamiento del modelo, se llevó a cabo un balanceo de clases, debido a la naturaleza de los datos, solo contiene datos de la ocurrencia de eventos, esto genera sesgos en el modelo y un sobre-ajuste que hace que el modelo tenga un rendimiento disminuido \citep{he2009learning}.
 
@@ -101,9 +101,9 @@ Adicionalmente, se entrenó un modelo de clasificación para determinar la proba
 
 Para la gestión del modelo, en cuanto a su implementación, mantenimiento y actualización, se programó APSCheduler, para ejecutar tareas periódicas que permiten gestionar el ciclo de vida de los modelos de aprendizaje automático, desde su entrenamiento hasta su despliegue en producción y versionado.
 
-El servidor se desarrolló en \texttt{Rust} \citep{rust2025}, un lenguaje de programación enfocado en la eficiencia en el uso de memoria y seguridad en el uso de la misma. Se utilizó \texttt{Memcached} para generar un caché de los datos y de esta forma poder servirlos de manera más eficiente y rápida \citep{fitzpatrick2004memcached}, debido al volumen de datos, se priorizó la unicidad de los mismos, evitando generar copias, para no aumentar el uso de memoria.
+El servidor se desarrolló en \texttt{Rust} \citep{rust2025}, un lenguaje de programación enfocado en la eficiencia y seguridad en el uso de memoria. Se utilizó \texttt{Memcached} para generar un caché de los datos y de esta forma poder servirlos de manera más eficiente y rápida \citep{fitzpatrick2004memcached}, debido al volumen de datos, se priorizó la unicidad de los mismos, evitando generar copias, para no aumentar el uso de memoria.
 
-Para el procesado de los datos en el cliente —\texttt{Dash}—, se generan múltiples workers que permiten servir la aplicación de forma eficiente, y se utiliza solo una instancia en memoria de los datos, compartidos por todos los datos, y para mantener la integridad de los datos, se implementa un \texttt{Mutex} para controlar el acceso de lectura a los mismos desde las tareas asíncronas \citep{ramalho2015fluent}.
+Para el procesado de los datos en el cliente —\texttt{Dash}—, se generan múltiples workers que permiten servir la aplicación de forma eficiente, y se utiliza solo una instancia en memoria de los datos, compartida por todos los workers. Para mantener la integridad de los datos, se implementa un \texttt{Mutex} para controlar el acceso de lectura a los mismos desde las tareas asíncronas \citep{ramalho2015fluent}.
 
 La perspectiva general del flujo de datos se muestra en la \cref{fig:fuente} y el flujo desde la API de Waze hasta el dashboard se puede observar en la \cref{fig:wf_dash}
 
@@ -130,7 +130,7 @@ Analizar y modelar el comportamiento del tráfico vehicular en Antofagasta media
 
 \begin{itemize}
     \item Realizar un análisis descriptivo de los datos recolectados para identificar patrones y tendencias relevantes en el comportamiento del tráfico.
-    \item Presentar información visualmente comprensible y útil para las autoridades de gestión vial, facilitando la implementación de políticas y acciones basadas en datos.
+    \item Presentar información visualmente comprensible y útil para la gestión vial, facilitando la implementación de políticas y acciones basadas en datos.
     \item Proponer una herramienta exploratoria para apoyar la toma de decisiones en la gestión vial
 \end{itemize}
 
@@ -146,7 +146,7 @@ El tráfico vehicular en entornos urbanos presenta un comportamiento complejo e 
 
 \subsection{Gestión de la seguridad vial}
 
-Existen diferentes estrategias para la gestión vehicular, desde sistemas manuales como la dirección del tránsito por carabineros, o más automatizados, como la gestión inteligente de semáforos. En términos de seguridad, para evitar la ocurrencia de accidentes, resulta conveniente aplicar la jerarquía de control de riesgo \cref{fig:jerarquia_riesgos}. Esta busca abordar desde la medida de mayor impacto, hasta la de menor impacto en la exposición al riesgo. Se divide en dos grupos principales, las barreras duras y las barreras blandas (o administrativas). El primer grupo consta de la eliminación del agente de riesgo, la sustitución por uno de menor exposición o medidas ingenieriles, que buscan administrar la exposición con algún rediseño u organización. Las medidas administrativas constan de diferentes estrategias que puedan cambiar el comportamiento, el cuidado o la visibilidad de la exposición, por último, los elementos de protección personal, que buscan mitigar el daño ante algún posible accidente \citep{niosh2024}.
+Existen diferentes estrategias para la gestión vehicular, desde sistemas manuales como la dirección del tránsito por carabineros; o más automatizados, como la gestión inteligente de semáforos. En términos de seguridad, para evitar la ocurrencia de accidentes, resulta conveniente aplicar la jerarquía de control de riesgo (\cref{fig:jerarquia_riesgos}). Esta busca abordar desde la medida de mayor impacto, hasta la de menor impacto en la exposición al riesgo. Se divide en dos grupos principales, las barreras duras y las barreras blandas (o administrativas). El primer grupo consta de la eliminación del agente de riesgo, la sustitución por uno de menor exposición o medidas ingenieriles, que buscan administrar la exposición con algún rediseño u organización. Las medidas administrativas constan de diferentes estrategias que puedan cambiar el comportamiento, el cuidado o la visibilidad de la exposición, por último, los elementos de protección personal, que buscan mitigar el daño ante algún posible accidente \citep{niosh2024}.
 
 \begin{figure}[h]
     \centering
@@ -185,7 +185,7 @@ En este estudio se empleó un modelo supervisado de clasificación, con el objet
 
 \subsection{Evaluación de los modelos de Machine Learning}
 
-Para evaluar el rendimiento del modelo se utilizaron métricas ampliamente empleadas en problemas de clasificación binaria, tales como la exactitud (\textit{accuracy}), la precisión (\textit{precision}), la sensibilidad (\textit{recall}) y la medida F1 (\textit{F1-score}) \citep{manning2008}. La exactitud representa el porcentaje total de predicciones correctas sobre el total de casos evaluados. La precisión corresponde a la proporción de casos positivos correctamente identificados por el modelo, es decir, el número de verdaderos positivos dividido por el total de predicciones positivas. Por su parte, la sensibilidad —también conocida como \textit{recall}— mide la capacidad del modelo para identificar correctamente todos los casos positivos reales, dividiendo los verdaderos positivos por el total de casos positivos reales. La medida F1, en tanto, es la media armónica entre precisión y sensibilidad, y proporciona una visión equilibrada del desempeño del modelo cuando es necesario considerar tanto los errores por omisión como los errores por comisión.
+Para evaluar el rendimiento del modelo se utilizaron métricas ampliamente empleadas en problemas de clasificación binaria, tales como la exactitud (\textit{accuracy}), la precisión (\textit{precision}), la recuperación (\textit{recall}) y la medida F1 (\textit{F1-score}) \citep{manning2008}. La exactitud representa el porcentaje total de predicciones correctas sobre el total de casos evaluados. La precisión corresponde a la proporción de casos positivos correctamente identificados por el modelo, es decir, el número de verdaderos positivos dividido por el total de predicciones positivas. Por su parte, la recuperación —también conocida como \textit{recall}— mide la capacidad del modelo para identificar correctamente todos los casos positivos reales, dividiendo los verdaderos positivos por el total de casos positivos reales. La medida F1, en tanto, es la media armónica entre precisión y recuperación, y proporciona una visión equilibrada del desempeño del modelo cuando es necesario considerar tanto los errores por omisión como los errores por comisión.
 
 Además, se construyó una matriz de confusión, la cual permite observar el número de aciertos y errores cometidos en cada clase —“ocurre” y “no ocurre”— lo que facilita una evaluación más detallada del comportamiento del modelo. Este análisis es clave para comprender sus limitaciones y fortalezas, especialmente en aplicaciones reales relacionadas con la predicción de accidentes de tránsito.
 
@@ -195,8 +195,8 @@ Las fórmulas utilizadas para el cálculo de estas métricas son las siguientes:
 \begin{aligned}
 \text{Exactitud (Accuracy)} &= \frac{TP + TN}{TP + TN + FP + FN} \\
 \text{Precisión (Precision)} &= \frac{TP}{TP + FP} \\
-\text{Sensibilidad (Recall)} &= \frac{TP}{TP + FN} \\
-\text{Medida F1 (F1-score)} &= 2 \cdot \frac{\text{Precisión} \cdot \text{Sensibilidad}}{\text{Precisión} + \text{Sensibilidad}}
+\text{Recuperación (Recall)} &= \frac{TP}{TP + FN} \\
+\text{Medida F1 (F1-score)} &= 2 \cdot \frac{\text{Precisión} \cdot \text{Recuperación}}{\text{Precisión} + \text{Recuperación}}
 \end{aligned}
 \]
 
@@ -210,7 +210,7 @@ Para abordar problemas de clasificación binaria, como la predicción de ocurren
 
 \textbf{XGBoost} (\textit{Extreme Gradient Boosting}), es un algoritmo basado en el método de \textit{boosting}, donde los árboles son construidos de manera secuencial. A diferencia del \textit{bagging}, el \textit{boosting} busca corregir los errores cometidos por los modelos anteriores, ajustando cada nuevo árbol a los residuos del conjunto anterior. XGBoost optimiza una función de pérdida regularizada utilizando técnicas avanzadas como la poda previa, el manejo eficiente de valores faltantes y una implementación paralelizada, lo que lo convierte en uno de los algoritmos más eficientes y precisos en clasificación tabular \citep{chen2016xgboost}.
 
-Ambos algoritmos permiten capturar relaciones no lineales y complejas entre las variables predictoras y la variable objetivo, siendo adecuados para trabajar con datos heterogéneos, como los recopilados desde fuentes de tráfico urbano. En la etapa de desarrollo se aplicaron ambos modelos para comparar su desempeño predictivo sobre el conjunto de datos estudiado.
+Los algoritmos permiten capturar relaciones no lineales y complejas entre las variables predictoras y la variable objetivo, siendo adecuados para trabajar con datos heterogéneos, como los recopilados desde fuentes de tráfico urbano. En la etapa de desarrollo se aplicaron los modelos para comparar su desempeño predictivo sobre el conjunto de datos estudiado.
 
 \subsection{Análisis geoespacial}
 
@@ -220,7 +220,7 @@ Para llevar a cabo análisis espaciales cuantitativos sobre los eventos reportad
 
 La transformación se realizó utilizando la proyección Transversa de Mercator (Transverse Mercator), en su implementación como zona UTM 19 Sur (EPSG:32719). Esta proyección es conforme y está basada en el elipsoide WGS84, con un meridiano central en $\lambda_0 = -69^\circ$, un factor de escala $k_0 = 0.9996$, y un falso este de $500\,000$ m. Para el hemisferio sur, además, se aplica una corrección vertical de $10\,000\,000$ m a la coordenada norte. Esto se detalla en el Apéndice~\ref{ap:utm}.
 
-Esta transformación se aplicó mediante la función \texttt{to\_crs} de la librería \texttt{GeoPandas}, la cual utiliza internamente la librería \texttt{Pyproj} como interfaz con la librería PROJ \citep{gdal_proj, pyproj, geopandas}.
+Esta transformación se aplicó mediante la función \texttt{to\_crs} de la librería \texttt{GeoPandas}, la cual utiliza internamente la librería \texttt{Pyproj} como interfaz de la librería PROJ \citep{gdal_proj, pyproj, geopandas}.
 
 La elección de EPSG:32719 permite minimizar la distorsión local, ya que el sistema UTM divide el globo en zonas longitudinales estrechas, optimizando la precisión en cada región. Al ser una proyección conforme y métrica, asegura que las distancias, áreas y densidades calculadas sobre el plano proyectado sean válidas y consistentes con el Sistema Internacional de Unidades \citep{epsg32719}.
 
@@ -243,7 +243,7 @@ Más recientemente, \citet{berhanu2024} aplicaron aprendizaje automático y aná
 
 \section{Desarrollo}
 
-Se diseña una estrategia de recolección de datos que garantiza información con un nivel adecuado de certeza. La API de Waze Cities, que proporciona información en tiempo real sobre eventos activos, fue la fuente principal de datos. Para lograr un volumen de datos representativo, se implementó un servidor encargado de recopilar y almacenar esta información de manera continua. El servidor fue desarrollado en \texttt{Rust}, utilizando la librería reqwest \citep{reqwest2025} para extraer los datos desde la API de Waze Cities. Se recolectan los eventos de tráfico y se almacenan en una base de datos PostgreSQL. Este servidor se ejecuta de manera continua actualizando la información cada 2 minutos. La estructura de la base de datos se muestra en la \cref{fig:db_diagram}.
+Se diseña una estrategia de recolección de datos que garantiza información con un nivel de certeza conocido. La API de Waze Cities, que proporciona información en tiempo real sobre eventos activos, fue la fuente principal de datos. Para lograr un volumen de datos representativo, se implementó un servidor encargado de recopilar y almacenar esta información de manera continua. El servidor fue desarrollado en \texttt{Rust}, utilizando la librería reqwest \citep{reqwest2025} para extraer los datos desde la API de Waze Cities. Se recolectan los eventos de tráfico y se almacenan en una base de datos PostgreSQL. Este servidor se ejecuta de manera continua actualizando la información cada 2 minutos. La estructura de la base de datos se muestra en la \cref{fig:db_diagram}.
 
 \begin{figure}[H]
     \centering
@@ -254,11 +254,12 @@ Se diseña una estrategia de recolección de datos que garantiza información co
 
 Existen dos estructuras principales, las alertas (\texttt{alerts}) y las congestiones (\texttt{jams}), el primero registra todos los eventos reportados por usuarios, tales como peligros, accidentes, congestión o rutas cerradas. En el caso de los eventos de congestión, son datos generados automáticamente por Waze, los cuales usando la geolocalización, estiman congestiones en diferentes puntos de la ciudad. Para este proyecto, se utiliza la información de las alertas. Sin embargo, se almacenaron los datos de congestión, para un posterior análisis, que está fuera del alcance de este estudio. Esta estructura se definió con base en los datos relevantes y completos que proporciona la API, los tipos de datos disponibles pueden ser consultados en la documentación de Waze \citep{waze2024}.
 
-Desde octubre de 2024 hasta abril de 2025, se capturan 32,354 alertas, las cuales se analizarán a lo largo de este estudio.
+Desde octubre de 2024 hasta abril de 2025, se capturan 53,159 alertas, que al ser filtradas (ver \label{ssec:filter}), finalmente se obtienen 26,336, las cuales se analizarán a lo largo de este estudio.
 
-\subsection{Filtrado temporal y agrupación de eventos}
 
-Las alertas pueden contener duplicados, debido a que diferentes usuarios pueden reportar el mismo evento. Para evitar esto, se filtraron los datos agrupándolos por segmento (\cref{ssec:freq_zone}) y periodos de tiempo, eliminando grupos duplicados en una ventana de tiempo de 120 minutos, es decir, todo evento que se reportó con el mismo tipo, en el mismo segmento, dentro de un periodo de dos horas, será considerado como un solo evento. Este procedimiento, resumido en el \cref{alg:filter}, permite homogeneizar la granularidad temporal de los eventos y asegurar la consistencia tipológica de los atributos (\texttt{group}, \texttt{type}). El código fuente completo se presenta en el Anexo~\ref{annex:filter_code}.
+\subsection{Filtrado temporal y agrupación de eventos} \label{ssec:filter}
+
+Las alertas pueden contener duplicados, debido a que diferentes usuarios pueden reportar el mismo evento. Para evitar esto, se filtraron los datos agrupándolos por segmento (\cref{ssec:freq_zone}) y periodos de tiempo, eliminando grupos duplicados en una ventana de tiempo de 120 minutos, es decir, todo evento que se reportó con el mismo tipo, en el mismo segmento, dentro de un periodo de dos horas, será considerado como un solo evento. Este procedimiento, resumido en el \cref{alg:filter}, permite homogeneizar la granularidad temporal de los eventos y asegurar la consistencia tipológica de los atributos (\texttt{group}, \texttt{type}). El código fuente completo se presenta en el Apéndice~\ref{annex:filter_code}.
 
 De este modo, el filtro actúa como un mecanismo de depuración de ruido observacional, preservando un único registro representativo por evento real. Aunque esta consolidación produce una ligera disminución en las métricas de desempeño (\texttt{ROC AUC} y \texttt{F1-score}), el efecto se considera metodológicamente favorable, ya que aumenta la consistencia temporal y evita el sesgo hacia zonas con mayor densidad de usuarios o reportes. En consecuencia, el modelo resultante refleja con mayor precisión la ocurrencia efectiva de incidentes de tráfico, en lugar de su frecuencia de reporte.
 
@@ -677,7 +678,7 @@ En el \cref{tab:model-comparison} se puede observar la comparación de los model
 
 \begin{table}[H]
 \centering
-\begin{tabular}{|l|p{7.5cm}|c|c|}
+\begin{tabular}{|l|p{6.5cm}|c|c|}
 \hline
 \textbf{Modelo} & \textbf{Mejores Hiperparámetros} & \textbf{ROC AUC} & \textbf{PR AUC} \\
 \hline
@@ -719,16 +720,16 @@ Los gráficos de la curva ROC están representados en la \cref{fig:ROC} y de la 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.38\textwidth]{images/ROC.png}
+    \includegraphics[width=0.9\textwidth]{images/ROC.png}
     \caption{Curvas ROC}
     \label{fig:ROC}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.38\textwidth]{images/Precision-Recall.png}
+    \includegraphics[width=0.9\textwidth]{images/Precision-Recall.png}
     \caption{Curvas Precision-Recall}
-    \label{fig:prce-recall}
+    \label{fig:prec-recall}
 \end{figure}
 
 \subsection{Generación de eventos negativos simulados} \label{ssec:class_balancing}
@@ -741,7 +742,7 @@ En este contexto, la generación de eventos negativos se basa en una grilla temp
 
 Este enfoque permite preservar la estructura temporal y geoespacial de los datos reales, evitando introducir ruido artificial y facilitando una evaluación más robusta de métricas de desempeño como \texttt{recall} y \texttt{precision}.
 
-El procedimiento se resume en el \cref{alg:neg_events}. El código completo se incluye en el Anexo~\ref{annex:neg_code}.
+El procedimiento se resume en el \cref{alg:neg_events}. El código completo se incluye en el Apéndice~\ref{annex:neg_code}.
 
 \begin{algorithm}[H]
 \caption{Generación de eventos negativos artificiales}
@@ -768,7 +769,7 @@ La versión final del modelo (\texttt{v6}) se entrenó utilizando los hiperpará
 El modelo utiliza codificación \textit{one-hot} y un esquema de clasificación binaria (\texttt{binary: logistic}), con una semilla aleatoria (\texttt{random\_state = 42}) para garantizar la reproducibilidad \citep{geron2019hands}
 
 
-\noindent En cuanto al rendimiento, se obtuvieron los siguientes resultados para una muestra de 64,708 eventos, con un 50\% de eventos ocurridos y un 50\% de no ocurridos. Esta proporción se logró mediante la simulación de eventos negativos sobre una grilla temporal de 5 minutos, generando combinaciones posibles de tiempo, localización y tipo de evento que no están presentes en los datos originales (\cref{ssec:class_balancing}). Esto permite evaluar el modelo en condiciones balanceadas, facilitando la interpretación de métricas como \texttt{precision}, \texttt{recall} y \texttt{F1-score}.
+\noindent En cuanto al rendimiento, se obtuvieron los siguientes resultados para una muestra de 52,672 eventos, con un 50\% de eventos ocurridos y un 50\% de no ocurridos. Esta proporción se logró mediante la simulación de eventos negativos sobre una grilla temporal de 5 minutos, generando combinaciones posibles de tiempo, localización y tipo de evento que no están presentes en los datos originales (\cref{ssec:class_balancing}). Esto permite evaluar el modelo en condiciones balanceadas, facilitando la interpretación de métricas como \texttt{precision}, \texttt{recall} y \texttt{F1-score}.
 
 \begin{itemize}
     \item \textbf{Accuracy}: 0.8795
@@ -806,7 +807,7 @@ La \cref{fig:learning_curve} muestra la curva de aprendizaje del modelo XGBoost 
 
 Para entregar una interfaz que permita al usuario final interactuar con los datos, se desarrolló un tablero de control utilizando \texttt{Dash}, un marco de trabajo especializado en la presentación de datos gráficos mediante Python. La arquitectura del sistema se diseñó siguiendo el patrón cliente-servidor: el servidor implementado en Rust y el cliente en Python, como se muestra en la \cref{fig:architecture}. El servidor se encarga de las operaciones intensivas como la captura, transformación, almacenamiento y gestión del caché de los datos, mientras que el cliente maneja la interacción con el usuario, la actualización de datos desde el servidor, el entrenamiento del modelo y la generación del tablero de control.
 
-El ciclo de vida del modelo se gestiona mediante APScheduler. Esto permite automatizar el re-entrenamiento periódico del modelo con nuevos datos, garantizando su actualización y adaptación a los cambios en los patrones de tráfico. El proceso incluye la validación automática del rendimiento del modelo, comparando las métricas clave (precisión, recall, F1-score) con los umbrales establecidos, y solo se despliega una nueva versión si representa una mejora en el F1-score.
+El ciclo de vida del modelo se gestiona mediante APScheduler. Esto permite automatizar el reentrenamiento periódico del modelo con nuevos datos, garantizando su actualización y adaptación a los cambios en los patrones de tráfico.
 
 En el servidor se utiliza Memcached como sistema de caché para optimizar el acceso a los datos frecuentemente consultados, implementando una estrategia de almacenamiento que prioriza la unicidad de los datos para minimizar el uso de memoria. En el lado del cliente, se implementa un sistema de workers múltiples que comparten una única instancia de los datos en memoria, protegida mediante un \texttt{Mutex} para garantizar la integridad en las operaciones de lectura concurrentes.
 
@@ -935,6 +936,51 @@ Estas expresiones corresponden a un desarrollo en serie basado en una expansión
 
 La implementación computacional de estas fórmulas puede realizarse utilizando bibliotecas como \texttt{Pyproj}, que encapsulan estos desarrollos y gestionan automáticamente los parámetros de cada sistema de referencia (CRS).
 
+\section{Código fuente: Filtrado temporal y agrupación de eventos}
+\label{annex:filter_code}
+
+\begin{minted}[fontsize=\footnotesize,breaklines,frame=lines]{python}
+def filter_by_group_time(self, timedelta_min: int, inplace: bool = False) -> gpd.GeoDataFrame | pd.DataFrame:
+    """
+    Filter and group data by time intervals.
+    """
+    if self.data is None or "pub_millis" not in self.data.columns:
+        return pd.DataFrame()
+
+    data = self.data.copy() if not inplace else self.data
+
+    if not np.issubdtype(data["pub_millis"].dtype, np.integer):
+        data["pub_millis"] = round(data["pub_millis"].astype(np.int64, errors="ignore") / 1_000_000).astype(np.int64)
+
+    step = np.int64(60_000 * timedelta_min)
+    data["interval_start"] = ((data["pub_millis"]).to_numpy() // step) * step
+
+    data["interval_start"] = pd.to_datetime(data["interval_start"], unit="ms", utc=True)
+    data["interval_start"] = data["interval_start"].dt.tz_convert(utils.TZ)
+
+    data["group"] = data["group"].astype(np.int16)
+    data["type"] = data["type"].astype(str)
+
+    data.drop_duplicates(subset=["interval_start", "group", "type"], inplace=True)
+    data.drop(columns=["interval_start"], inplace=True)
+
+    if not pd.api.types.is_datetime64_any_dtype(data["pub_millis"]):
+        data["pub_millis"] = pd.to_datetime(data["pub_millis"], unit="ms", utc=True)
+        data["pub_millis"] = data["pub_millis"].dt.tz_convert(utils.TZ)
+
+    data.reset_index(drop=True, inplace=True)
+    return data
+\end{minted}
+
+\url{https://github.com/richardhapb/antof-traffic-client/blob/72c1e2cea730670bffb58f0844cd71d1888481df/src/analytics/alerts.py#L100}
+
+\noindent\textbf{Nota:}
+La función utiliza la zona horaria definida en el módulo \texttt{utils.TZ} y mantiene la consistencia tipológica de las columnas de entrada.
+
+\url{https://github.com/richardhapb/antof-traffic-client/blob/72c1e2cea730670bffb58f0844cd71d1888481df/src/utils/utils.py#L27}
+
+\newpage
+
 \section{Código fuente: Generación de eventos negativos}
 \label{annex:neg_code}
 
@@ -978,53 +1024,14 @@ def generate_neg_simulated_data(data: pd.DataFrame | GeoDataFrame, geodata: str 
     return alerts.data
 \end{minted}
 
+\url{https://github.com/richardhapb/antof-traffic-client/blob/72c1e2cea730670bffb58f0844cd71d1888481df/src/analytics/ml.py#L172}
+
 \noindent\textbf{Nota:}
 Las funciones \texttt{join\_coords()} y \texttt{generate\_aggregate\_data()} son funciones auxiliares definidas en el módulo \texttt{utils}, utilizadas para concatenar coordenadas geográficas y agregar estadísticas por grupo usadas en el modelo final, respectivamente.
 
-\url{https://github.com/richardhapb/antof-traffic-client/blob/main/src/utils/utils.py} \\
-\url{https://github.com/richardhapb/antof-traffic-client/blob/main/src/analytics/ml.py}
+\url{https://github.com/richardhapb/antof-traffic-client/blob/72c1e2cea730670bffb58f0844cd71d1888481df/src/utils/utils.py#L260} \\
+\url{https://github.com/richardhapb/antof-traffic-client/blob/72c1e2cea730670bffb58f0844cd71d1888481df/src/utils/utils.py#L95}
 \newpage
-
-\section{Código fuente: Filtrado temporal y agrupación de eventos}
-\label{annex:filter_code}
-
-\begin{minted}[fontsize=\footnotesize,breaklines,frame=lines]{python}
-def filter_by_group_time(self, timedelta_min: int, inplace: bool = False) -> gpd.GeoDataFrame | pd.DataFrame:
-    """
-    Filter and group data by time intervals.
-    """
-    if self.data is None or "pub_millis" not in self.data.columns:
-        return pd.DataFrame()
-
-    data = self.data.copy() if not inplace else self.data
-
-    if not np.issubdtype(data["pub_millis"].dtype, np.integer):
-        data["pub_millis"] = round(data["pub_millis"].astype(np.int64, errors="ignore") / 1_000_000).astype(np.int64)
-
-    step = np.int64(60_000 * timedelta_min)
-    data["interval_start"] = ((data["pub_millis"]).to_numpy() // step) * step
-
-    data["interval_start"] = pd.to_datetime(data["interval_start"], unit="ms", utc=True)
-    data["interval_start"] = data["interval_start"].dt.tz_convert(utils.TZ)
-
-    data["group"] = data["group"].astype(np.int16)
-    data["type"] = data["type"].astype(str)
-
-    data.drop_duplicates(subset=["interval_start", "group", "type"], inplace=True)
-    data.drop(columns=["interval_start"], inplace=True)
-
-    if not pd.api.types.is_datetime64_any_dtype(data["pub_millis"]):
-        data["pub_millis"] = pd.to_datetime(data["pub_millis"], unit="ms", utc=True)
-        data["pub_millis"] = data["pub_millis"].dt.tz_convert(utils.TZ)
-
-    data.reset_index(drop=True, inplace=True)
-    return data
-\end{minted}
-
-\noindent\textbf{Nota:}
-La función utiliza la zona horaria definida en el módulo \texttt{utils.TZ} y mantiene la consistencia tipológica de las columnas de entrada.
-\newpage
-
 
 \bibliography{biblio}
 \end{document}
