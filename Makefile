@@ -1,8 +1,8 @@
-.PHONY: all re clean
+.PHONY: all re clean deps
 
 TEX		 := xelatex
 TEXFLAGS ?= -interaction=nonstopmode -halt-on-error -shell-escape
-BIB		 ?= bibtex
+BIB		 ?= biber
 
 SRCDIR	 := thesis
 JOB		 := thesis
@@ -32,6 +32,10 @@ re:
 		$(BIB) $(OUTDIR)/$(JOB) && \
 		$(TEX) -output-directory=$(OUTDIR) $(TEXFLAGS) $(JOB).tex && \
 		$(TEX) -output-directory=$(OUTDIR) $(TEXFLAGS) $(JOB).tex
+
+deps:
+	sudo tlmgr update --self
+	sudo tlmgr install xurl hyperref babel-spanish csquotes natbib url
 
 clean:
 	rm -rf $(SRCDIR)/$(OUTDIR)
