@@ -64,6 +64,8 @@
 
 \begin{document}
 
+\pagenumbering{gobble}
+
 \title{\ttitle}
 \author{\auth}
 \date{\today}
@@ -83,7 +85,10 @@ A los profesores apasionados por su trabajo, que no solo transmiten conocimiento
 \listoftables
 \newpage
 
-\section*{Resumen}
+\section{Resumen}
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
 
 El proyecto desarrollado tuvo como propósito la creación de una herramienta efectiva para analizar y predecir, con alta confiabilidad, el comportamiento del tráfico vehicular en la ciudad de Antofagasta, utilizando datos provenientes de la plataforma Waze Cities. Esta plataforma, alimentada por su comunidad de usuarios, proporciona información en tiempo real que permite obtener una visión detallada de los eventos de tráfico en la ciudad. La investigación resultante generó información relevante para la gestión del tráfico, facilitando la toma de decisiones por parte de las autoridades locales, con miras a mejorar la seguridad vial y optimizar la eficiencia del flujo vehicular. A partir del análisis y explotación de estos datos, fue posible identificar patrones y tendencias que, al ser integrados en la planificación urbana, permiten optimizar rutas críticas, reducir la congestión y disminuir la probabilidad de accidentes.
 
@@ -219,13 +224,15 @@ donde \( TP \) son los verdaderos positivos, \( TN \) los verdaderos negativos, 
 
 \subsection{Algoritmos de clasificación: Random Forest, Logistic Regression y XGBoost}
 
-Para abordar problemas de clasificación binaria, como la predicción de ocurrencia o no ocurrencia de eventos de tráfico, se utilizaron algoritmos de aprendizaje supervisado. En particular, se emplearon los métodos \textit{Random Forest} y \textit{XGBoost}, los cuales han demostrado un alto rendimiento en tareas de clasificación estructurada \parencite{friedman2001elements, chen2016xgboost}.
+Para abordar problemas de clasificación binaria, como la predicción de ocurrencia o no ocurrencia de eventos de tráfico, se utilizaron algoritmos de aprendizaje supervisado. En particular, se emplearon los métodos \textit{Random Forest}, \textit{Logistic Regression} y \textit{XGBoost}, los cuales han demostrado un alto rendimiento en tareas de clasificación estructurada \parencite{friedman2001elements, chen2016xgboost, hosmer2013applied}.
 
 \textbf{Random Forest} es un algoritmo basado en el principio del ensamblado de modelos, específicamente mediante la construcción de múltiples árboles de decisión. Cada árbol es entrenado sobre una muestra aleatoria del conjunto de datos (con reemplazo), y en cada nodo del árbol se selecciona una subdivisión óptima a partir de un subconjunto aleatorio de características. Esta técnica, conocida como \textit{bagging} (bootstrap aggregating), permite reducir la varianza del modelo y mejorar su capacidad de generalización. La predicción final se obtiene mediante votación mayoritaria entre todos los árboles del conjunto \parencite{breiman2001random}.
 
-\textbf{XGBoost} (\textit{Extreme Gradient Boosting}), es un algoritmo basado en el método de \textit{boosting}, donde los árboles son construidos de manera secuencial. A diferencia del \textit{bagging}, el \textit{boosting} busca corregir los errores cometidos por los modelos anteriores, ajustando cada nuevo árbol a los residuos del conjunto anterior. XGBoost optimiza una función de pérdida regularizada utilizando técnicas avanzadas como la poda previa, el manejo eficiente de valores faltantes y una implementación paralelizada, lo que lo convierte en uno de los algoritmos más eficientes y precisos en clasificación tabular \parencite{chen2016xgboost}.
+\textbf{Logistic Regression} es uno de los modelos estadísticos más utilizados para tareas de clasificación binaria. Se basa en la estimación de la probabilidad de pertenencia a una clase mediante la función logística o sigmoide, que transforma una combinación lineal de las variables predictoras en valores comprendidos entre 0 y 1. Este enfoque permite interpretar los coeficientes del modelo como efectos marginales sobre la probabilidad de ocurrencia del evento, manteniendo una alta interpretabilidad y simplicidad computacional. No obstante, su desempeño puede verse limitado ante relaciones no lineales o interacciones complejas entre las variables \parencite{hosmer2013applied}.
 
-Los algoritmos permiten capturar relaciones no lineales y complejas entre las variables predictoras y la variable objetivo, siendo adecuados para trabajar con datos heterogéneos, como los recopilados desde fuentes de tráfico urbano. En la etapa de desarrollo se aplicaron los modelos para comparar su desempeño predictivo sobre el conjunto de datos estudiado.
+\textbf{XGBoost} (\textit{Extreme Gradient Boosting}) es un algoritmo basado en el método de \textit{boosting}, donde los árboles son construidos de manera secuencial. A diferencia del \textit{bagging}, el \textit{boosting} busca corregir los errores cometidos por los modelos anteriores, ajustando cada nuevo árbol a los residuos del conjunto anterior. XGBoost optimiza una función de pérdida regularizada utilizando técnicas avanzadas como la poda previa, el manejo eficiente de valores faltantes y una implementación paralelizada, lo que lo convierte en uno de los algoritmos más eficientes y precisos en clasificación tabular \parencite{chen2016xgboost}.
+
+Estos algoritmos permiten capturar relaciones tanto lineales como no lineales entre las variables predictoras y la variable objetivo, siendo adecuados para trabajar con datos heterogéneos, como los recopilados desde fuentes de tráfico urbano. En la etapa de desarrollo se aplicaron los modelos para comparar su desempeño predictivo sobre el conjunto de datos estudiado.
 
 \subsection{Análisis geoespacial}
 
@@ -897,6 +904,10 @@ Estas recomendaciones buscan fortalecer una gestión vial proactiva y basada en 
 \newpage
 
 \appendix
+
+\pagenumbering{Alph}
+\setcounter{page}{1}
+
 \section{Transformación de coordenadas UTM}
 \label{ap:utm}
 
