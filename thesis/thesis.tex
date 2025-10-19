@@ -282,11 +282,27 @@ Para la gestión del modelo, en cuanto a su implementación, mantenimiento y act
 
 \subsection{Investigaciones previas}
 
-El análisis del tráfico vehicular y la predicción de accidentes han sido objeto de múltiples estudios en los últimos años. Por ejemplo, \parencite{barcelo2005} exploraron simulaciones dinámicas de redes de tráfico utilizando AIMSUN, destacando su capacidad para modelar escenarios urbanos complejos. Por otro lado, \parencite{vanlint2005} desarrollaron modelos basados en redes neuronales para predecir tiempos de viaje en autopistas, incluso en condiciones de datos faltantes, demostrando la utilidad de enfoques basados en aprendizaje automático.
+La literatura sobre análisis y predicción del tráfico urbano integra tres líneas principales: (i) \textit{fuentes de datos colaborativas y en tiempo real} para caracterizar el estado de la red; (ii) \textit{modelos predictivos} (estadísticos y de aprendizaje automático) para estimar riesgo/ocurrencia de incidentes; y (iii) \textit{métodos geo–espaciotemporales} para identificar y explicar patrones de concentración. De forma transversal, se estudian estrategias para enfrentar \textit{datos desbalanceados}, \textit{evaluación adecuada de clasificadores} y \textit{actualización continua} ante \textit{concept drift}.
 
-En el ámbito de la gestión de tráfico basada en datos, \parencite{chen2015} propusieron enfoques impulsados por datos para la predicción y gestión del tráfico, enfatizando la importancia de integrar fuentes de datos en tiempo real. Asimismo, \parencite{goedertier2009robust} introdujeron técnicas para descubrir procesos robustos mediante eventos negativos artificiales, lo que permite abordar problemas de clasificación supervisada en contextos de tráfico.
+\paragraph{Datos colaborativos y analítica en tiempo real.}
+El uso de plataformas de reporte ciudadano (como Waze) y fuentes heterogéneas ha mostrado ser efectivo para caracterizar congestión y siniestralidad a escala urbana, permitiendo alimentar gemelos digitales y tableros operacionales con latencias bajas \parencite{chen2015, ferreira2017waze, wazecitiescasestudies2024}. Trabajos con simuladores meso/microscópicos (p.\,ej., AIMSUN) han servido para validar escenarios y políticas de control bajo supuestos realistas de demanda y oferta \parencite{barcelo2005}.
 
-Más recientemente, \parencite{berhanu2024} aplicaron aprendizaje automático y análisis espacial para predecir accidentes de tráfico y optimizar rutas en redes urbanas congestionadas, destacando la relevancia de combinar modelos predictivos con análisis geoespacial.
+\paragraph{Modelos predictivos de incidentes.}
+En predicción de accidentes y eventos de tráfico, se han utilizado modelos desde regresiones generalizadas (p.\,ej., binomial negativa para frecuencias) hasta \textit{ensemble} (Random Forest, Gradient Boosting/XGBoost) y redes neuronales, reportándose ventajas consistentes de los métodos no lineales frente a relaciones complejas entre variables \parencite{lord2010crashfreq, chen2016xgboost, vanlint2005, berhanu2024}. Dado el interés práctico por interpretabilidad, técnicas de explicación pos–hoc como \textit{SHAP} permiten descomponer la contribución de variables y favorecer decisiones de gestión con trazabilidad \parencite{lundberg2017shap}.
+
+\paragraph{Análisis espacial y espaciotemporal.}
+La identificación de \textit{hotspots} de siniestralidad se ha abordado mediante estimación de densidad por núcleo (KDE) en red vial y pruebas de autocorrelación espacial (Moran's I, LISA) y de clústeres locales (Getis–Ord $G_i^*$), así como agrupamiento espaciotemporal (ST–DBSCAN) para capturar persistencia temporal y proximidad espacial de incidentes \parencite{xie2013kde, moran1950, anselin1995lisa, getis1992, birant2007stdbscan}. Estas herramientas complementan la modelación predictiva al ofrecer una lectura geométrica de la exposición y permiten priorizar intervenciones.
+
+\paragraph{Desbalance de clases y generación de no–eventos.}
+En problemas de seguridad vial es común el desbalance positivo/negativo. La literatura recomienda tanto \textit{reponderación} de clases como \textit{resampling} (p.\,ej., SMOTE) y, cuando no existen registros negativos explícitos, la generación controlada de no–eventos a partir de la combinación de rejillas temporales y segmentación espacial, cuidando la consistencia con el proceso generativo \parencite{chawla2002smote, goedertier2009robust}. En este trabajo se adopta una estrategia 1:1 de eventos simulados negativos, coherente con enfoques previos para clasificar ocurrencia/no–ocurrencia bajo restricciones espaciotemporales.
+
+\paragraph{Evaluación de clasificadores en escenarios desbalanceados.}
+Además de la curva ROC–AUC, la literatura recomienda la curva Precision–Recall (PR–AUC) por su mayor sensibilidad a la clase positiva cuando es minoritaria \parencite{saito2015}. La comparación de modelos debe considerar ambas métricas y, cuando sea posible, análisis de \textit{calibración} de probabilidades y matrices de costo específicas del dominio.
+
+\paragraph{Actualización y deriva de concepto.}
+Los patrones de tráfico presentan estacionalidad y cambios estructurales (obras viales, demografía, hábitos de movilidad), por lo que los modelos requieren políticas explícitas de reentrenamiento y monitoreo de desempeño para mitigar \textit{concept drift} \parencite{gama2014concept}. La práctica de versionar modelos y registrar métricas/h\_params facilita trazabilidad y gobierno del ciclo de vida.
+
+En síntesis, el estado del arte respalda el uso de fuentes colaborativas, aprendizaje automático no lineal e instrumentos geo–espaciotemporales para comprender y predecir eventos de tráfico. Este estudio se alinea con dichas evidencias: integra datos colaborativos (Waze), compara algoritmos (Regresión Logística, Random Forest, XGBoost), aplica métodos espaciales y enfrenta el desbalance mediante no–eventos simulados y métricas apropiadas (ROC–AUC y PR–AUC).
 
 \section{Desarrollo}
 
@@ -346,7 +362,7 @@ De este modo, el filtro actúa como un mecanismo de depuración de ruido observa
 
 \subsection{Eventos en el espacio y tiempo}
 
-En la \autoref{fig:dist_events} se observa la distribución espacial de los distintos tipos de eventos en la ciudad. Se aprecia una mayor concentración en las principales avenidas, especialmente en el caso de los accidentes, los cuales tienden a ocurrir con mayor frecuencia en los cruces de estas arterias.
+En la \autoref{fig:dist_events} se observa la distribución espacial de los distintos tipos de eventos en la ciudad. Desde una perspectiva general se aprecian concentraciones en determinadas zonas de la ciudad, las cuales serán analizadas en futuros gráficos.
 
 \begin{figure}[H]
     \centering
@@ -874,33 +890,41 @@ Estas métricas evidencian un modelo con gran capacidad para identificar correct
 
 \subsection{Curva de aprendizaje del modelo}
 
-La \autoref{fig:learning_curve} muestra la curva de aprendizaje del modelo XGBoost entrenado. Se observa un rendimiento alto y consistente tanto en el conjunto de entrenamiento como en el de validación (aproximadamente 0.88–0.90), con una brecha mínima entre ambas curvas. Esto indica que el modelo generaliza adecuadamente, sin presentar sobreajuste ni subajuste. Además, el comportamiento plano de ambas curvas sugiere que incrementar el tamaño del conjunto de entrenamiento no tendría un impacto significativo en el rendimiento, lo cual evidencia una saturación en la capacidad de aprendizaje del modelo con las características actuales \parencite{raschka2018,chen2015}.
+La \autoref{fig:learning_curve} presenta la curva de aprendizaje del modelo \textit{XGBoost} entrenado. Se observa un desempeño alto y estable tanto en el conjunto de entrenamiento como en el de validación (valores de exactitud entre 0.80 y 0.89), con una brecha reducida y constante entre ambas curvas.
+
+Este comportamiento indica que el modelo ha alcanzado un nivel de generalización adecuado, sin evidencias de sobreajuste ni subajuste. Además, la forma aproximádamente horizontal de las curvas sugiere que el incremento del tamaño del conjunto de entrenamiento no produciría mejoras significativas en el rendimiento, lo que refleja una saturación en la capacidad de aprendizaje con las características actuales \parencite{raschka2018, chen2015}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{images/learning_curve.png}
-    \caption{Curva de aprendizaje del modelo XGBoost: desempeño en entrenamiento y validación.}
+    \caption{Curva de aprendizaje del modelo \textit{XGBoost}: desempeño en entrenamiento con validación cruzada estratificada de 20 particiones.}
     \label{fig:learning_curve}
 \end{figure}
 
-% Aplicación implementación (dashboard online y ML)
+El entrenamiento del modelo está programado para realizarse cada 30 días, utilizando los nuevos datos. Los datos del dashboard se actualizan cada 5 minutos.
 
-\subsection{Despliegue y mantenimiento del modelo}
+\subsection{Despliegue del modelo y panel de visualización}
 
-Para entregar una interfaz que permita al usuario final interactuar con los datos, se desarrolló un tablero de control utilizando \texttt{Dash}, un marco de trabajo especializado en la presentación de datos gráficos mediante Python. La arquitectura del sistema se diseñó siguiendo el patrón cliente-servidor: el servidor implementado en Rust y el cliente en Python, como se muestra en la \autoref{fig:architecture}. El servidor se encarga de las operaciones intensivas como la captura, transformación, almacenamiento y gestión del caché de los datos, mientras que el cliente maneja la interacción con el usuario, la actualización de datos desde el servidor, el entrenamiento del modelo y la generación del tablero de control.
+Con el objetivo de facilitar la interpretación de los resultados y el uso práctico del modelo predictivo, se desarrolló un \textit{dashboard} interactivo que integra tanto los análisis descriptivos como las predicciones generadas por el sistema. En la \autoref{fig:dashboard_general} se presenta una vista global del panel; en particular, la sección de análisis descriptivo se ilustra en la \autoref{fig:dash_descriptivo} y la sección dedicada al modelo predictivo en la \autoref{fig:dash_predictivo}.
 
-El ciclo de vida del modelo se gestiona mediante APScheduler. Esto permite automatizar el reentrenamiento periódico del modelo con nuevos datos, garantizando su actualización y adaptación a los cambios en los patrones de tráfico.
+El \textit{dashboard} fue implementado en \textit{Python} utilizando el framework \textit{Dash}, integrando directamente los resultados del modelo \textit{XGBoost} con componentes visuales interactivos. La interfaz cuenta con filtros por calle y rango de fechas, posibilitando una exploración detallada de los eventos registrados. En la sección predictiva, el usuario puede ajustar los parámetros de entrada —como fecha, hora y tipo de evento (accidente, congestión u peligro)— para obtener proyecciones específicas del comportamiento del tráfico.
 
-En el servidor se utiliza Memcached como sistema de caché para optimizar el acceso a los datos frecuentemente consultados, implementando una estrategia de almacenamiento que prioriza la unicidad de los datos para minimizar el uso de memoria. En el lado del cliente, se implementa un sistema de workers múltiples que comparten una única instancia de los datos en memoria, protegida mediante un \texttt{Mutex} para garantizar la integridad en las operaciones de lectura concurrentes.
+El sistema se encuentra desplegado en línea y disponible públicamente a través del sitio web \url{https://traficoantofagasta.com}. La estructura técnica y la arquitectura del sistema (cliente y \textit{backend}) se describen de forma general en el \autoref{annex:dashboard}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{images/dashboard.png}
-    \caption{Arquitectura del sistema}
-    \label{fig:architecture}
+    \subfloat[Sección de análisis descriptivo]{
+        \includegraphics[height=7cm]{images/dash1.png}
+        \label{fig:dash_descriptivo}
+    }
+    \hfill
+    \subfloat[Sección del modelo predictivo]{
+        \includegraphics[height=7cm]{images/dash2.png}
+        \label{fig:dash_predictivo}
+    }
+    \caption{Vista general del \textit{dashboard} desarrollado para el monitoreo y predicción del tráfico vehicular.}
+    \label{fig:dashboard_general}
 \end{figure}
-
-El entrenamiento del modelo está programado para realizarse cada 30 días, utilizando los nuevos datos. Los datos del dashboard se actualizan cada 5 minutos.
 
 \section{Discusiones}
 
@@ -1125,6 +1149,40 @@ Las funciones \texttt{join\_coords()} y \texttt{generate\_aggregate\_data()} son
 Referencias: \\
 \url{https://github.com/richardhapb/antof-traffic-client/blob/72c1e2cea730670bffb58f0844cd71d1888481df/src/utils/utils.py#L260} \\\\
 \url{https://github.com/richardhapb/antof-traffic-client/blob/72c1e2cea730670bffb58f0844cd71d1888481df/src/utils/utils.py#L95}
+
+\newpage
+
+\section{Estructura general del sistema y despliegue}
+\label{annex:dashboard}
+
+El sistema desarrollado se compone de dos componentes principales: un cliente, implementado en \textit{Python}, y un servidor, desarrollado en \textit{Rust}.
+Ambos módulos operan de manera conjunta para procesar los datos de tráfico, ejecutar los modelos de predicción y ofrecer un entorno de visualización accesible mediante un \textit{dashboard} web.
+
+\subsection*{Cliente}
+
+El cliente reúne los análisis exploratorios, la preparación de datos, el entrenamiento de los modelos y la interfaz visual.
+Su estructura principal se divide en los siguientes módulos:
+
+\begin{itemize}
+    \item \textbf{Módulo \texttt{analytics}}: contiene las rutinas de análisis estadístico, correlaciones, agrupamiento y entrenamiento de los modelos predictivos.
+    \item \textbf{Módulo \texttt{dashboard}}: implementa el panel de visualización construido con \textit{Dash}, que integra filtros por calle, fecha y tipo de evento, junto con parámetros ajustables para generar predicciones personalizadas.
+    \item \textbf{Módulo \texttt{utils}}: agrupa funciones auxiliares para la limpieza y exploración de los datos.
+    \item \textbf{Módulo \texttt{waze}}: maneja la ingesta de reportes provenientes de la API de Waze, los cuales sirven como fuente principal del conjunto de datos.
+\end{itemize}
+
+La ejecución del cliente se gestiona mediante el archivo principal \texttt{main.py}, que coordina el flujo completo: desde la carga de datos hasta la visualización final en el \textit{dashboard}.
+El sistema fue configurado para su despliegue con \texttt{gunicorn} y puede ejecutarse tanto en entorno local como remoto.
+
+\subsection*{Servidor}
+
+El servidor fue desarrollado en \textit{Rust} e implementa una arquitectura ligera basada en un servicio web que actúa como intermediario entre el modelo predictivo y la interfaz visual.
+Sus principales responsabilidades incluyen la administración de las solicitudes del \textit{Cliente}, el acceso a la base de datos y la gestión de caché.
+
+\subsection*{Despliegue y acceso}
+
+El sistema completo se encuentra desplegado en línea y disponible públicamente en \url{https://traficoantofagasta.com}, donde los usuarios pueden consultar tanto las métricas descriptivas como las predicciones generadas por el modelo.
+El diseño modular del proyecto permite su actualización y ampliación futura, integrando nuevas fuentes de datos o modelos de predicción más avanzados.
+
 \newpage
 
 \end{document}

@@ -9,21 +9,22 @@ from utils import utils
 from utils.utils import TZ, logger, ALERTS_BEGIN_TIMESTAMP
 
 
-def train() -> bool:
+def train(register_model: bool = True, until: datetime | None = None) -> ML | None:
     """Trigger the model trainning"""
 
-    init_mlflow()
+    if register_model:
+        init_mlflow()
 
     logger.info("Extracting data from server")
 
-    now_millis = int(datetime.now(pytz.UTC).timestamp()) * 1000
+    until_millis = int(until.timestamp() if until else datetime.now(pytz.UTC).timestamp()) * 1000
 
     try:
-        alerts = utils.get_data(ALERTS_BEGIN_TIMESTAMP, now_millis)  # Get all data
+        alerts = utils.get_data(ALERTS_BEGIN_TIMESTAMP, until_millis)  # Get data
         alerts.filter_by_group_time(120, True)
     except requests.ConnectionError:
         logger.exception("Error retrieving data from server")
-        return False
+        return None
 
     logger.info("Data found: %i", alerts.data.shape[0])
 
@@ -57,19 +58,20 @@ def train() -> bool:
 
     logger.info("Model trained")
 
-    ml.log_model_params(
-        hash_encode=ml.hash,
-        ohe=ml.ohe,
-        sample=ml.data.shape,
-        ordinal_encoder=False,
-        sample_no_events=ml.total_events.shape if ml.total_events is not None else [],
-        geodata="group",
-        categories=categories,
-    )
+    if register_model:
+        ml.log_model_params(
+            hash_encode=ml.hash,
+            ohe=ml.ohe,
+            sample=ml.data.shape,
+            ordinal_encoder=False,
+            sample_no_events=ml.total_events.shape if ml.total_events is not None else [],
+            geodata="group",
+            categories=categories,
+        )
 
-    logger.info("Model registered")
+        logger.info("Model registered")
 
-    return True
+    return ml
 
 
 if __name__ == "__main__":
