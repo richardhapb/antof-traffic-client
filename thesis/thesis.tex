@@ -56,6 +56,15 @@
 \usepackage[spanish]{cleveref}
 
 \usepackage{algorithm}
+
+% For hyperref the name to use \autoref should be
+% {name of element}autorefname
+\newcommand{\algorithmautorefname}{Algoritmo}
+
+% Spanish
+\floatname{algorithm}{Algoritmo}
+
+
 \usepackage{algpseudocode}
 
 \usepackage[caption = true]{subfig}
@@ -171,7 +180,7 @@ Existen diferentes estrategias para la gestión vehicular, desde sistemas manual
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\textwidth]{images/jerarquia_control_riesgo.png}
-    \caption{Jerarquía de control de riesgos. Fuente: \textcite{niosh2024}.}
+    \caption{Jerarquía de control de riesgos \parencite{niosh2024}.}
     \label{fig:jerarquia_riesgos}
 \end{figure}
 
@@ -240,7 +249,7 @@ Waze entrega las coordenadas geoespaciales de los eventos de tráfico en el sist
 
 Para llevar a cabo análisis espaciales cuantitativos sobre los eventos reportados por Waze —incluyendo cálculos de distancia, densidad y agrupación geográfica— fue necesario transformar dichas coordenadas a un sistema proyectado con unidades métricas.
 
-La transformación se realizó utilizando la proyección Transversa de Mercator (Transverse Mercator), en su implementación como zona UTM 19 Sur (EPSG:32719). Esta proyección es conforme y está basada en el elipsoide WGS84, con un meridiano central en $\lambda_0 = -69^\circ$, un factor de escala $k_0 = 0.9996$, y un falso este de $500\,000$ m. Para el hemisferio sur, además, se aplica una corrección vertical de $10\,000\,000$ m a la coordenada norte. Esto se detalla en el Apéndice~\ref{ap:utm}.
+La transformación se realizó utilizando la proyección Transversa de Mercator (Transverse Mercator), en su implementación como zona UTM 19 Sur (EPSG:32719). Esta proyección es conforme y está basada en el elipsoide WGS84, con un meridiano central en $\lambda_0 = -69^\circ$, un factor de escala $k_0 = 0.9996$, y un falso este de $500\,000$ m. Para el hemisferio sur, además, se aplica una corrección vertical de $10\,000\,000$ m a la coordenada norte. Esto se detalla en el \autoref{ap:utm}.
 
 Esta transformación se aplicó mediante la función \texttt{to\_crs} de la librería \texttt{GeoPandas}, la cual utiliza internamente la librería \texttt{Pyproj} como interfaz de la librería PROJ \parencite{gdal_proj, pyproj, geopandas}.
 
@@ -281,7 +290,7 @@ Desde octubre de 2024 hasta abril de 2025, se capturan 53,159 alertas, que al se
 
 \subsection{Filtrado temporal y agrupación de eventos} \label{ssec:filter}
 
-Las alertas pueden contener duplicados, debido a que diferentes usuarios pueden reportar el mismo evento. Para evitar esto, se filtraron los datos agrupándolos por segmento (\autoref{ssec:freq_zone}) y periodos de tiempo, eliminando grupos duplicados en una ventana de tiempo de 120 minutos, es decir, todo evento que se reportó con el mismo tipo, en el mismo segmento, dentro de un periodo de dos horas, será considerado como un solo evento. Este procedimiento, resumido en el \autoref{alg:filter}, permite homogeneizar la granularidad temporal de los eventos y asegurar la consistencia tipológica de los atributos (\texttt{group}, \texttt{type}). El código fuente completo se presenta en el Apéndice~\ref{annex:filter_code}.
+Las alertas pueden contener duplicados, debido a que diferentes usuarios pueden reportar el mismo evento. Para evitar esto, se filtraron los datos agrupándolos por segmento (\autoref{ssec:freq_zone}) y periodos de tiempo, eliminando grupos duplicados en una ventana de tiempo de 120 minutos, es decir, todo evento que se reportó con el mismo tipo, en el mismo segmento, dentro de un periodo de dos horas, será considerado como un solo evento. Este procedimiento, resumido en el \autoref{alg:filter}, permite homogeneizar la granularidad temporal de los eventos y asegurar la consistencia tipológica de los atributos (\texttt{group}, \texttt{type}). El código fuente completo se presenta en el \autoref{annex:filter_code}.
 
 De este modo, el filtro actúa como un mecanismo de depuración de ruido observacional, preservando un único registro representativo por evento real. Aunque esta consolidación produce una ligera disminución en las métricas de desempeño (\texttt{ROC AUC} y \texttt{F1-score}), el efecto se considera metodológicamente favorable, ya que aumenta la consistencia temporal y evita el sesgo hacia zonas con mayor densidad de usuarios o reportes. En consecuencia, el modelo resultante refleja con mayor precisión la ocurrencia efectiva de incidentes de tráfico, en lugar de su frecuencia de reporte.
 
@@ -360,7 +369,7 @@ Para el análisis temporal, los eventos se agruparon por hora del día, calculan
 
 \subsection{Modelo de correlación lineal}
 
-Los resultados de la regresión lineal entre accidentes y reportes de congestión, presentados en la \autoref{fig:corr_lineal}, indican una fuerte correlación positiva durante los días de semana ($R^2 = 0.90$), lo que no implica necesariamente una causalidad. En cambio, durante los fines de semana la relación es más débil ($R^2 = 0.67$), aunque aún presente.
+Los resultados de la regresión lineal entre accidentes y reportes de congestión, presentados en la \autoref{fig:corr_lineal}, indican una fuerte correlación positiva durante los días de semana ($R^2 = 0.92$), lo que no implica necesariamente una causalidad. En cambio, durante los fines de semana la relación es más débil ($R^2 = 0.75$), aunque aún presente.
 
 % Prueba hipótesis relación accidents-jams
 
@@ -402,21 +411,22 @@ El análisis estadístico del modelo lineal entregó los siguientes resultados:
 \begin{itemize}
     \item Para días de semana:
     \begin{itemize}
-        \item El modelo ajustado fue $y = 0.1673x + 0.0996$
-        \item Se obtuvo un $R^2 = 0.90$
-        \item La significancia global fue $F(1, 22) = 203.33$, $p < 0.0001$
-        \item Los parámetros fueron estadísticamente significativos con $p < 0.001$
-        \item El estadístico $t$ para la prueba de correlación fue $t = 14.26$, $p < 0.0001$
+        \item El modelo ajustado fue $y = 0.1382\,x + 0.1072$
+        \item Se obtuvo un $R^2 = 0.92$
+        \item Coeficiente de Pearson: $r = 0.96$ (IC 95\%: [0.91, 0.98])
+        \item Significancia global: $F(1, 22) = 256.70$, $p < 0.0001$
+        \item Parámetros significativos: $\beta_1$ ($t = 16.02$, $p < 0.0001$); $\beta_0$ ($t = 4.08$, $p < 0.001$)
+        \item Estadístico $t$ para la prueba de correlación: $t = 16.02$, $p < 0.0001$
     \end{itemize}
 
     \item Para fines de semana:
     \begin{itemize}
-        \item El modelo ajustado fue $y = 0.1365x + 0.0748$
-        \item Se obtuvo un $R^2 = 0.67$
-        \item El coeficiente de correlación de Pearson fue $r = 0.82$ con IC 95\%: [0.62, 0.92]
-        \item La significancia global fue $F(1, 22) = 44.42$, $p < 0.0001$
-        \item Los parámetros fueron estadísticamente significativos con $p < 0.0001$
-        \item El estadístico $t$ para la prueba de correlación fue $t = 6.66$, $p < 0.0001$
+        \item El modelo ajustado fue $y = 0.1205\,x + 0.0719$
+        \item Se obtuvo un $R^2 = 0.75$
+        \item Coeficiente de Pearson: $r = 0.87$ (IC 95\%: [0.71, 0.94])
+        \item Significancia global: $F(1, 22) = 66.23$, $p < 0.0001$
+        \item Parámetros significativos: $\beta_1$ ($t = 8.14$, $p < 0.0001$); $\beta_0$ ($t = 9.24$, $p < 0.0001$)
+        \item Estadístico $t$ para la prueba de correlación: $t = 8.14$, $p < 0.0001$
     \end{itemize}
 \end{itemize}
 
@@ -426,7 +436,7 @@ Los gráficos Q-Q (\autoref{fig:qq_lin}) muestran una aproximación razonable a 
 
 Los gráficos de residuos (\autoref{fig:resid_lin}) revelan patrones distintos para cada período. En días de semana, aunque hay cierta dispersión alrededor de cero, se observa variabilidad considerable con algunos residuos positivos destacados (especialmente entre valores ajustados de 0.5 y 0.6) y residuos negativos pronunciados alrededor de 0.8. Para fines de semana, los residuos muestran menor magnitud global, pero un patrón menos aleatorio, sugiriendo posible estructura no capturada por el modelo lineal.
 
-En resumen, el análisis confirma una relación lineal significativa entre congestión y accidentes, considerablemente más fuerte durante días laborables ($R^2 = 0.90$) que en fines de semana ($R^2 = 0.67$). Los patrones observados en los residuos, particularmente para fines de semana, sugieren la pertinencia de explorar modelos no lineales que podrían capturar mejor las relaciones subyacentes en los datos.
+En resumen, el análisis confirma una relación lineal significativa entre congestión y accidentes, considerablemente más fuerte durante días laborables ($R^2 = 0.95$) que en fines de semana ($R^2 = 0.78$). Los patrones observados en los residuos, particularmente para fines de semana, sugieren la pertinencia de explorar modelos no lineales que podrían capturar mejor las relaciones subyacentes en los datos.
 
 
 \begin{figure}[H]
@@ -442,6 +452,9 @@ En resumen, el análisis confirma una relación lineal significativa entre conge
 \caption{Gráficos Q-Q de los residuos del modelo lineal}
 \label{fig:qq_lin}
 \end{figure}
+
+
+A partir de la aplicación de la prueba de normalidad \textbf{D'Agostino–Pearson}, se obtuvo un valor de $p = 0.78$ para los días de semana y $p = 0.51$ para los fines de semana. En ambos casos, los valores de $p$ resultan superiores al nivel de significancia ($\alpha = 0.05$), por lo que no se rechaza la hipótesis nula de normalidad. Esto sugiere que los residuos del modelo se distribuyen aproximadamente de forma normal, indicando que las desviaciones entre los valores observados y los estimados son esencialmente aleatorias. En consecuencia, puede inferirse que la relación modelada no se encuentra significativamente afectada por variables omitidas ni por errores sistemáticos.
 
 
 \subsection{Modelo de correlación exponencial inversa}
@@ -484,18 +497,22 @@ El análisis estadístico del modelo exponencial inverso entregó resultados sig
 \begin{itemize}
     \item Para días de semana:
     \begin{itemize}
-        \item El modelo ajustado fue $y = 0.3119/x^{-0.6319}$
-        \item Se obtuvo un $R^2 = 0.94$
-        \item La significancia global fue $F(2, 22) = 158.81$, $p < 0.0001$
-        \item Los parámetros fueron estadísticamente significativos con $p < 0.0001$
+        \item Modelo ajustado: $y = \dfrac{0.2821}{x^{-0.6468}}$ \; (equivalente a $y = 0.2821\,x^{0.6468}$)
+        \item $R^2 = 0.9520$ \; ($R^2_{\text{aj}} = 0.9499$)
+        \item Significancia global: $F(2, 22) = 218.32$, $p < 0.0001$
+        \item Parámetros:
+              $a=0.2821$ \; ($t = 13.80$, $p < 0.0001$, IC 95\%: $[0.2397,\;0.3245]$), \;
+              $b=-0.6468$ \; ($t = -13.50$, $p < 0.0001$, IC 95\%: $[-0.7461,\;-0.5475]$)
     \end{itemize}
 
     \item Para fines de semana:
     \begin{itemize}
-        \item El modelo ajustado fue $y = 0.1826/x^{-0.2776}$
-        \item Se obtuvo un $R^2 = 0.71$
-        \item La significancia global fue $F(2, 22) = 27.19$, $p < 0.001$
-        \item Los parámetros fueron estadísticamente significativos con $p < 0.001$
+        \item Modelo ajustado: $y = \dfrac{0.1781}{x^{-0.3008}}$ \; (equivalente a $y = 0.1781\,x^{0.3008}$)
+        \item $R^2 = 0.7838$ \; ($R^2_{\text{aj}} = 0.7740$)
+        \item Significancia global: $F(2, 22) = 39.89$, $p < 0.0001$
+        \item Parámetros:
+              $a=0.1781$ \; ($t = 20.55$, $p < 0.0001$, IC 95\%: $[0.1602,\;0.1961]$), \;
+              $b=-0.3008$ \; ($t = -7.48$, $p < 0.0001$, IC 95\%: $[-0.3841,\;-0.2174]$)
     \end{itemize}
 \end{itemize}
 
@@ -511,7 +528,7 @@ En conjunto, estos resultados indican que el modelo exponencial inverso no solo 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{images/residuos_exp.png}
-\caption{Residuos del modelo de exponencial inverso para días de semana y fines de semana}
+\caption{Residuos del modelo exponencial inverso para días de semana y fines de semana}
 \label{fig:resid_exp}
 \end{figure}
 
@@ -522,9 +539,7 @@ En conjunto, estos resultados indican que el modelo exponencial inverso no solo 
 \label{fig:qq_exp}
 \end{figure}
 
-% Cálculo de la frecuencia por zona
-% Filtro por zona
-%    Algóritmo cKDTree
+En el caso del modelo exponencial, se aplicó igualmente la prueba de normalidad \textbf{D'Agostino–Pearson} sobre los residuos obtenidos. Para los días de semana se obtuvo un valor $p = 0.2579$, mientras que para los fines de semana el valor fue $p = 0.6500$. Dado que en ambos casos se cumple que $p > \alpha = 0.05$, no se rechaza la hipótesis nula de normalidad. Esto indica que los residuos están distribuidos aproximadamente de manera normal, por lo que las variaciones no explicadas por el modelo pueden considerarse aleatorias y no evidencian la presencia de patrones sistemáticos o sesgos en la estimación.
 
 \subsection{Frecuencia por zona} \label{ssec:freq_zone}
 
@@ -764,7 +779,7 @@ En este contexto, la generación de eventos negativos se basa en una grilla temp
 
 Este enfoque permite preservar la estructura temporal y geoespacial de los datos reales, evitando introducir ruido artificial y facilitando una evaluación más robusta de métricas de desempeño como \texttt{recall} y \texttt{precision}.
 
-El procedimiento se resume en el \autoref{alg:neg_events}. El código completo se incluye en el Apéndice~\ref{annex:neg_code}.
+El procedimiento se resume en el \autoref{alg:neg_events}. El código completo se incluye en el \autoref{annex:neg_code}.
 
 \begin{algorithm}[H]
 \caption{Generación de eventos negativos artificiales}
@@ -900,6 +915,10 @@ En base a los hallazgos, se sugiere:
 \end{itemize}
 
 Estas recomendaciones buscan fortalecer una gestión vial proactiva y basada en datos, orientada a la reducción de accidentes y la mejora sostenida de la movilidad urbana.
+
+\newpage
+
+\printbibliography
 
 \newpage
 
@@ -1062,8 +1081,6 @@ Referencias: \\
 \url{https://github.com/richardhapb/antof-traffic-client/blob/72c1e2cea730670bffb58f0844cd71d1888481df/src/utils/utils.py#L260} \\\\
 \url{https://github.com/richardhapb/antof-traffic-client/blob/72c1e2cea730670bffb58f0844cd71d1888481df/src/utils/utils.py#L95}
 \newpage
-
-\printbibliography
 
 \end{document}
 
