@@ -44,6 +44,7 @@ dependencies = [
     "gunicorn==23.0.0",
     "idna==3.10",
     "importlib-metadata==8.5.0",
+    "ipykernel>=7.0.1",
     "isort==5.13.2",
     "itsdangerous==2.2.0",
     "jinja2==3.1.4",
@@ -89,12 +90,14 @@ dependencies = [
     "scikit-learn==1.5.2",
     "scikit-learn-stubs>=0.0.3",
     "scipy==1.14.1",
+    "seaborn>=0.13.2",
     "setuptools==75.6.0",
     "shapely==2.0.6",
     "six==1.16.0",
     "smmap==5.0.1",
     "sqlalchemy==2.0.36",
     "sqlparse==0.5.2",
+    "statsmodels>=0.14.5",
     "tenacity==9.0.0",
     "threadpoolctl==3.5.0",
     "tomlkit==0.13.2",
@@ -190,8 +193,26 @@ ignore = [
     "ANN201" # Not return type required
 ]
 
-"*.ipynb" = [
-    "S101",  # Allow asserts in notebooks
+"*/**/*.ipynb" = [
+    "E402", # Module level import not at top of file - common in notebooks
+    "W391", # Blank line at end of file - notebooks often have trailing cells
+    "E303", # Too many blank lines - notebooks naturally have spacing
+    "B018", # Found useless expression - notebooks often have expressions for output
+    "F401", # Imported but unused - common in exploratory notebooks
+    "F841", # Local variable assigned but never used - common in data exploration
+    "T201", # print() statements - notebooks use print for output
+    "T203", # pprint() statements - notebooks use pprint for debugging
+    "S101", # Use of assert - notebooks often use assert for quick checks
+    "PLR2004", # Magic values - notebooks often have hardcoded values for analysis
+    "ANN", # Type annotations - not typically used in notebooks
+    "D", # Docstring rules - notebooks don't need full docstrings
+    "ARG001", # Unused function arguments - common in notebook helper functions
+    "C901", # Function too complex - notebook functions can be exploratory
+    "PLR0913", # Too many arguments - notebook functions can be experimental
+    "UP006", # Type annotations - notebooks often use older typing syntax
+    "UP007", # Union type syntax - notebooks often use older syntax
+    "N999", # Invalid module name - notebook files often have descriptive names
+    "INP001", # Implicit namespace package - notebooks aren't packages
 ]
 
 # McCabe complexity

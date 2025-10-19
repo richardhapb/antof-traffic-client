@@ -188,17 +188,33 @@ La eliminación de la necesidad de transporte, puede ser abordada con estrategia
 
 \subsection{Indicadores de bondad y ajuste}
 
-Para evaluar la relación entre variables cuantitativas y validar supuestos estadísticos, se utilizaron indicadores clásicos de ajuste y asociación. En particular, se aplicaron pruebas de hipótesis y el coeficiente de correlación de Pearson, herramientas fundamentales en el análisis estadístico inferencial \parencite{devore2011, montgomery2018}.
+Para evaluar la relación entre variables cuantitativas y validar los supuestos estadísticos de los modelos aplicados, se emplearon indicadores clásicos de ajuste y asociación. En particular, se utilizaron pruebas de hipótesis, el coeficiente de correlación de Pearson y el coeficiente de correlación de Spearman, herramientas fundamentales en el análisis estadístico inferencial \parencite{devore2011, montgomery2018, field2018}.
 
-La \textbf{prueba de hipótesis} permite evaluar si existe suficiente evidencia en los datos para rechazar una afirmación nula sobre una población. En el caso de correlaciones, la hipótesis nula establece que no existe relación lineal entre las variables (\( H_0 : \rho = 0 \)), mientras que la hipótesis alternativa plantea la existencia de una correlación (\( H_1 : \rho \neq 0 \)). El valor-p obtenido indica la probabilidad de observar un estadístico igual o más extremo, bajo el supuesto de que la hipótesis nula es verdadera. Si el valor-p es inferior al nivel de significancia (\( \alpha \)), se rechaza la hipótesis nula \parencite{devore2011}.
+La \textbf{prueba de hipótesis} permite evaluar si existe suficiente evidencia en los datos para rechazar una afirmación nula sobre una población. En el caso de correlaciones, la hipótesis nula establece que no existe relación entre las variables (\( H_0 : \rho = 0 \)), mientras que la hipótesis alternativa plantea la existencia de una correlación (\( H_1 : \rho \neq 0 \)). El valor-p obtenido indica la probabilidad de observar un estadístico igual o más extremo bajo el supuesto de que la hipótesis nula es verdadera. Si el valor-p es inferior al nivel de significancia (\( \alpha \)), se rechaza la hipótesis nula \parencite{devore2011}.
 
-El \textbf{coeficiente de correlación de Pearson} (\( r \)) mide la intensidad y dirección de la relación lineal entre dos variables cuantitativas. Su valor varía entre $-1$ y $1$, donde valores cercanos a $1$ indican una correlación positiva fuerte, valores cercanos a $-1$ una correlación negativa fuerte, y valores cercanos a $0$ una relación débil o inexistente. Este indicador viene dado por:
+El \textbf{coeficiente de correlación de Pearson} (\( r \)) mide la intensidad y dirección de la relación lineal entre dos variables cuantitativas. Su valor varía entre $-1$ y $1$, donde valores cercanos a $1$ indican una correlación positiva fuerte, valores cercanos a $-1$ una correlación negativa fuerte, y valores próximos a $0$ una relación débil o inexistente. Este indicador se define como:
 
 \begin{equation}
 r = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum_{i=1}^{n}(x_i - \bar{x})^2 \sum_{i=1}^{n}(y_i - \bar{y})^2}}
 \end{equation}
 
 donde \( x_i \) y \( y_i \) representan los valores observados, y \( \bar{x} \) y \( \bar{y} \) sus respectivas medias \parencite{montgomery2018}.
+
+No obstante, el coeficiente de Pearson asume linealidad y normalidad en las variables, condiciones que no siempre se cumplen en fenómenos reales como el tráfico vehicular. Por ello, se complementó el análisis mediante el estudio de los \textbf{residuos} del modelo, a fin de verificar la validez de los supuestos de normalidad, independencia y homocedasticidad. Los residuos, definidos como las diferencias entre los valores observados y los estimados, deben distribuirse aleatoriamente en torno a cero y sin patrones sistemáticos para garantizar que el modelo explique adecuadamente la relación entre las variables \parencite{montgomery2018}.
+
+La evaluación de la normalidad de los residuos se realizó mediante la \textbf{prueba de D’Agostino–Pearson}, la cual combina medidas de asimetría y curtosis para contrastar la hipótesis de normalidad. Si el valor-p resultante es mayor que el nivel de significancia (\( \alpha = 0.05 \)), no se rechaza la hipótesis nula, lo que indica que los residuos se distribuyen aproximadamente de forma normal y las desviaciones del modelo pueden considerarse aleatorias.
+
+De forma complementaria, se incorporó el \textbf{coeficiente de correlación de Spearman} (\( \rho_s \)), una medida no paramétrica que evalúa la relación monótona entre dos variables a partir del orden de sus valores, sin requerir supuestos de normalidad ni homocedasticidad \parencite{field2018}. Este coeficiente se define como la correlación de Pearson aplicada sobre los rangos de las observaciones:
+
+\begin{equation}
+\rho_s = 1 - \frac{6 \sum_{i=1}^{n} d_i^2}{n(n^2 - 1)}
+\end{equation}
+
+donde \( d_i \) representa la diferencia entre los rangos de cada par de observaciones y \( n \) el número total de datos. Al basarse en rangos, esta medida es más robusta frente a valores atípicos y distribuciones no normales, siendo especialmente útil cuando la relación entre las variables es creciente o decreciente, pero no estrictamente lineal.
+
+Finalmente, para evaluar el ajuste de los modelos de regresión —tanto lineales como no lineales (exponencial inverso)— se emplearon indicadores de \textbf{bondad de ajuste}, como el coeficiente de determinación (\( R^2 \)) y el error cuadrático medio (ECM). El primero mide la proporción de la variabilidad explicada por el modelo, mientras que el segundo cuantifica la magnitud promedio del error entre los valores observados y los predichos. En conjunto, estas métricas permiten analizar el grado de precisión del modelo y su capacidad de generalización.
+
+En síntesis, el enfoque adoptado en este estudio combina métodos \textbf{paramétricos} y \textbf{no paramétricos}, junto con un análisis exhaustivo de residuos, para garantizar la validez estadística y la robustez de las conclusiones. Este marco metodológico mixto permite que la inferencia sobre la relación entre congestión y accidentes se base tanto en fundamentos teóricos como en evidencia empírica contrastada.
 
 \subsection{Ciencia de datos para el análisis de comportamiento}
 
@@ -540,6 +556,35 @@ En conjunto, estos resultados indican que el modelo exponencial inverso no solo 
 \end{figure}
 
 En el caso del modelo exponencial, se aplicó igualmente la prueba de normalidad \textbf{D'Agostino–Pearson} sobre los residuos obtenidos. Para los días de semana se obtuvo un valor $p = 0.2579$, mientras que para los fines de semana el valor fue $p = 0.6500$. Dado que en ambos casos se cumple que $p > \alpha = 0.05$, no se rechaza la hipótesis nula de normalidad. Esto indica que los residuos están distribuidos aproximadamente de manera normal, por lo que las variaciones no explicadas por el modelo pueden considerarse aleatorias y no evidencian la presencia de patrones sistemáticos o sesgos en la estimación.
+
+
+\subsection{Análisis de correlación no paramétrica de Spearman}
+
+Si bien los modelos lineal y exponencial inverso presentaron un ajuste adecuado y los residuos cumplieron con los supuestos de normalidad según la prueba de D’Agostino–Pearson, el análisis estadístico puede enriquecerse mediante la incorporación de un enfoque no paramétrico. Este tipo de métodos permite evaluar la relación entre variables sin requerir supuestos estrictos de normalidad, homocedasticidad ni linealidad, lo que otorga mayor robustez frente a posibles valores atípicos o distribuciones asimétricas.
+
+En este contexto, se aplicó el \textbf{coeficiente de correlación de Spearman} ($\rho_s$), el cual mide la fuerza y dirección de la relación monótona entre dos variables a partir del orden de sus valores. Este enfoque es particularmente útil cuando la relación puede ser creciente o decreciente, pero no estrictamente lineal, como suele ocurrir en fenómenos de tráfico urbano donde el incremento de la congestión no siempre implica un aumento proporcional de accidentes.
+
+El coeficiente de Spearman se define como la correlación de Pearson aplicada sobre los rangos de las observaciones, según la expresión:
+
+\begin{equation}
+\rho_s = 1 - \frac{6 \sum_{i=1}^{n} d_i^2}{n(n^2 - 1)}
+\end{equation}
+
+donde $d_i$ representa la diferencia entre los rangos de las variables $x_i$ y $y_i$, y $n$ corresponde al número total de observaciones. Los valores de $\rho_s$ oscilan entre $-1$ y $1$, indicando respectivamente una correlación monótona negativa perfecta, nula o positiva perfecta.
+
+Los resultados obtenidos para las correlaciones entre reportes de congestión y accidentes fueron los siguientes:
+
+\begin{itemize}
+    \item Días de semana: $\rho_s = 0.95$, $p = 1.40 \times 10^{-12}$
+    \item Fin de semana: $\rho_s = 0.85$, $p = 1.04 \times 10^{-7}$
+\end{itemize}
+
+En ambos casos, los valores $p$ son significativamente inferiores al nivel de significancia adoptado ($\alpha = 0.01$), por lo que se rechaza la hipótesis nula de ausencia de correlación. Estos resultados confirman una relación monótona fuerte y positiva entre el número de reportes de congestión y la ocurrencia de accidentes, coherente con los hallazgos obtenidos en los modelos lineales y exponenciales.
+
+La inclusión del método de Spearman aporta una \textbf{validación complementaria} desde una perspectiva no paramétrica, fortaleciendo la evidencia de asociación entre las variables analizadas. Dado que el análisis de residuos mostró normalidad y ausencia de patrones sistemáticos, la aplicación de ambos enfoques —paramétrico (Pearson y modelos lineales/exponenciales) y no paramétrico (Spearman)— permite asegurar una evaluación estadística rigurosa y robusta de la relación entre congestión y accidentes.
+
+En síntesis, el uso combinado de modelos de regresión con análisis de residuos y correlaciones no paramétricas refuerza la consistencia de los resultados y la solidez de las conclusiones. Esta estrategia metodológica integra los beneficios de la inferencia clásica con la flexibilidad de los métodos robustos, asegurando que las conclusiones no dependan de supuestos restrictivos de distribución o forma funcional.
+
 
 \subsection{Frecuencia por zona} \label{ssec:freq_zone}
 
