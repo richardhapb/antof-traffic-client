@@ -1,7 +1,7 @@
 %!TEX root = thesis.tex
 
 \documentclass[12pt]{article}
-\usepackage[spanish,es-noshorthands]{babel}
+\usepackage[spanish,es-noshorthands,es-tabla]{babel}
 
 % Use a new page for each section
 \usepackage{titlesec}
@@ -37,6 +37,18 @@
 \setminted{fontsize=\footnotesize, breaklines, frame=lines}
 
 \renewcommand{\baselinestretch}{1.5}
+
+% Tables
+\usepackage{booktabs}
+
+
+% === Cover variables ===
+\newcommand{\degreeTitle}{INGENIERO CIVIL INDUSTRIAL, MENCIÓN GESTIÓN}
+\newcommand{\alumno}{Richard Peña Bonifaz}
+\newcommand{\profPatro}{Manuel Saldaña Pino}
+\newcommand{\profColab}{Luis Araya Alcázar}
+\newcommand{\city}{Antofagasta}
+\newcommand{\yearCover}{2025}
 
 \newcommand{\ttitle}{Análisis Descriptivo y Predictivo Basado en Datos del Tráfico Vehicular en Antofagasta: Un Enfoque a partir de Reportes de Conductores}
 \newcommand{\auth}{Richard Peña Bonifaz}
@@ -74,11 +86,7 @@
 \begin{document}
 
 \pagenumbering{gobble}
-
-\title{\ttitle}
-\author{\auth}
-\date{\today}
-\maketitle
+\input{cover}
 
 \section*{Dedicatoria}
 
@@ -99,9 +107,11 @@ A los profesores apasionados por su trabajo, que no solo transmiten conocimiento
 \pagenumbering{arabic}
 \setcounter{page}{1}
 
-El proyecto desarrollado tuvo como propósito la creación de una herramienta efectiva para analizar y predecir, con alta confiabilidad, el comportamiento del tráfico vehicular en la ciudad de Antofagasta, utilizando datos provenientes de la plataforma Waze Cities. Esta plataforma, alimentada por su comunidad de usuarios, proporciona información en tiempo real que permite obtener una visión detallada de los eventos de tráfico en la ciudad. La investigación resultante generó información relevante para la gestión del tráfico, facilitando la toma de decisiones por parte de las autoridades locales, con miras a mejorar la seguridad vial y optimizar la eficiencia del flujo vehicular. A partir del análisis y explotación de estos datos, fue posible identificar patrones y tendencias que, al ser integrados en la planificación urbana, permiten optimizar rutas críticas, reducir la congestión y disminuir la probabilidad de accidentes.
+El proyecto tuvo como propósito desarrollar una herramienta para analizar y predecir el comportamiento del tráfico vehicular en la ciudad de Antofagasta, utilizando datos de la plataforma \textit{Waze for Cities}. Esta fuente, alimentada por su comunidad de usuarios, proporciona información en tiempo real sobre incidentes viales, permitiendo generar una visión detallada de las condiciones del tránsito urbano.
 
-Se utilizó el algoritmo \texttt{GridSearchCV} para seleccionar los mejores parámetros del modelo acorde a su curva ROC-AUC final. Se probaron tres modelos de clasificación: RandomForestClassifier, LogisticRegression y XGBBoost, siendo este último el modelo seleccionado debido a que obtuvo el mayor rendimiento, con un F1-score de 78.6\% y volumen bajo la curva ROC (ROC-AUC) de 84.3\%. Se utilizaron 52,672 datos para el entrenamiento, 26,336 datos de eventos reportados por conductores (luego de ser filtrados) y 26,336 datos generados de forma ficticia como no-ocurrencia de eventos para el balanceo de clases, debido a la naturaleza de los datos al contener solo registros de ocurrencias.
+A partir del análisis de más de 53.000 eventos recopilados entre octubre de 2024 y abril de 2025, se identificaron patrones espaciales y temporales que evidencian zonas críticas y horarios de mayor riesgo. Se entrenaron tres modelos de clasificación —\textit{Random Forest}, \textit{Regresión Logística} y \textit{XGBoost}— seleccionándose este último por su mejor desempeño (\textbf{F1-score = 0.88}, \textbf{ROC–AUC = 0.84}).
+
+Los resultados evidencian una asociación positiva y estadísticamente significativa entre congestión y accidentes ($r = 0.96$ en días laborales). En el marco de los modelos estimados, las variables de congestión muestran aporte predictivo para discriminar la ocurrencia de accidentes; sin embargo, esta asociación no implica causalidad y requiere validación con fuentes independientes. El sistema desarrollado integra estos modelos en un \textit{dashboard} web actualizado cada cinco minutos, disponible en \url{https://traficoantofagasta.com}, ofreciendo una herramienta de apoyo para la gestión del tráfico urbano y la toma de decisiones basadas en datos.
 
 \section{Introducción}
 \subsection{Descripción del problema}
@@ -110,7 +120,7 @@ Antofagasta, una ciudad con más de 106,000 vehículos en circulación \parencit
 
 La infraestructura vial limitada cuenta con dos arterias principales para poder atravesar la ciudad, la Avenida Edmundo Perez Zujovic y la Avenida Pedro Aguirre Cerda, La segunda solo presente en un una parte del recorrido, por lo que para el resto, se deben utilizar diferentes alternativas en similares alturas de la ciudad, ninguna de estas continuas. Esto posiciona a la Avenida Edmundo Perez Zujovic, la cual en el sector sur de la ciudad se encuentra con Avenida Grecia y Avenida Ejército, como la única vía continua que atraviesa la ciudad completamente. Esta particularidad dada las características geográficas de Antofagasta sumada a la alta concentración de vehículos, genera una alta congestión y  riesgo de accidentes, especialmente en las zonas anteriormente mencionadas.
 
-Actualmente, no existe algún sistema de monitoreo en tiempo real que permitan gestionar el tráfico de manera proactiva. Los sistemas de monitoreo tradicionales, como son la gestión de semáforos y el estudio de vías, es valioso para la administración del flujo vehicular y la estandarización de las intersecciones. Sin embargo, tiene limitaciones por ser estático para la vía en donde el diseño fue realizado. Este tipo de gestión tiene la limitación de no permitir una visión global del flujo vehicular, como también la poca flexibilidad ante los cambios que se generan en el entorno \parencite{auld2009}.
+Actualmente, no existe algún sistema de monitoreo en tiempo real que permitan gestionar el tráfico de manera proactiva. Los sistemas de monitoreo tradicionales, como son la gestión de semáforos y el estudio de vías, son valiosos para la administración del flujo vehicular y la estandarización de las intersecciones. Sin embargo, tiene limitaciones por ser estático para la vía en donde el diseño fue realizado. Este tipo de gestión tiene la limitación de no permitir una visión global del flujo vehicular, como también la poca flexibilidad ante los cambios que se generan en el entorno \parencite{auld2009}.
 
 Explorar nuevas fuentes de datos, como los eventos vehiculares en la ciudad, o la gestión a través de visión por computadora, son herramientas que permiten gestionar de forma eficiente y efectiva el flujo vehicular, proporcionando datos en tiempo real, también ofrecen opciones de automatización y predictibilidad \parencite{chen2015}. Contar con grandes volúmenes de datos permite desarrollar modelos inteligentes para la gestión del tráfico vehicular.
 
@@ -210,7 +220,7 @@ De forma complementaria, se incorporó el \textbf{coeficiente de correlación de
 \rho_s = 1 - \frac{6 \sum_{i=1}^{n} d_i^2}{n(n^2 - 1)}
 \end{equation}
 
-donde \( d_i \) representa la diferencia entre los rangos de cada par de observaciones y \( n \) el número total de datos. Al basarse en rangos, esta medida es más robusta frente a valores atípicos y distribuciones no normales, siendo especialmente útil cuando la relación entre las variables es creciente o decreciente, pero no estrictamente lineal.
+donde \( d_i \) representa la diferencia entre los rangos de cada par de observaciones y \( n \) el número total de pares analizados. Al basarse en rangos, esta medida es más robusta frente a valores atípicos y distribuciones no normales, siendo especialmente útil cuando la relación entre las variables es creciente o decreciente, pero no estrictamente lineal.
 
 Finalmente, para evaluar el ajuste de los modelos de regresión —tanto lineales como no lineales (exponencial inverso)— se emplearon indicadores de \textbf{bondad de ajuste}, como el coeficiente de determinación (\( R^2 \)) y el error cuadrático medio (ECM). El primero mide la proporción de la variabilidad explicada por el modelo, mientras que el segundo cuantifica la magnitud promedio del error entre los valores observados y los predichos. En conjunto, estas métricas permiten analizar el grado de precisión del modelo y su capacidad de generalización.
 
@@ -230,9 +240,14 @@ En este estudio se empleó un modelo supervisado de clasificación, con el objet
 
 \subsection{Evaluación de los modelos de Machine Learning}
 
-Para evaluar el rendimiento del modelo se utilizaron métricas ampliamente empleadas en problemas de clasificación binaria, tales como la exactitud (\textit{accuracy}), la precisión (\textit{precision}), la recuperación (\textit{recall}) y la medida F1 (\textit{F1-score}) \parencite{manning2008}. La exactitud representa el porcentaje total de predicciones correctas sobre el total de casos evaluados. La precisión corresponde a la proporción de casos positivos correctamente identificados por el modelo, es decir, el número de verdaderos positivos dividido por el total de predicciones positivas. Por su parte, la recuperación —también conocida como \textit{recall}— mide la capacidad del modelo para identificar correctamente todos los casos positivos reales, dividiendo los verdaderos positivos por el total de casos positivos reales. La medida F1, en tanto, es la media armónica entre precisión y recuperación, y proporciona una visión equilibrada del desempeño del modelo cuando es necesario considerar tanto los errores por omisión como los errores por comisión.
+Para evaluar el rendimiento del modelo se utilizaron métricas ampliamente empleadas en problemas de clasificación binaria, tales como la exactitud (\textit{accuracy}), la precisión (\textit{precision}), la recuperación (\textit{recall}) y la medida F1 (\textit{F1-score}) \parencite{manning2008}.
+La exactitud representa el porcentaje total de predicciones correctas sobre el total de casos evaluados.
+La precisión corresponde a la proporción de casos positivos correctamente identificados por el modelo, es decir, el número de verdaderos positivos dividido por el total de predicciones positivas.
+Por su parte, la recuperación —también conocida como \textit{recall}— mide la capacidad del modelo para identificar correctamente todos los casos positivos reales, dividiendo los verdaderos positivos por el total de casos positivos reales.
+La medida F1, en tanto, es la media armónica entre precisión y recuperación, y proporciona una visión equilibrada del desempeño del modelo cuando es necesario considerar tanto los errores por omisión como los errores por comisión.
 
-Además, se construyó una matriz de confusión, la cual permite observar el número de aciertos y errores cometidos en cada clase —“ocurre” y “no ocurre”— lo que facilita una evaluación más detallada del comportamiento del modelo. Este análisis es clave para comprender sus limitaciones y fortalezas, especialmente en aplicaciones reales relacionadas con la predicción de accidentes de tránsito.
+Además, se construyó una \textbf{matriz de confusión}, la cual permite observar el número de aciertos y errores cometidos en cada clase —“ocurre” y “no ocurre”—, facilitando una evaluación más detallada del comportamiento del modelo.
+Este análisis es clave para comprender sus limitaciones y fortalezas, especialmente en aplicaciones reales relacionadas con la predicción de accidentes de tránsito.
 
 Las fórmulas utilizadas para el cálculo de estas métricas son las siguientes:
 
@@ -246,6 +261,27 @@ Las fórmulas utilizadas para el cálculo de estas métricas son las siguientes:
 \]
 
 donde \( TP \) son los verdaderos positivos, \( TN \) los verdaderos negativos, \( FP \) los falsos positivos y \( FN \) los falsos negativos.
+
+\vspace{1em}
+
+Adicionalmente, se emplearon indicadores basados en curvas de rendimiento que permiten analizar el comportamiento del clasificador a distintos umbrales de decisión.
+Entre ellas destacan la \textbf{curva ROC} (\textit{Receiver Operating Characteristic}) y la \textbf{curva Precision–Recall}, junto con sus respectivas áreas bajo la curva (\textbf{AUC}, por sus siglas en inglés).
+
+La \textbf{curva ROC} representa la relación entre la \textit{tasa de verdaderos positivos} (TPR o \textit{recall}) y la \textit{tasa de falsos positivos} (FPR) a medida que varía el umbral de decisión.
+El \textbf{área bajo la curva ROC (ROC–AUC)} cuantifica la capacidad global del modelo para discriminar entre clases; un valor cercano a 1 indica un clasificador con excelente poder de separación, mientras que un valor de 0.5 equivale a una predicción aleatoria \parencite{fawcett2006roc}.
+
+Por su parte, la \textbf{curva Precision–Recall} describe la relación entre la \textit{precisión} y la \textit{recuperación} del modelo, siendo especialmente útil en contextos con clases desbalanceadas, donde la curva ROC puede ofrecer una visión demasiado optimista del desempeño \parencite{saito2015}.
+El \textbf{área bajo la curva Precision–Recall (PR–AUC)} resume este equilibrio: valores elevados reflejan una mayor proporción de predicciones positivas correctas sin pérdida significativa de sensibilidad.
+
+El análisis conjunto de ROC–AUC y PR–AUC permite evaluar tanto la capacidad discriminativa del modelo como su utilidad práctica en escenarios donde los falsos positivos y falsos negativos tienen costos distintos, como ocurre en la predicción de eventos de tráfico.
+
+Finalmente, se consideró la \textbf{curva de aprendizaje} (\textit{learning curve}) como herramienta de diagnóstico para analizar el comportamiento del modelo durante el entrenamiento.
+Esta curva muestra cómo varía el rendimiento del modelo —medido por la exactitud o el error— en función del tamaño del conjunto de entrenamiento, manteniendo constante el conjunto de validación \parencite{raschka2018}.
+
+El análisis de la curva de aprendizaje permite identificar problemas de \textbf{sobreajuste} (\textit{overfitting}) o \textbf{subajuste} (\textit{underfitting}).
+Cuando el desempeño en entrenamiento es alto pero bajo en validación, el modelo está sobreajustando a los datos, mientras que si ambos son bajos, el modelo presenta subajuste.
+Por el contrario, cuando las curvas de entrenamiento y validación convergen hacia un valor alto y estable, se considera que el modelo ha alcanzado una buena capacidad de generalización.
+En este estudio, la curva de aprendizaje se utilizó para verificar la estabilidad de los modelos entrenados y determinar si la incorporación de más datos o ajustes de hiperparámetros podría mejorar el rendimiento sin incrementar la varianza del modelo.
 
 \subsection{Algoritmos de clasificación: Random Forest, Logistic Regression y XGBoost}
 
@@ -282,7 +318,7 @@ Para la gestión del modelo, en cuanto a su implementación, mantenimiento y act
 
 \subsection{Investigaciones previas}
 
-La literatura sobre análisis y predicción del tráfico urbano integra tres líneas principales: (i) \textit{fuentes de datos colaborativas y en tiempo real} para caracterizar el estado de la red; (ii) \textit{modelos predictivos} (estadísticos y de aprendizaje automático) para estimar riesgo/ocurrencia de incidentes; y (iii) \textit{métodos geo–espaciotemporales} para identificar y explicar patrones de concentración. De forma transversal, se estudian estrategias para enfrentar \textit{datos desbalanceados}, \textit{evaluación adecuada de clasificadores} y \textit{actualización continua} ante \textit{concept drift}.
+La literatura sobre análisis y predicción del tráfico urbano integra tres líneas principales: (i) \textit{fuentes de datos colaborativas y en tiempo real} para caracterizar el estado de la red; (ii) \textit{modelos predictivos} (estadísticos y de aprendizaje automático) para estimar riesgo/ocurrencia de incidentes; y (iii) \textit{métodos geo–espaciotemporales} para identificar y explicar patrones de concentración. De forma transversal, se estudian estrategias para enfrentar \textit{datos desbalanceados} y \textit{evaluación adecuada de clasificadores}.
 
 \paragraph{Datos colaborativos y analítica en tiempo real.}
 El uso de plataformas de reporte ciudadano (como Waze) y fuentes heterogéneas ha mostrado ser efectivo para caracterizar congestión y siniestralidad a escala urbana, permitiendo alimentar gemelos digitales y tableros operacionales con latencias bajas \parencite{chen2015, ferreira2017waze, wazecitiescasestudies2024}. Trabajos con simuladores meso/microscópicos (p.\,ej., AIMSUN) han servido para validar escenarios y políticas de control bajo supuestos realistas de demanda y oferta \parencite{barcelo2005}.
@@ -299,14 +335,11 @@ En problemas de seguridad vial es común el desbalance positivo/negativo. La lit
 \paragraph{Evaluación de clasificadores en escenarios desbalanceados.}
 Además de la curva ROC–AUC, la literatura recomienda la curva Precision–Recall (PR–AUC) por su mayor sensibilidad a la clase positiva cuando es minoritaria \parencite{saito2015}. La comparación de modelos debe considerar ambas métricas y, cuando sea posible, análisis de \textit{calibración} de probabilidades y matrices de costo específicas del dominio.
 
-\paragraph{Actualización y deriva de concepto.}
-Los patrones de tráfico presentan estacionalidad y cambios estructurales (obras viales, demografía, hábitos de movilidad), por lo que los modelos requieren políticas explícitas de reentrenamiento y monitoreo de desempeño para mitigar \textit{concept drift} \parencite{gama2014concept}. La práctica de versionar modelos y registrar métricas/h\_params facilita trazabilidad y gobierno del ciclo de vida.
-
 En síntesis, el estado del arte respalda el uso de fuentes colaborativas, aprendizaje automático no lineal e instrumentos geo–espaciotemporales para comprender y predecir eventos de tráfico. Este estudio se alinea con dichas evidencias: integra datos colaborativos (Waze), compara algoritmos (Regresión Logística, Random Forest, XGBoost), aplica métodos espaciales y enfrenta el desbalance mediante no–eventos simulados y métricas apropiadas (ROC–AUC y PR–AUC).
 
 \section{Desarrollo}
 
-Se diseña una estrategia de recolección de datos que garantiza información con un nivel de certeza conocido. La API de Waze Cities, que proporciona información en tiempo real sobre eventos activos, fue la fuente principal de datos. Para lograr un volumen de datos representativo, se implementó un servidor encargado de recopilar y almacenar esta información de manera continua. El servidor fue desarrollado en \texttt{Rust}, utilizando la librería reqwest \parencite{reqwest2025} para extraer los datos desde la API de Waze Cities. Se recolectan los eventos de tráfico y se almacenan en una base de datos PostgreSQL. Este servidor se ejecuta de manera continua actualizando la información cada 2 minutos. La estructura de la base de datos se muestra en la \autoref{fig:db_diagram}.
+Se diseña una estrategia de recolección de datos que garantiza información con un nivel de certeza conocido. La API de la plataforma Waze Cities, que proporciona información en tiempo real sobre eventos activos, fue la fuente principal de datos. Para lograr un volumen de datos representativo, se implementó un servidor encargado de recopilar y almacenar esta información de manera continua. El servidor fue desarrollado en \texttt{Rust}, utilizando la librería reqwest \parencite{reqwest2025} para extraer los datos desde la API de la plataforma Waze Cities. Se recolectan los eventos de tráfico y se almacenan en una base de datos PostgreSQL. Este servidor se ejecuta de manera continua actualizando la información cada 2 minutos. La estructura de la base de datos se muestra en la \autoref{fig:db_diagram}.
 
 \begin{figure}[H]
     \centering
@@ -324,7 +357,7 @@ Desde octubre de 2024 hasta abril de 2025, se capturan 53,159 alertas, que al se
 
 Las alertas pueden contener duplicados, debido a que diferentes usuarios pueden reportar el mismo evento. Para evitar esto, se filtraron los datos agrupándolos por segmento (\autoref{ssec:freq_zone}) y periodos de tiempo, eliminando grupos duplicados en una ventana de tiempo de 120 minutos, es decir, todo evento que se reportó con el mismo tipo, en el mismo segmento, dentro de un periodo de dos horas, será considerado como un solo evento. Este procedimiento, resumido en el \autoref{alg:filter}, permite homogeneizar la granularidad temporal de los eventos y asegurar la consistencia tipológica de los atributos (\texttt{group}, \texttt{type}). El código fuente completo se presenta en el \autoref{annex:filter_code}.
 
-De este modo, el filtro actúa como un mecanismo de depuración de ruido observacional, preservando un único registro representativo por evento real. Aunque esta consolidación produce una ligera disminución en las métricas de desempeño (\texttt{ROC AUC} y \texttt{F1-score}), el efecto se considera metodológicamente favorable, ya que aumenta la consistencia temporal y evita el sesgo hacia zonas con mayor densidad de usuarios o reportes. En consecuencia, el modelo resultante refleja con mayor precisión la ocurrencia efectiva de incidentes de tráfico, en lugar de su frecuencia de reporte.
+De este modo, el filtro actúa como un mecanismo de depuración de ruido observacional, preservando un único registro representativo por evento real. Aunque esta consolidación produce una ligera disminución en las métricas de desempeño (\texttt{ROC AUC} y \texttt{F1-score}) –alrededor de 4\%–, el efecto se considera metodológicamente favorable, ya que aumenta la consistencia temporal y evita el sesgo hacia zonas con mayor densidad de usuarios o reportes. En consecuencia, el modelo resultante refleja con mayor precisión la ocurrencia efectiva de incidentes de tráfico, en lugar de su frecuencia de reporte.
 
 
 \begin{algorithm}[H]
@@ -334,15 +367,9 @@ De este modo, el filtro actúa como un mecanismo de depuración de ruido observa
 \Require Conjunto de datos $D$, tamaño de intervalo $\Delta t$ (en minutos)
 \Ensure Conjunto filtrado y agrupado $D'$
 
-\State $D' \gets \emptyset$
-\If{$D = \emptyset$ \textbf{or} no existe columna \texttt{pub\_millis}}
-    \State \Return $D'$
-\EndIf
-
-\State $D' \gets$ Copia de $D$
 \State $paso \gets \Delta t \times 60000$ \Comment{Conversión de minutos a milisegundos}
 
-\ForAll{evento $\in D'$}
+\ForAll{evento $\in D$}
     \If{\texttt{pub\_millis} no es entero}
         \State evento.\texttt{pub\_millis} $\gets$ Redondear(evento.\texttt{pub\_millis} / $10^6$)
     \EndIf
@@ -354,15 +381,15 @@ De este modo, el filtro actúa como un mecanismo de depuración de ruido observa
 \State Eliminar duplicados en [\texttt{interval\_start}, \texttt{group}, \texttt{type}]
 \State Eliminar columna auxiliar \texttt{interval\_start}
 \State Convertir \texttt{pub\_millis} a formato fecha-hora (zona local)
-\State Reiniciar índices de $D'$
-\State \Return $D'$
+\State Reiniciar índices de $D$
+\State \Return $D$
 \end{algorithmic}
 \end{algorithm}
 
 
 \subsection{Eventos en el espacio y tiempo}
 
-En la \autoref{fig:dist_events} se observa la distribución espacial de los distintos tipos de eventos en la ciudad. Desde una perspectiva general se aprecian concentraciones en determinadas zonas de la ciudad, las cuales serán analizadas en futuros gráficos.
+En la \autoref{fig:dist_events} se observa la distribución espacial de los distintos tipos de eventos en la ciudad. Desde una perspectiva general se aprecian concentraciones en determinadas zonas de la ciudad.
 
 \begin{figure}[H]
     \centering
@@ -399,11 +426,56 @@ Para el análisis temporal, los eventos se agruparon por hora del día, calculan
     \label{fig:time_events}
 \end{figure}
 
-\subsection{Modelo de correlación lineal}
+\subsection{Prueba de correlación lineal de Pearson}
 
-Los resultados de la regresión lineal entre accidentes y reportes de congestión, presentados en la \autoref{fig:corr_lineal}, indican una fuerte correlación positiva durante los días de semana ($R^2 = 0.92$), lo que no implica necesariamente una causalidad. En cambio, durante los fines de semana la relación es más débil ($R^2 = 0.75$), aunque aún presente.
+Para evaluar la existencia de una relación estadísticamente significativa entre el número de reportes de congestión y la cantidad de accidentes por hora, se aplicó una prueba de correlación de Pearson.
 
-% Prueba hipótesis relación accidents-jams
+La hipótesis nula ($H_0$) establece que no existe correlación lineal entre ambas variables, mientras que la hipótesis alternativa ($H_1$) plantea que sí existe tal correlación:
+
+\begin{align}
+H_0&:\ \rho = 0 \\
+H_1&:\ \rho \ne 0
+\end{align}
+
+donde $\rho$ representa el coeficiente de correlación poblacional.
+El estadístico de prueba se calcula mediante:
+
+\begin{equation}
+t = \frac{r \sqrt{n - 2}}{\sqrt{1 - r^2}}
+\end{equation}
+
+donde $r$ es el coeficiente de correlación muestral y $n$ el número de observaciones.
+El valor resultante se contrasta con la distribución t de Student con $n - 2$ grados de libertad.
+
+Los resultados obtenidos indican una correlación positiva y significativa entre ambas variables:
+\begin{itemize}
+    \item Días de semana: \( r = 0.96 \) (IC 95\%: [0.91, 0.98]), \(t = 16.02,\ p < 0.0001\)
+    \item Fines de semana: \( r = 0.87 \) (IC 95\%: [0.71, 0.94]), \(t = 8.14,\ p < 0.0001\)
+\end{itemize}
+
+Por tanto, se rechaza la hipótesis nula con un nivel de confianza del 99\%, concluyendo que existe una relación lineal estadísticamente significativa entre el número de reportes de congestión y la cantidad de accidentes registrados por hora.
+
+\vspace{0.5cm}
+
+\subsection{Modelo de regresión lineal}
+
+Con el propósito de describir y cuantificar la relación observada, se ajustó un modelo de regresión lineal simple de la forma:
+
+\begin{equation}
+y = \beta_0 + \beta_1 x + \varepsilon
+\end{equation}
+
+donde:
+\begin{itemize}
+    \item \(y\): número promedio de accidentes registrados por hora,
+    \item \(x\): número promedio de reportes de congestión por hora,
+    \item \(\beta_0\): intercepto del modelo, que representa el valor esperado de \(y\) cuando \(x = 0\),
+    \item \(\beta_1\): pendiente o coeficiente de regresión, que indica el cambio promedio en \(y\) ante una unidad de incremento en \(x\),
+    \item \(\varepsilon\): término de error aleatorio, asumido con media cero y varianza constante.
+\end{itemize}
+
+Los resultados del modelo lineal se presentan en la \autoref{fig:corr_lineal}.
+Se observa una fuerte relación positiva durante los días de semana y una relación moderada durante los fines de semana.
 
 \begin{figure}[H]
     \centering
@@ -415,54 +487,34 @@ Los resultados de la regresión lineal entre accidentes y reportes de congestió
         \includegraphics[width=0.9\textwidth]{images/corr_lin_fs.png}
     }
     \newline
-    \caption{Correlación lineal entre accidentes y congestión}
+    \caption{Modelos de regresión lineal entre accidentes y reportes de congestión.}
     \label{fig:corr_lineal}
 \end{figure}
-
-\subsection{Prueba de hipótesis de correlación lineal}
-
-Para evaluar la existencia de una relación estadísticamente significativa entre el número de reportes de congestión y la cantidad de accidentes por hora, se aplicó una prueba de correlación de Pearson.
-
-La hipótesis nula ($H_0$) establece que no existe correlación lineal entre ambas variables, mientras que la hipótesis alternativa ($H_1$) plantea que sí existe tal correlación:
-
-\begin{align}
-H_0&:\ \rho = 0 \\
-H_1&:\ \rho \ne 0
-\end{align}
-
-Donde $\rho$ representa el coeficiente de correlación poblacional. El estadístico de prueba se calcula mediante:
-
-\begin{equation}
-t = \frac{r \sqrt{n - 2}}{\sqrt{1 - r^2}}
-\end{equation}
-
-donde $r$ es el coeficiente de correlación muestral y $n$ el número de observaciones. El valor resultante se contrasta con la distribución t de Student con $n - 2$ grados de libertad.
 
 El análisis estadístico del modelo lineal entregó los siguientes resultados:
 
 \begin{itemize}
-    \item Para días de semana:
+    \item \textbf{Días de semana:}
     \begin{itemize}
-        \item El modelo ajustado fue $y = 0.1382\,x + 0.1072$
-        \item Se obtuvo un $R^2 = 0.92$
-        \item Coeficiente de Pearson: $r = 0.96$ (IC 95\%: [0.91, 0.98])
-        \item Significancia global: $F(1, 22) = 256.70$, $p < 0.0001$
-        \item Parámetros significativos: $\beta_1$ ($t = 16.02$, $p < 0.0001$); $\beta_0$ ($t = 4.08$, $p < 0.001$)
-        \item Estadístico $t$ para la prueba de correlación: $t = 16.02$, $p < 0.0001$
+        \item Modelo ajustado: \( y = 0.1382\,x + 0.1072 \)
+        \item Coeficiente de determinación: \( R^2 = 0.92 \)
+        \item Significancia global: \( F(1, 22) = 256.70,\ p < 0.0001 \)
+        \item Parámetros significativos: \( \beta_1 \) (\(t = 16.02,\ p < 0.0001\)); \( \beta_0 \) (\(t = 4.08,\ p < 0.001\))
     \end{itemize}
 
-    \item Para fines de semana:
+    \item \textbf{Fines de semana:}
     \begin{itemize}
-        \item El modelo ajustado fue $y = 0.1205\,x + 0.0719$
-        \item Se obtuvo un $R^2 = 0.75$
-        \item Coeficiente de Pearson: $r = 0.87$ (IC 95\%: [0.71, 0.94])
-        \item Significancia global: $F(1, 22) = 66.23$, $p < 0.0001$
-        \item Parámetros significativos: $\beta_1$ ($t = 8.14$, $p < 0.0001$); $\beta_0$ ($t = 9.24$, $p < 0.0001$)
-        \item Estadístico $t$ para la prueba de correlación: $t = 8.14$, $p < 0.0001$
+        \item Modelo ajustado: \( y = 0.1205\,x + 0.0719 \)
+        \item Coeficiente de determinación: \( R^2 = 0.75 \)
+        \item Significancia global: \( F(1, 22) = 66.23,\ p < 0.0001 \)
+        \item Parámetros significativos: \( \beta_1 \) (\(t = 8.14,\ p < 0.0001\)); \( \beta_0 \) (\(t = 9.24,\ p < 0.0001\))
     \end{itemize}
 \end{itemize}
 
-Estos resultados permiten rechazar la hipótesis nula con un nivel de confianza del 99\% para los días de semana, confirmando la existencia de una relación lineal estadísticamente significativa entre el número de reportes de congestión y la cantidad de accidentes registrados por hora.
+Los altos valores de \(R^2\) y la significancia de los coeficientes confirman que el número de reportes de congestión explica una proporción considerable de la variabilidad observada en los accidentes de tránsito por hora.
+Sin embargo, la existencia de correlación o ajuste lineal no implica causalidad; los resultados deben contrastarse con otras fuentes de información y variables contextuales para una interpretación integral.
+
+\subsubsection{Análisis de residuos y validación del modelo}
 
 Los gráficos Q-Q (\autoref{fig:qq_lin}) muestran una aproximación razonable a la distribución normal en ambos períodos. Para los días de semana, los puntos siguen la línea de referencia, con algunas desviaciones en los extremos, particularmente en los valores más altos. En el caso de fin de semana, la aproximación a la línea teórica es más consistente, con una distribución más cercana a la normal.
 
@@ -489,9 +541,11 @@ En resumen, el análisis confirma una relación lineal significativa entre conge
 A partir de la aplicación de la prueba de normalidad \textbf{D'Agostino–Pearson}, se obtuvo un valor de $p = 0.78$ para los días de semana y $p = 0.51$ para los fines de semana. En ambos casos, los valores de $p$ resultan superiores al nivel de significancia ($\alpha = 0.05$), por lo que no se rechaza la hipótesis nula de normalidad. Esto sugiere que los residuos del modelo se distribuyen aproximadamente de forma normal, indicando que las desviaciones entre los valores observados y los estimados son esencialmente aleatorias. En consecuencia, puede inferirse que la relación modelada no se encuentra significativamente afectada por variables omitidas ni por errores sistemáticos.
 
 
-\subsection{Modelo de correlación exponencial inversa}
+\subsubsection{Modelo de correlación exponencial inversa}
 
-Dado que la relación entre congestión y accidentes no necesariamente es lineal en todos los contextos —especialmente bajo alta densidad vehicular— se propuso un modelo exponencial inverso.
+El análisis de residuos del modelo lineal sugirió la posible existencia de una estructura no capturada completamente por una relación estrictamente lineal,
+particularmente durante los fines de semana.
+Por ello, se exploró un modelo no lineal de tipo exponencial inverso, adecuado para representar relaciones donde el efecto marginal de la congestión sobre la ocurrencia de accidentes disminuye progresivamente a medida que aumenta la densidad vehicular.
 
 El modelo propuesto se ajusta a la siguiente forma funcional:
 
@@ -504,6 +558,16 @@ donde:
     \item $A(x)$ es el número estimado de accidentes por hora,
     \item $x$ representa el número de reportes de congestión por hora,
     \item $\alpha$, $\beta$ y $\gamma$ son parámetros ajustados mediante regresión no lineal.
+\end{itemize}
+
+donde:
+\begin{itemize}
+    \item \(A(x)\): número estimado de accidentes por hora,
+    \item \(x\): número de reportes de congestión por hora,
+    \item \(\alpha\): parámetro de escala que controla la magnitud del efecto,
+    \item \(\beta\): exponente que determina la pendiente de decrecimiento,
+    \item \(\gamma\): término de desplazamiento vertical del modelo,
+    \item \(\varepsilon\): término de error aleatorio.
 \end{itemize}
 
 Este modelo fue aplicado tanto a los días de semana como a los fines de semana. En ambos casos, se observó un ajuste visual considerable, respaldando la hipótesis de una relación decreciente no lineal entre ambas variables bajo ciertas condiciones de tráfico.
@@ -573,10 +637,13 @@ En conjunto, estos resultados indican que el modelo exponencial inverso no solo 
 
 En el caso del modelo exponencial, se aplicó igualmente la prueba de normalidad \textbf{D'Agostino–Pearson} sobre los residuos obtenidos. Para los días de semana se obtuvo un valor $p = 0.2579$, mientras que para los fines de semana el valor fue $p = 0.6500$. Dado que en ambos casos se cumple que $p > \alpha = 0.05$, no se rechaza la hipótesis nula de normalidad. Esto indica que los residuos están distribuidos aproximadamente de manera normal, por lo que las variaciones no explicadas por el modelo pueden considerarse aleatorias y no evidencian la presencia de patrones sistemáticos o sesgos en la estimación.
 
+En conjunto, estos resultados indican que el modelo exponencial inverso presenta un mejor ajuste que el modelo lineal, especialmente durante los días de semana.
+Sin embargo, dado que ambos modelos se basan en supuestos paramétricos —particularmente la normalidad de los residuos y la homocedasticidad—, se complementó el análisis mediante un enfoque no paramétrico para verificar la robustez de la relación observada.
 
 \subsection{Análisis de correlación no paramétrica de Spearman}
 
-Si bien los modelos lineal y exponencial inverso presentaron un ajuste adecuado y los residuos cumplieron con los supuestos de normalidad según la prueba de D’Agostino–Pearson, el análisis estadístico puede enriquecerse mediante la incorporación de un enfoque no paramétrico. Este tipo de métodos permite evaluar la relación entre variables sin requerir supuestos estrictos de normalidad, homocedasticidad ni linealidad, lo que otorga mayor robustez frente a posibles valores atípicos o distribuciones asimétricas.
+Si bien los modelos lineal y exponencial inverso mostraron ajustes estadísticamente significativos y residuos con distribución aproximadamente normal según la prueba de D’Agostino–Pearson,
+resulta pertinente incorporar un enfoque no paramétrico que permita validar la robustez de los resultados sin depender de los supuestos de normalidad y linealidad.
 
 En este contexto, se aplicó el \textbf{coeficiente de correlación de Spearman} ($\rho_s$), el cual mide la fuerza y dirección de la relación monótona entre dos variables a partir del orden de sus valores. Este enfoque es particularmente útil cuando la relación puede ser creciente o decreciente, pero no estrictamente lineal, como suele ocurrir en fenómenos de tráfico urbano donde el incremento de la congestión no siempre implica un aumento proporcional de accidentes.
 
@@ -701,85 +768,84 @@ Considerando la media de accidentes diarios, se agrupa por segmento, se define q
 % TN=4629, FP=1955, FN=1059, TP=5525
 %
 
-Se evaluaron tres modelos de clasificación para seleccionar el con mejor rendimiento, para ello primero se seleccionaron los mejores hiperparámetros para cada uno basado en la \texttt{curva ROC-AUC}, realizando una búsqueda exhaustiva (\textit{GridSearchCV}) sobre los tres modelos: \textbf{Random Forest}, \textbf{Logistic Regression} y \textbf{XGBoost}.
+Se evaluaron tres modelos de clasificación para seleccionar el de mejor rendimiento.
+La sintonía de hiperparámetros se realizó mediante una búsqueda exhaustiva (\textit{GridSearchCV}) utilizando como métrica principal el área bajo la curva ROC (\texttt{ROC–AUC}).
+Los modelos considerados fueron \textbf{Random Forest}, \textbf{Regresión Logística} y \textbf{XGBoost}.
 
 \paragraph{Random Forest.}
-Se evaluaron los siguientes hiperparámetros:
 
-\begin{itemize}
-    \item \texttt{n\_estimators}: [200, 350, 500]
-    \item \texttt{max\_depth}: [None, 10, 20]
-    \item \texttt{min\_samples\_leaf}: [1, 3]
-    \item \texttt{class\_weight}: [None, 'balanced']
-\end{itemize}
+\begin{table}[H]
+\centering
+\caption{Mejores hiperparámetros obtenidos para el modelo \textit{Random Forest}.}
+\label{tab:rf-params}
+\begin{tabular}{lc}
+\toprule
+\textbf{Hiperparámetro} & \textbf{Valor óptimo} \\
+\midrule
+\texttt{n\_estimators}       & 100  \\
+\texttt{max\_depth}          & 10   \\
+\texttt{min\_samples\_leaf}  & 2    \\
+\texttt{max\_features}       & 2    \\
+\texttt{max\_leaf\_nodes}    & 8    \\
+\texttt{class\_weight}       & None \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-Los mejores hiperparámetros obtenidos fueron:
-
-\begin{itemize}
-    \item \texttt{n\_estimators}: 500
-    \item \texttt{max\_depth}: 20
-    \item \texttt{min\_samples\_leaf}: 3
-    \item \texttt{class\_weight}: None
-\end{itemize}
-
-Con estos valores, el modelo alcanzó una puntuación máxima de \textbf{0.8414} en validación cruzada (métrica ROC–AUC).
+Con estos valores el modelo alcanzó un \textbf{ROC–AUC de 0.8394} y un \textbf{PR–AUC de 0.8073} (véase \autoref{tab:model-comparison}).
 
 \paragraph{Regresión Logística.}
-Se evaluaron los siguientes hiperparámetros:
 
-\begin{itemize}
-    \item \texttt{clf\_\_penalty}: [l2]
-    \item \texttt{clf\_\_solver}: ['lbfgs', 'liblinear']
-    \item \texttt{clf\_\_C}: [0.1, 1.0, 10.0]
-    \item \texttt{clf\_\_class\_weight}: [None, 'balanced']
-\end{itemize}
+\begin{table}[H]
+\centering
+\caption{Mejores hiperparámetros obtenidos para el modelo de \textit{Regresión Logística}.}
+\label{tab:lr-params}
+\begin{tabular}{lc}
+\toprule
+\textbf{Hiperparámetro} & \textbf{Valor óptimo} \\
+\midrule
+\texttt{penalty}   & l2 \\
+\texttt{solver}    & lbfgs \\
+\texttt{max\_iter} & 1000 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-Los mejores hiperparámetros obtenidos fueron:
-
-\begin{itemize}
-    \item \texttt{clf\_\_penalty}: l2
-    \item \texttt{clf\_\_solver}: lbfgs
-    \item \texttt{clf\_\_C}: 0.1
-    \item \texttt{clf\_\_class\_weight}: balanced
-\end{itemize}
-
-El modelo obtuvo una puntuación de \textbf{0.7566} en validación cruzada (ROC–AUC).
+El modelo obtuvo un \textbf{ROC–AUC de 0.7463} y un \textbf{PR–AUC de 0.6590} (\autoref{tab:model-comparison}).
 
 \paragraph{XGBoost.}
-Se evaluaron los siguientes hiperparámetros:
 
-\begin{itemize}
-    \item \texttt{colsample\_bytree}: [0.8, 1.0]
-    \item \texttt{gamma}: [0.8, 1.0]
-    \item \texttt{learning\_rate}: [0.1, 0.03]
-    \item \texttt{max\_depth}: [3, 6, 10, 20]
-    \item \texttt{min\_child\_weight}: [1, 3]
-    \item \texttt{n\_estimators}: [80, 100]
-    \item \texttt{subsample}: [0.8, 1.0]
-\end{itemize}
+\begin{table}[H]
+\centering
+\caption{Mejores hiperparámetros obtenidos para el modelo \textit{XGBoost}.}
+\label{tab:xgb-params}
+\begin{tabular}{lc}
+\toprule
+\textbf{Hiperparámetro} & \textbf{Valor óptimo} \\
+\midrule
+\texttt{max\_depth}        & 30   \\
+\texttt{n\_estimators}     & 80   \\
+\texttt{learning\_rate}    & 0.1  \\
+\texttt{gamma}             & 1    \\
+\texttt{colsample\_bytree} & 0.7  \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-Los mejores hiperparámetros obtenidos fueron:
+Con esta configuración, \textit{XGBoost} alcanzó la mejor puntuación promedio, con un \textbf{ROC–AUC de 0.8433} y un \textbf{PR–AUC de 0.8108}, superando ligeramente a \textit{Random Forest} y de forma clara a la \textit{Regresión Logística} (\autoref{tab:model-comparison}).
 
-\begin{itemize}
-    \item \texttt{colsample\_bytree}: 0.8
-    \item \texttt{gamma}: 1.0
-    \item \texttt{learning\_rate}: 0.1
-    \item \texttt{max\_depth}: 10
-    \item \texttt{min\_child\_weight}: 1
-    \item \texttt{n\_estimators}: 80
-    \item \texttt{subsample}: 0.8
-\end{itemize}
-
-Con estos valores, el modelo XGBoost alcanzó la mejor puntuación promedio en validación cruzada, con un \textbf{ROC–AUC de 0.8480}, confirmando su superior capacidad de generalización frente a los otros modelos.
+Los gráficos de la curva ROC y de la curva Precision–Recall se presentan en las \autoref{fig:ROC} y \autoref{fig:prec-recall}, respectivamente.
 
 En el \autoref{tab:model-comparison} se puede observar la comparación de los modelos.
 
 \begin{table}[H]
 \centering
-\begin{tabular}{|l|p{5.5cm}|c|c|}
-\hline
+\caption{Comparativa de modelos ajustados con \texttt{GridSearchCV} según el área bajo las curvas ROC y Precision–Recall (PR AUC).}
+\label{tab:model-comparison}
+\begin{tabular}{l p{6cm} c c}
+\toprule
 \textbf{Modelo} & \textbf{Mejores Hiperparámetros} & \textbf{ROC AUC} & \textbf{PR AUC} \\
-\hline
+\midrule
 \textbf{Random Forest} &
 \begin{tabular}[c]{@{}l@{}}
 \texttt{class\_weight}: None\\
@@ -790,7 +856,7 @@ En el \autoref{tab:model-comparison} se puede observar la comparación de los mo
 \texttt{n\_estimators}: 100
 \end{tabular}
 & 0.8394 & 0.8073 \\
-\hline
+\midrule
 \textbf{XGBoost} &
 \begin{tabular}[c]{@{}l@{}}
 \texttt{colsample\_bytree}: 0.7\\
@@ -800,7 +866,7 @@ En el \autoref{tab:model-comparison} se puede observar la comparación de los mo
 \texttt{n\_estimators}: 80
 \end{tabular}
 & \textbf{0.8433} & \textbf{0.8108} \\
-\hline
+\midrule
 \textbf{Regresión Logística} &
 \begin{tabular}[c]{@{}l@{}}
 \texttt{penalty}: l2\\
@@ -808,10 +874,8 @@ En el \autoref{tab:model-comparison} se puede observar la comparación de los mo
 \texttt{max\_iter}: 1000
 \end{tabular}
 & 0.7463 & 0.6590 \\
-\hline
+\bottomrule
 \end{tabular}
-\caption{Comparativa de modelos ajustados con \texttt{GridSearchCV} según el área bajo las curvas ROC y Precision–Recall (PR AUC).}
-\label{tab:model-comparison}
 \end{table}
 
 Los gráficos de la curva ROC están representados en la \autoref{fig:ROC} y de la curva Precision-Recall en la \autoref{fig:prec-recall}.
@@ -829,6 +893,31 @@ Los gráficos de la curva ROC están representados en la \autoref{fig:ROC} y de 
     \caption{Curvas Precision-Recall}
     \label{fig:prec-recall}
 \end{figure}
+
+\subsection{Matriz de confusión y desempeño comparativo de los modelos}
+
+La \autoref{tab:confusion_matrix_models} presenta un resumen de las matrices de confusión obtenidas para los tres modelos de clasificación evaluados: \textit{Random Forest}, \textit{Logistic Regression} y \textit{XGBoost}.
+Cada matriz permite analizar la distribución de aciertos y errores en las predicciones, considerando las métricas \textit{True Negatives} (TN), \textit{False Positives} (FP), \textit{False Negatives} (FN) y \textit{True Positives} (TP).
+En términos generales, el modelo \textit{XGBoost} logra el mejor equilibrio entre sensibilidad y especificidad, con un menor número de falsos positivos y un alto número de verdaderos positivos, lo que evidencia su capacidad de generalización frente a los otros algoritmos.
+
+\begin{table}[H]
+\centering
+\caption{Resumen de matrices de confusión para los modelos de clasificación evaluados.}
+\label{tab:confusion_matrix_models}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Modelo} & \textbf{TN} & \textbf{FP} & \textbf{FN} & \textbf{TP} \\
+\midrule
+Random Forest        & 4567 & 2017 & 1090 & 5494 \\
+Logistic Regression  & 3877 & 2707 & 1019 & 5565 \\
+XGBoost              & 4644 & 1940 & 1066 & 5518 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A partir de los valores presentados, se observa que el modelo \textit{XGBoost} mantiene una proporción más favorable entre verdaderos positivos y falsos positivos, lo que sugiere un mejor rendimiento en la identificación de eventos reales de congestión sin un exceso de falsas alarmas.
+En contraste, \textit{Logistic Regression} presenta el mayor número de falsos positivos, reflejando una menor capacidad discriminativa frente a los otros métodos.
+Finalmente, \textit{Random Forest} muestra un comportamiento intermedio, con un desempeño aceptable pero ligeramente inferior al de \textit{XGBoost} en términos de precisión global.
 
 \subsection{Generación de eventos negativos simulados} \label{ssec:class_balancing}
 
@@ -867,26 +956,32 @@ La versión final del modelo (\texttt{v6}) se entrenó utilizando los hiperpará
 El modelo utiliza codificación \textit{one-hot} y un esquema de clasificación binaria (\texttt{binary: logistic}), con una semilla aleatoria (\texttt{random\_state = 42}) para garantizar la reproducibilidad \parencite{geron2019hands}
 
 
-\noindent En cuanto al rendimiento, se obtuvieron los siguientes resultados para una muestra de 52,672 eventos, con un 50\% de eventos ocurridos y un 50\% de no ocurridos. Esta proporción se logró mediante la simulación de eventos negativos sobre una grilla temporal de 5 minutos, generando combinaciones posibles de tiempo, localización y tipo de evento que no están presentes en los datos originales (\autoref{ssec:class_balancing}). Esto permite evaluar el modelo en condiciones balanceadas, facilitando la interpretación de métricas como \texttt{precision}, \texttt{recall} y \texttt{F1-score}.
+\noindent En cuanto al rendimiento, se obtuvieron los resultados que se resumen en la \autoref{tab:model-performance}, calculados sobre una muestra de 52{,}672 eventos, con una proporción balanceada de 50\% de ocurrencias y 50\% de no ocurrencias.
+Este equilibrio se logró mediante la simulación de eventos negativos sobre una grilla temporal de 5 minutos, generando combinaciones posibles de tiempo, localización y tipo de evento no presentes en los datos originales (\autoref{ssec:class_balancing}).
+Este procedimiento permite evaluar el modelo en condiciones controladas y facilita la interpretación de métricas como \textit{precision}, \textit{recall} y \textit{F1-score}.
 
-\begin{itemize}
-    \item \textbf{Accuracy}: 0.8795
-    \item \textbf{Recall}: 0.9076
-    \item \textbf{Precision}: 0.8583
-    \item \textbf{F1-score}: 0.8823
-    \item \textbf{Promedio validación cruzada (10 folds)}: 0.7819
-\end{itemize}
+\begin{table}[H]
+\centering
+\caption{Métricas de rendimiento del modelo \textit{XGBoost} en conjunto de validación balanceado.}
+\label{tab:model-performance}
+\begin{tabular}{l c}
+\toprule
+\textbf{Métrica} & \textbf{Valor} \\
+\midrule
+Exactitud (\textit{Accuracy}) & 0.8795 \\
+Recuperación (\textit{Recall}) & 0.9076 \\
+Precisión (\textit{Precision}) & 0.8583 \\
+Medida F1 (\textit{F1-score}) & 0.8823 \\
+Área bajo la curva ROC (\textit{ROC–AUC}) & 0.8433 \\
+Área bajo la curva Precision–Recall (\textit{PR–AUC}) & 0.8108 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\noindent Respecto a la matriz de confusión, se registraron los siguientes valores:
+Estas métricas evidencian un modelo con alta capacidad para identificar correctamente los casos positivos, manteniendo un equilibrio adecuado entre sensibilidad y precisión.
+Los valores de área bajo las curvas ROC y Precision–Recall confirman un poder discriminativo consistente en distintos umbrales de decisión.
 
-\begin{itemize}
-    \item Verdaderos positivos: 5,539
-    \item Verdaderos negativos: 5,843
-    \item Falsos positivos: 965
-    \item Falsos negativos: 595
-\end{itemize}
-
-Estas métricas evidencian un modelo con gran capacidad para identificar correctamente los casos positivos, sin sacrificar precisión ni equilibrio. La validación cruzada muestra estabilidad a lo largo de los distintos \texttt{folds}, lo que refuerza la robustez del modelo final y confirma que no hubo sobreentrenamiento \parencite{geron2019hands}.
+El modelo se entrenó y evaluó utilizando particiones aleatorias del conjunto de datos (70\% entrenamiento y 30\% validación), verificándose estabilidad en las métricas a lo largo de distintas ejecuciones y sin evidencia de sobreajuste.
 
 \subsection{Curva de aprendizaje del modelo}
 
@@ -938,7 +1033,7 @@ El análisis temporal evidenció una correlación entre la frecuencia de acciden
 
 En la modelación estadística, se observó una correlación significativa entre la congestión reportada y la ocurrencia de accidentes, especialmente en días laborales. El modelo exponencial inverso logró un ajuste superior ($R^2 = 0.96$) respecto al modelo lineal ($R^2 = 0.92$).
 
-El modelo XGBoost logró un desempeño destacado en la predicción de accidentes, con un \textbf{F1-score de 0.88} y un \textbf{Recall de 0.91} en el conjunto de validación. Si bien no se realizó una comparación directa y sistemática con todos los modelos clásicos de series temporales, los resultados obtenidos sugieren que los algoritmos de aprendizaje automático como XGBoost pueden capturar relaciones no lineales y complejas entre las variables predictoras.
+El modelo XGBoost logró un desempeño destacado en la predicción de accidentes, con un \textbf{F1-score de 0.88} y un \textbf{Recall de 0.91} en el conjunto de validación. Los resultados obtenidos sugieren que los algoritmos de aprendizaje automático como XGBoost pueden capturar relaciones no lineales y complejas entre las variables predictoras.
 
 El análisis temporal sugiere una mayor frecuencia de accidentes en días hábiles y horarios punta. Se debe contrastar esta relación utilizando nuevas fuentes de información como puede ser la visión por computadora o evaluaciones en terreno \parencite{goodall2019}.
 
@@ -948,9 +1043,9 @@ El enfoque geoespacial permitió visualizar con claridad zonas críticas y patro
 
 \subsection{Implicancias prácticas y futuras aplicaciones}
 
-El sistema desarrollado evidencia el potencial de los datos colaborativos y el aprendizaje automático para mejorar la gestión del tráfico en ciudades de tamaño medio. Su arquitectura modular y su enfoque basado en datos abiertos facilitan la replicabilidad en otras urbes chilenas. Además, la actualización periódica del modelo y la visualización en tiempo real abren la puerta a su integración con sistemas de gestión vial, aplicaciones móviles o incluso plataformas de respuesta ante emergencias y eventos masivos.
+El sistema desarrollado evidencia el potencial de los datos colaborativos y el aprendizaje automático para mejorar la gestión del tráfico en ciudades de tamaño medio. Su arquitectura modular y su enfoque basado en datos abiertos facilitan la replicabilidad en otras urbes chilenas. Además, la actualización periódica del modelo y la visualización en tiempo real abren la puerta a su integración con sistemas de gestión vial, aplicaciones móviles o programas de prevención de accidentes de tránsito.
 
-Futuras aplicaciones podrían incluir la incorporación de datos meteorológicos, información de infraestructura o variables de comportamiento humano, así como la exploración de modelos más avanzados (por ejemplo, LSTM o transformers) que capturen mejor la naturaleza secuencial y dinámica del tráfico.
+Futuras aplicaciones podrían incluir la incorporación de datos meteorológicos, información de infraestructura o sistemas adicionales que permitan mejorar la confiabilidad del modelo y poder gestionar de forma preventiva el tránsito vehicular.
 
 \subsection{Limitaciones del estudio}
 
@@ -958,32 +1053,31 @@ El presente trabajo enfrentó diversas restricciones asociadas principalmente a 
 
 La generalización de los resultados debe abordarse con cautela, considerando las particularidades urbanas y culturales de cada ciudad, así como las limitaciones del enfoque aplicado. Finalmente, la adopción de modelos complejos puede suponer un desafío adicional en cuanto a la transparencia y comprensión de los resultados por parte de los usuarios finales.
 
-\section{Conclusiones}
+\section{Conclusiones y Perspectivas Futuras}
 
-Este estudio demuestra la factibilidad y el impacto del uso de datos colaborativos para la gestión inteligente del tráfico urbano en Antofagasta. Los principales aportes incluyen:
+Este estudio demostró la factibilidad y relevancia del uso de datos colaborativos para la gestión inteligente del tráfico urbano en Antofagasta. A partir de más de 53.000 eventos registrados por usuarios de \textit{Waze}, se desarrolló un sistema integral capaz de analizar, predecir y visualizar el comportamiento del tránsito vehicular.
 
+Los principales resultados obtenidos son:
 \begin{itemize}
-    \item Identificación precisa de zonas críticas con alta concentración de accidentes.
-    \item Confirmación de una correlación estadísticamente significativa entre congestión y accidentes, especialmente durante días laborales.
-    \item Validación de modelos no lineales y de aprendizaje automático como herramientas para la predicción de incidentes en contextos urbanos densos.
-    \item Desarrollo e implementación de un sistema funcional de monitoreo, visualización y actualización periódica del modelo, con potencial de escalabilidad.
+\item Se identificaron con precisión zonas críticas de alta concentración de accidentes, particularmente en los segmentos 84, 103 y 106–109 del eje Pedro Aguirre Cerda–Edmundo Pérez Zujovic.
+\item Se confirmó una correlación estadísticamente significativa entre congestión y accidentes ($R^2 = 0.92$, $p < 0.001$ en días laborales), reforzada por el modelo exponencial inverso ($R^2 = 0.95$).
+\item El modelo \textit{XGBoost} alcanzó un \textbf{F1-score de 0.88}, \textbf{Recall de 0.91} y \textbf{ROC–AUC de 0.84}, validando su capacidad predictiva.
+\item El sistema fue implementado con un \textit{dashboard} operativo en línea, actualizado cada cinco minutos, que permite monitorear y proyectar eventos de tráfico en tiempo real.
 \end{itemize}
 
-El enfoque propuesto es viable y adaptable, constituyendo una base sólida para futuras iniciativas de movilidad urbana orientadas a la seguridad y eficiencia.
+Estos resultados confirman que la integración de datos colaborativos y técnicas de aprendizaje automático constituye una alternativa viable, escalable y de bajo costo para fortalecer la gestión vial en ciudades intermedias.
 
-\section{Recomendaciones}
-
-En base a los hallazgos, se sugiere:
+\subsection*{Recomendaciones y proyecciones futuras}
 
 \begin{itemize}
-    \item \textbf{Intervención focalizada}: Priorizar mejoras de infraestructura, señalización y fiscalización en los segmentos críticos identificados.
-    \item \textbf{Monitoreo y actualización}: Mantener y ampliar la infraestructura de captura y análisis de datos, integrando nuevas fuentes (sensores, cámaras) y promoviendo la actualización continua del modelo.
-    \item \textbf{Validación cruzada}: Complementar los análisis con estudios de campo y encuestas a usuarios para validar y enriquecer los hallazgos.
-    \item \textbf{Escalabilidad}: Replicar y adaptar la metodología a otras ciudades chilenas con características similares, atendiendo a sus particularidades.
-    \item \textbf{Investigación avanzada}: Incorporar nuevas variables (clima, infraestructura, comportamiento humano) y explorar modelos predictivos de mayor complejidad y capacidad explicativa.
+\item \textbf{Intervención focalizada:} Priorizar la implementación de mejoras viales y medidas de seguridad en los segmentos críticos identificados.
+\item \textbf{Validación empírica:} Incorporar registros municipales, cámaras de tránsito o estudios de terreno para corroborar los patrones detectados.
+\item \textbf{Ampliación del modelo:} Integrar variables adicionales (meteorología, obras viales, visión por computadora) y explorar arquitecturas secuenciales como LSTM o modelos \textit{transformers}.
+\item \textbf{Replicabilidad:} Adaptar la metodología a otras ciudades con dinámicas similares de congestión, ajustando los parámetros de calibración y fuentes de datos.
+\item \textbf{Sostenibilidad del sistema:} Mantener el ciclo de reentrenamiento mensual del modelo y fortalecer la infraestructura de captura y procesamiento de datos.
 \end{itemize}
 
-Estas recomendaciones buscan fortalecer una gestión vial proactiva y basada en datos, orientada a la reducción de accidentes y la mejora sostenida de la movilidad urbana.
+En síntesis, el proyecto constituye una base sólida para el desarrollo de plataformas predictivas de movilidad urbana, demostrando que los datos colaborativos —combinados con técnicas de inteligencia artificial— pueden transformarse en herramientas efectivas para la toma de decisiones públicas.
 
 \newpage
 
@@ -993,7 +1087,7 @@ Estas recomendaciones buscan fortalecer una gestión vial proactiva y basada en 
 
 \appendix
 
-\pagenumbering{Alph}
+\pagenumbering{gobble}
 \setcounter{page}{1}
 
 \section{Transformación de coordenadas UTM}

@@ -10,6 +10,7 @@ OUTDIR	 := build
 
 # Dependencies
 SRC		 := $(SRCDIR)/$(JOB).tex
+COVER	 := $(SRCDIR)/cover.tex
 PDF		 := $(SRCDIR)/$(OUTDIR)/$(JOB).pdf
 BIBS	 := $(wildcard $(SRCDIR)/*.bib)
 IMAGES	 := $(wildcard $(SRCDIR)/images/**/*) $(wildcard $(SRCDIR)/images/*)
@@ -17,7 +18,7 @@ IMAGES	 := $(wildcard $(SRCDIR)/images/**/*) $(wildcard $(SRCDIR)/images/*)
 all: $(PDF)
 
 # Compile from thesis/ to match relative pahts (images/, diagrams/, etc.)
-$(PDF): $(SRC) $(BIBS) $(IMAGES)
+$(PDF): $(SRC) $(COVER) $(BIBS) $(IMAGES)
 	@mkdir -p $(SRCDIR)/$(OUTDIR)
 	cd $(SRCDIR) && \
 		$(TEX) -output-directory=$(OUTDIR) $(TEXFLAGS) $(JOB).tex && \
