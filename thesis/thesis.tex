@@ -118,7 +118,7 @@ Los resultados evidencian una asociación positiva y estadísticamente significa
 
 Antofagasta, una ciudad con más de 106,000 vehículos en circulación \parencite{conaset2023}, enfrenta desafíos significativos en la gestión de su tráfico vehicular. Durante el año 2023, se registraron 1,715 accidentes, los cuales resultaron en 31 fallecidos y 102 heridos graves \parencite{conaset2023}. Tuvo un crecimiento de su parque automotor de 0.8\% y 3.5\% en los años 2022 y 2023 respectivamente según datos del INE \parencite{ine2023}.
 
-La infraestructura vial limitada cuenta con dos arterias principales para poder atravesar la ciudad, la Avenida Edmundo Perez Zujovic y la Avenida Pedro Aguirre Cerda, La segunda solo presente en un una parte del recorrido, por lo que para el resto, se deben utilizar diferentes alternativas en similares alturas de la ciudad, ninguna de estas continuas. Esto posiciona a la Avenida Edmundo Perez Zujovic, la cual en el sector sur de la ciudad se encuentra con Avenida Grecia y Avenida Ejército, como la única vía continua que atraviesa la ciudad completamente. Esta particularidad dada las características geográficas de Antofagasta sumada a la alta concentración de vehículos, genera una alta congestión y  riesgo de accidentes, especialmente en las zonas anteriormente mencionadas.
+La infraestructura vial de Antofagasta se articula principalmente en torno a dos arterias que permiten atravesar la ciudad, la Avenida Edmundo Pérez Zujovic y la Avenida Pedro Aguirre Cerda, la segunda solo está presente en una parte del recorrido, por lo que para el resto, se deben utilizar diferentes alternativas en similares alturas de la ciudad, ninguna de estas continuas. Esto posiciona a la Avenida Edmundo Pérez Zujovic, la cual en el sector sur de la ciudad se encuentra con Avenida Grecia y Avenida Ejército, como la única vía continua que atraviesa la ciudad completamente. Esta particularidad dada las características geográficas de Antofagasta sumada a la alta concentración de vehículos, genera una alta congestión y  riesgo de accidentes, especialmente en las zonas anteriormente mencionadas.
 
 Actualmente, no existe algún sistema de monitoreo en tiempo real que permitan gestionar el tráfico de manera proactiva. Los sistemas de monitoreo tradicionales, como son la gestión de semáforos y el estudio de vías, son valiosos para la administración del flujo vehicular y la estandarización de las intersecciones. Sin embargo, tiene limitaciones por ser estático para la vía en donde el diseño fue realizado. Este tipo de gestión tiene la limitación de no permitir una visión global del flujo vehicular, como también la poca flexibilidad ante los cambios que se generan en el entorno \parencite{auld2009}.
 
@@ -130,7 +130,7 @@ La plataforma Waze Cities, permite a ciudades poder obtener datos para gestionar
 
 \subsection{Metodología}
 
-Se realiza un análisis geoespacial con el objetivo de identificar puntos críticos, como vías principales, calles secundarias y zonas de alto tráfico. Este análisis se llevó a cabo utilizando \texttt{GeoPandas}. Los resultados se presentan mediante técnicas de visualización que permitien interpretar las tendencias y puntos de interés de manera efectiva.
+Se realiza un análisis geoespacial con el objetivo de identificar puntos críticos, como vías principales, calles secundarias y zonas de alto tráfico. Este análisis se llevó a cabo utilizando \texttt{GeoPandas}. Los resultados se presentan mediante técnicas de visualización que permiten interpretar las tendencias y puntos de interés de manera efectiva.
 
 El pipeline de datos incluye una base de datos relacional para almacenarlos, un flujo ETL (Extract, Transform, Load) para procesarlos y un cliente web para visualizarlos. Se utilizó PostgreSQL \parencite{postgres2025} como base de datos SQL, Memcached  \parencite{memcached2025} como base de datos de caché, APScheduler para la programación de tareas y Dash \parencite{dash2025} como herramienta de visualización. Este enfoque permitió automatizar el flujo de datos y garantizar la actualización constante de la información.
 
@@ -140,7 +140,7 @@ Adicionalmente, se entrenó un modelo de clasificación para determinar la proba
 
 Para la gestión del modelo, en cuanto a su implementación, mantenimiento y actualización, se programó APSCheduler, para ejecutar tareas periódicas que permiten gestionar el ciclo de vida de los modelos de aprendizaje automático, desde su entrenamiento hasta su despliegue en producción y versionado.
 
-El servidor se desarrolló en \texttt{Rust} \parencite{rust2025}, un lenguaje de programación enfocado en la eficiencia y seguridad en el uso de memoria. Se utilizó \texttt{Memcached} para generar un caché de los datos y de esta forma poder servirlos de manera más eficiente y rápida \parencite{fitzpatrick2004memcached}, debido al volumen de datos, se priorizó la unicidad de los mismos, evitando generar copias, para no aumentar el uso de memoria.
+El servidor se desarrolló en \texttt{Rust} \parencite{rust2025}\footnote{Rust es un lenguaje de programación enfocado en seguridad de memoria y concurrencia sin necesidad de garbage collector, características deseables en sistemas en tiempo real.}. Se utilizó \texttt{Memcached} para generar un caché de los datos y de esta forma poder servirlos de manera más eficiente y rápida \parencite{fitzpatrick2004memcached}, debido al volumen de datos, se priorizó la unicidad de los mismos, evitando generar copias, para no aumentar el uso de memoria.
 
 Para el procesado de los datos en el cliente —\texttt{Dash}—, se generan múltiples workers que permiten servir la aplicación de forma eficiente, y se utiliza solo una instancia en memoria de los datos, compartida por todos los workers. Para mantener la integridad de los datos, se implementa un \texttt{Mutex} para controlar el acceso de lectura a los mismos desde las tareas asíncronas \parencite{ramalho2015fluent}.
 
@@ -228,7 +228,7 @@ En síntesis, el enfoque adoptado en este estudio combina métodos \textbf{param
 
 \subsection{Ciencia de datos para el análisis de comportamiento}
 
-Entender el comportamiento del tráfico vehicular, permite desarrollar medidas ingenieriles que disminuyan la probabilidad de accidentes, gestionando diversas variables como la congestión vehicular, los horarios con mayor probabilidad de accidentes y los sectores con mayor frecuencia de accidentes. La ciencia de datos permite, a través del uso de diferentes herramientas estadísticas, predecir con un grado de certeza conocido, la probabilidad de que ocurra un accidente tomando en cuenta variables que puedan ser determinantes para la ocurrencia de los mismos.
+Entender el comportamiento del tráfico vehicular, permite desarrollar medidas ingenieriles que disminuyan la probabilidad de accidentes, gestionando diversas variables como la congestión vehicular, los horarios con mayor probabilidad de accidentes y los sectores con mayor frecuencia de accidentes. La ciencia de datos permite, a través del uso de diferentes herramientas estadísticas, predecir con un grado de certeza conocido, la probabilidad de que ocurra un accidente tomando en cuenta variables que inciden en su ocurrencia.
 
 Usando datos de eventos pasados, es posible generar modelos que, a partir de una entrada, entreguen una salida determinada según ciertos parámetros, esto se conoce como análisis predictivo. El análisis predictivo consiste en entrenar modelos con datos históricos para anticipar resultados futuros, utilizando distintas técnicas de aprendizaje automático, las cuales pueden clasificarse en aprendizaje supervisado, no supervisado y por refuerzo \parencite{murphy2012machine, geron2019hands, bishop2006pattern}.
 
@@ -303,9 +303,7 @@ Para llevar a cabo análisis espaciales cuantitativos sobre los eventos reportad
 
 La transformación se realizó utilizando la proyección Transversa de Mercator (Transverse Mercator), en su implementación como zona UTM 19 Sur (EPSG:32719). Esta proyección es conforme y está basada en el elipsoide WGS84, con un meridiano central en $\lambda_0 = -69^\circ$, un factor de escala $k_0 = 0.9996$, y un falso este de $500\,000$ m. Para el hemisferio sur, además, se aplica una corrección vertical de $10\,000\,000$ m a la coordenada norte. Esto se detalla en el \autoref{ap:utm}.
 
-Esta transformación se aplicó mediante la función \texttt{to\_crs} de la librería \texttt{GeoPandas}, la cual utiliza internamente la librería \texttt{Pyproj} como interfaz de la librería PROJ \parencite{gdal_proj, pyproj, geopandas}.
-
-La elección de EPSG:32719 permite minimizar la distorsión local, ya que el sistema UTM divide el globo en zonas longitudinales estrechas, optimizando la precisión en cada región. Al ser una proyección conforme y métrica, asegura que las distancias, áreas y densidades calculadas sobre el plano proyectado sean válidas y consistentes con el Sistema Internacional de Unidades \parencite{epsg32719}.
+Esta transformación se aplicó mediante la función \texttt{to\_crs} de la librería \texttt{GeoPandas}, la cual utiliza internamente \texttt{Pyproj} como interfaz de la librería PROJ \parencite{gdal_proj, pyproj, geopandas}. La elección del sistema \textbf{EPSG:32719} permite minimizar la distorsión local, ya que el sistema UTM divide el globo en zonas longitudinales estrechas, optimizando la precisión en cada región. Al ser una proyección conforme y métrica, garantiza que las distancias, áreas y densidades calculadas sobre el plano proyectado sean válidas y consistentes con el Sistema Internacional de Unidades \parencite{epsg32719}.
 
 \subsection{Aprendizaje automático}
 
@@ -671,18 +669,18 @@ En síntesis, el uso combinado de modelos de regresión con análisis de residuo
 
 \subsection{Frecuencia por zona} \label{ssec:freq_zone}
 
-Para representar conjuntos estáticos de puntos espaciales, se utiliza la estructura Kd-tree que computa distancias relativas mediante spiral codes y las almacena usando Directly Addressable Codes (DACs), optimizando el uso de memoria sin sacrificar eficiencia en consultas espaciales \parencite{gutierrez2023ckdtree}. Cada zona es llamada cuadrante o segmento.
+Para representar conjuntos estáticos de puntos espaciales, se utiliza la estructura Kd-tree que computa distancias relativas mediante spiral codes y las almacena usando Directly Addressable Codes (DACs), optimizando el uso de memoria sin sacrificar eficiencia en consultas espaciales \parencite{gutierrez2023ckdtree}. Cada zona es llamada segmento.
 
 En la \autoref{fig:quad_acc} se puede ver cómo se distribuyen los segmentos numéricamente, comenzando desde el segmento 1 en la esquina inferior izquierda. La opacidad del color rojo está relacionada con la cantidad de accidentes por segmento.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.38\textwidth]{images/quad_acc.png}
-    \caption{Identificación de cuadrantes en mapa de Antofagasta}
+    \caption{Identificación de segmentos en mapa de Antofagasta}
     \label{fig:quad_acc}
 \end{figure}
 
-Considerando la media de accidentes diarios, se agrupa por segmento, se define que las zonas mayores a 0.5 accidentes por día son considerados críticos, se construye un mapa según la criticidad (\autoref{fig:quad_mean_day}), al tomar la suma de los accidentes, se obtiene la \autoref{fig:quad_acc_total} que muestra la cantidad de accidentes reportados en el segmento en el periodo de estudio, que a su vez se clasifican como críticos si poseen más de 90 accidentes.
+Considerando la media de accidentes diarios, se agrupa por segmento, se define que las zonas mayores a 0.7 accidentes por día son considerados críticos, se construye un mapa según la criticidad (\autoref{fig:quad_mean_day}), al tomar la suma de los accidentes, se obtiene la \autoref{fig:quad_acc_total} que muestra la cantidad de accidentes reportados en el segmento en el periodo de estudio, que a su vez se clasifican como críticos si poseen más de 90 accidentes.
 
 \begin{figure}[H]
     \centering
@@ -696,6 +694,60 @@ Considerando la media de accidentes diarios, se agrupa por segmento, se define q
     }
     \caption{Accidentes por segmento}
 \end{figure}
+
+
+\subsection{Zonas críticas}\label{ssec:critical_zones}
+
+A partir de la segmentación espacial descrita en la \autoref{ssec:freq_zone}, se identificaron \textit{zonas críticas} como aquellos segmentos con mayor concentración de accidentes en el período de estudio. Para ello, se computó la frecuencia total por segmento y se ordenó de forma descendente, seleccionando los cuatro con mayor conteo. La visualización de detalle para cada uno se presenta en las \autoref{fig:critical_1}--\autoref{fig:critical_4}, donde se centra el recorte en el punto medio del segmento\footnote{Notar que el centroide está alineado con el centro del segmento, no necesariamente del punto crítico.} y se resalta el entorno mediante un \textit{buffer} métrico fijo alrededor del centroide.\footnote{Los centroides se reportan en EPSG:3857 (Web Mercator).}
+
+La \autoref{tab:critical_segments} resume la frecuencia y las coordenadas de los cuatro segmentos más incidentes. Se observa una alta concentración en pocos segmentos (221, 187, 159 y 153 accidentes, respectivamente), consistente con el mapa de criticidad de la \autoref{fig:quad_acc_total}. Este patrón evidencia \textit{puntos calientes} persistentes, útiles para priorizar medidas de gestión (señalización, fiscalización focalizada o rediseños micro-viales).
+
+\begin{table}[H]
+    \centering
+    \caption{Zonas críticas: frecuencia total y centroide del segmento (EPSG:3857).}
+    \label{tab:critical_segments}
+    \begin{tabular}{cccc}
+        \toprule
+        \textbf{Top} & \textbf{Accidentes (total)} & \textbf{Centro X (m)} & \textbf{Centro Y (m)} \\
+        \midrule
+        1 & 221 & $-7\,835\,048.083$ & $-2\,702\,232.018$ \\
+        2 & 187 & $-7\,835\,913.901$ & $-2\,709\,531.256$ \\
+        3 & 159 & $-7\,835\,048.083$ & $-2\,700\,772.171$ \\
+        4 & 153 & $-7\,835\,048.083$ & $-2\,706\,611.561$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+El análisis integrado de los datos geoespaciales y temporales permitió identificar patrones consistentes de concentración de accidentes en la ciudad de Antofagasta. Entre las zonas de mayor criticidad destacan los segmentos asociados al eje \textit{Pedro Aguirre Cerda}, particularmente en su intersección con \textit{Nicolás Tirado}, donde convergen flujos vehiculares provenientes del norte y del sector costero. Asimismo, la intersección \textit{Salvador Allende–Edmundo Pérez Zujovic} presenta una elevada densidad de incidentes, atribuible a la confluencia de arterias que conectan el centro con el borde industrial. Otras áreas relevantes incluyen el cruce de \textit{Caparrosa} con \textit{Pedro Aguirre Cerda} y la intersección de \textit{Tamarugos} con \textit{Edmundo Pérez Zujovic}.
+
+Estos resultados refuerzan la evidencia observada en la \autoref{ssec:freq_zone}, permitieron aislar sectores de riesgo sostenido. La persistencia temporal y la concentración espacial en torno a ejes estructurales sugieren que la siniestralidad responde tanto a factores de diseño vial (geometría de intersección, accesos laterales) como a condiciones operativas (volumen vehicular, flujos convergentes y patrones de movilidad urbana). De este modo, la metodología aplicada aporta una base empírica para orientar estrategias de intervención focalizada y planificación urbana sustentada en evidencia.
+
+\begin{figure}[H]
+    \centering
+    \subfloat[Nicolás Tirado / Pedro Aguirre Cerda]{
+        \includegraphics[width=0.49\textwidth]{images/critical_1.png}
+        \label{fig:critical_1}
+    }
+    \subfloat[Salvador Allende / Edmundo Pérez Zujovic]{
+        \includegraphics[width=0.49\textwidth]{images/critical_2.png}
+        \label{fig:critical_2}
+    }
+    \caption{Intersecciones críticas (detalle con \textit{buffer} alrededor del centro del segmento).}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \subfloat[Caparrosa / Pedro Aguirre Cerda]{
+        \includegraphics[width=0.49\textwidth]{images/critical_3.png}
+        \label{fig:critical_3}
+    }
+    \subfloat[Tamarugos / Edmundo Pérez Zujovic]{
+        \includegraphics[width=0.49\textwidth]{images/critical_4.png}
+        \label{fig:critical_4}
+    }
+    \caption{Intersecciones críticas (continuación).}
+\end{figure}
+
 
 \subsection{Selección del modelo de Machine Learning}
 
@@ -921,7 +973,7 @@ Finalmente, \textit{Random Forest} muestra un comportamiento intermedio, con un 
 
 \subsection{Generación de eventos negativos simulados} \label{ssec:class_balancing}
 
-Dado que el conjunto original contiene únicamente eventos positivos (ocurridos), fue necesario generar instancias negativas (no ocurridos) para entrenar un modelo de clasificación binaria. Para ello, se implementó una estrategia inspirada en el enfoque de generación de eventos negativos artificiales propuesto por Goedertier et al. \parencite{goedertier2009robust}, el cual permite representar problemas secuenciales como tareas de clasificación supervisada.
+Dado que el conjunto original contiene únicamente eventos positivos (ocurridos), fue necesario generar instancias negativas (no ocurridos) para entrenar un modelo de clasificación binaria. Para ello, se implementó una estrategia inspirada en el enfoque de generación de eventos negativos artificiales propuesto por Goedertier et al. \parencite{goedertier2009robust}, el cual permite representar problemas secuenciales como tareas de clasificación supervisada.\footnote{Este enfoque evita el uso de sobremuestreo sintético como SMOTE, reduciendo la distorsión de la distribución original de los datos.}
 
 A diferencia del algoritmo original, en el caso del tráfico vehicular se adoptó una relación 1:1 entre eventos positivos y negativos —esto es, se genera un evento negativo por cada evento positivo—, priorizando la eficiencia mediante operaciones vectorizadas y una estructura de datos matricial. Además, debido a que cada evento es independiente de los demás, no se aplicó la noción de causalidad ni las restricciones de paralelismo introducidas por Goedertier, propias de los procesos secuenciales.
 
@@ -987,7 +1039,7 @@ El modelo se entrenó y evaluó utilizando particiones aleatorias del conjunto d
 
 La \autoref{fig:learning_curve} presenta la curva de aprendizaje del modelo \textit{XGBoost} entrenado. Se observa un desempeño alto y estable tanto en el conjunto de entrenamiento como en el de validación (valores de exactitud entre 0.80 y 0.89), con una brecha reducida y constante entre ambas curvas.
 
-Este comportamiento indica que el modelo ha alcanzado un nivel de generalización adecuado, sin evidencias de sobreajuste ni subajuste. Además, la forma aproximádamente horizontal de las curvas sugiere que el incremento del tamaño del conjunto de entrenamiento no produciría mejoras significativas en el rendimiento, lo que refleja una saturación en la capacidad de aprendizaje con las características actuales \parencite{raschka2018, chen2015}.
+Este comportamiento indica que el modelo ha alcanzado un nivel de generalización adecuado, sin evidencias de sobreajuste ni subajuste. Además, la forma aproximadamente horizontal de las curvas sugiere que el incremento del tamaño del conjunto de entrenamiento no produciría mejoras significativas en el rendimiento, lo que refleja una saturación en la capacidad de aprendizaje con las características actuales \parencite{raschka2018, chen2015}.
 
 \begin{figure}[H]
     \centering
@@ -1025,7 +1077,7 @@ El sistema se encuentra desplegado en línea y disponible públicamente a travé
 
 \subsection{Patrones espaciales y temporales del tráfico}
 
-El análisis integrado de datos geoespaciales y temporales permitió identificar patrones críticos de siniestralidad en Antofagasta. Destacan como focos principales los segmentos del eje Pedro Aguirre Cerda, especialmente el cruce con Nicolás Tirado (segmentos 106–109), así como la intersección Salvador Allende–Edmundo Pérez Zujovic (segmentos 84 y 103), donde confluyen flujos significativos de vehículos desde distintos sectores de la ciudad. El centro urbano (segmento 82) también presenta una elevada concentración de incidentes.
+El análisis integrado de los datos geoespaciales y temporales permitió identificar patrones consistentes de concentración de accidentes en la ciudad de Antofagasta. Entre las zonas con mayor criticidad destacan los segmentos asociados al eje \textit{Pedro Aguirre Cerda}, particularmente en su intersección con \textit{Nicolás Tirado}, donde convergen flujos vehiculares provenientes del norte y del sector costero. Asimismo, la intersección \textit{Salvador Allende–Edmundo Pérez Zujovic} presenta una elevada densidad de incidentes, atribuible a la confluencia de arterias que conectan el centro con el borde industrial. Otras áreas relevantes incluyen el cruce de \textit{Caparrosa} con \textit{Pedro Aguirre Cerda} y la intersección de \textit{Tamarugos} con \textit{Edmundo Pérez Zujovic}.
 
 El análisis temporal evidenció una correlación entre la frecuencia de accidentes y la congestión del tráfico, en línea con la literatura sobre tráfico urbano \parencite{berhanu2024}. Esto sugiere que podría existir una relación de causalidad entre ambas variables, lo cual debe ser evidenciado utilizando métodos adicionales para la investigación.
 
@@ -1059,7 +1111,7 @@ Este estudio demostró la factibilidad y relevancia del uso de datos colaborativ
 
 Los principales resultados obtenidos son:
 \begin{itemize}
-\item Se identificaron con precisión zonas críticas de alta concentración de accidentes, particularmente en los segmentos 84, 103 y 106–109 del eje Pedro Aguirre Cerda–Edmundo Pérez Zujovic.
+\item Se identificaron con precisión zonas críticas de alta concentración de accidentes, particularmente en los mencionados en \autoref{ssec:critical_zones} del eje Pedro Aguirre Cerda–Edmundo Pérez Zujovic.
 \item Se confirmó una correlación estadísticamente significativa entre congestión y accidentes ($R^2 = 0.92$, $p < 0.001$ en días laborales), reforzada por el modelo exponencial inverso ($R^2 = 0.95$).
 \item El modelo \textit{XGBoost} alcanzó un \textbf{F1-score de 0.88}, \textbf{Recall de 0.91} y \textbf{ROC–AUC de 0.84}, validando su capacidad predictiva.
 \item El sistema fue implementado con un \textit{dashboard} operativo en línea, actualizado cada cinco minutos, que permite monitorear y proyectar eventos de tráfico en tiempo real.

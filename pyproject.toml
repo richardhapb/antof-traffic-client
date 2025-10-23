@@ -136,6 +136,11 @@ python_files = ["test_*.py", "*_tests.py"]
 addopts = "-vv -W ignore::DeprecationWarning"
 pythonpath = "src"
 
+[dependency-groups]
+dev = [
+    "matplotlib-backend-sixel>=0.1.0",
+]
+
 [tool.ruff.lint]
 preview = true
 select = [

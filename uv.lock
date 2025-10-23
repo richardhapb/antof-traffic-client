@@ -140,6 +140,11 @@ dependencies = [
     { name = "zipp" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "matplotlib-backend-sixel" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "affine", specifier = "==2.4.0" },
@@ -247,6 +252,9 @@ requires-dist = [
     { name = "xyzservices", specifier = "==2024.9.0" },
     { name = "zipp", specifier = "==3.21.0" },
 ]
+
+[package.metadata.requires-dev]
+dev = [{ name = "matplotlib-backend-sixel", specifier = ">=0.1.0" }]
 
 [[package]]
 name = "appnope"
@@ -1198,6 +1206,18 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/4f/27/7c72db0d0ee35d9237572565ffa3c0eb25fc46a3f47e0f16412a587bc9d8/matplotlib-3.9.3-cp313-cp313t-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:760a5e89ebbb172989e8273024a1024b0f084510b9105261b3b00c15e9c9f006", size = 8327768, upload-time = "2024-11-30T10:24:57.573Z" },
     { url = "https://files.pythonhosted.org/packages/de/ad/213eee624feadba7b77e881c9d2c04c1e036efe69d19031e3fa927fdb5dc/matplotlib-3.9.3-cp313-cp313t-musllinux_1_2_x86_64.whl", hash = "sha256:a42b9dc42de2cfe357efa27d9c50c7833fc5ab9b2eb7252ccd5d5f836a84e1e4", size = 9094075, upload-time = "2024-11-30T10:25:28.423Z" },
     { url = "https://files.pythonhosted.org/packages/19/1b/cb8e99a5fe2e2b14e3b8234cb1649a675be63f74a5224a648ae4ab61f60c/matplotlib-3.9.3-cp313-cp313t-win_amd64.whl", hash = "sha256:e0fcb7da73fbf67b5f4bdaa57d85bb585a4e913d4a10f3e15b32baea56a67f0a", size = 7888937, upload-time = "2024-11-30T10:25:46.096Z" },
+]
+
+[[package]]
+name = "matplotlib-backend-sixel"
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "matplotlib" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/11/97/18b74df33356a418ae73acbe39c3f42684bd15bdf908146dbc67d3182367/matplotlib-backend-sixel-0.1.0.tar.gz", hash = "sha256:c4b4b93dd2abaf75187815f925e32011259dfbf36b27da609d542b51eadb59af", size = 5976, upload-time = "2023-07-16T19:39:50.193Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a6/5f/6e4c192d812739e030957ea933fa436494d72707dd67c3a5edb7fae8f9d1/matplotlib_backend_sixel-0.1.0-py3-none-any.whl", hash = "sha256:049f2a8174df7e820c9cdc4d36f41c1ebbea6b38e89e0013662d9662271c131f", size = 6391, upload-time = "2023-07-16T19:39:48.629Z" },
 ]
 
 [[package]]
