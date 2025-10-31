@@ -19,8 +19,6 @@ graph
 t.py
 exceptions.txt
 v.py
-mlartifacts
-mlruns
 sql.json
 backup_waze.sql
 airflow.cfg
