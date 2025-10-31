@@ -31,15 +31,15 @@ def train(register_model: bool = True, until: datetime | None = None) -> ML | No
     # Best params tested with GridSearch
     model = XGBClassifier(
         random_state=42,
-        n_estimators=100,
+        n_estimators=80,
         objective="binary:logistic",
         tree_method="hist",
         eval_metric="auc",
         n_jobs=-1,
         colsample_bytree=0.8,
-        gamma=0.8,
+        gamma=1.0,
         learning_rate=0.1,
-        max_depth=20,
+        max_depth=10,
         min_child_weight=1,
         subsample=0.8,
     )
