@@ -226,7 +226,7 @@ class ML:
         happen_len = merged_pos.shape[0]
 
         merged_neg = merged[merged["happen"].isna()].sample(
-            happen_len, replace=False, random_state=42
+            happen_len * 10, replace=False, random_state=42
         ).reset_index(drop=True)
 
         full_data = cast("pd.DataFrame", pd.concat([merged_pos, merged_neg]))
@@ -312,10 +312,12 @@ class ML:
 
         self.total_events = cast(
             "pd.DataFrame",
-            pd.concat([
-                days1.sample(q_days1, replace=True, random_state=42),
-                days0.sample(q_days0 + diff, replace=True, random_state=42),
-            ]),
+            pd.concat(
+                [
+                    days1.sample(q_days1, replace=True, random_state=42),
+                    days0.sample(q_days0 + diff, replace=True, random_state=42),
+                ]
+            ),
         )
 
     def clean(self, columns_x: list, column_y: str) -> None:

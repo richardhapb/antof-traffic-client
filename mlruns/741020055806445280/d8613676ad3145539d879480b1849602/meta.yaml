@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/741020055806445280/d8613676ad3145539d879480b1849602/artifacts
+end_time: 1762728498758
+entry_point_name: ''
+experiment_id: '741020055806445280'
+lifecycle_stage: active
+run_id: d8613676ad3145539d879480b1849602
+run_name: learned-loon-871
+run_uuid: d8613676ad3145539d879480b1849602
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1762728484522
+status: 3
+tags: []
+user_id: richard
