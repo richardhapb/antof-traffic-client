@@ -42,4 +42,6 @@ analisis/**/*.woff
 analisis/**/*.js
 analisis/**/*.py
 thesis/build
+data.csv
+
 
