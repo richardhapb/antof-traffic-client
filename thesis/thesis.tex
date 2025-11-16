@@ -74,6 +74,12 @@
 \newcommand{\algorithmautorefname}{Algoritmo}
 \newcommand{\subfigureautorefname}{Figura}
 
+
+\addto\captionsspanish{%
+    \renewcommand{\listfigurename}{Índice de Figuras}
+    \renewcommand{\listtablename}{Índice de Tablas}
+}
+
 % Spanish
 \floatname{algorithm}{Algoritmo}
 
@@ -427,14 +433,17 @@ Para el análisis temporal, los eventos se agruparon por hora del día, calculan
 
 Para evaluar la existencia de una relación estadísticamente significativa entre el número de reportes de congestión y la cantidad de accidentes por hora, se aplicó una prueba de correlación de Pearson.
 
-La hipótesis nula ($H_0$) establece que no existe correlación lineal entre ambas variables, mientras que la hipótesis alternativa ($H_1$) plantea que sí existe tal correlación.
+La hipótesis nula (\autoref{eq:h0_corr}) establece que no existe correlación lineal entre ambas variables, mientras que la hipótesis alternativa (\autoref{eq:h1_corr}) plantea la existencia de una correlación distinta de cero. En estas expresiones, \(\rho\) corresponde al coeficiente de correlación poblacional.
 
-\begin{align*}
-H_0&:\ \rho = 0 \\
-H_1&:\ \rho \ne 0
-\end{align*}
+\begin{equation}
+H_0: \rho = 0
+\label{eq:h0_corr}
+\end{equation}
 
-donde $\rho$ representa el coeficiente de correlación poblacional.
+\begin{equation}
+H_1: \rho \ne 0
+\label{eq:h1_corr}
+\end{equation}
 
 El estadístico de prueba utilizado para evaluar la significancia del coeficiente de correlación se obtiene a partir de la expresión mostrada en la \autoref{eq:stat_t}. En esta formulación, el valor de $t$ depende del coeficiente de correlación muestral $r$ y del tamaño de la muestra $n$:
 
@@ -483,30 +492,21 @@ Se observa una fuerte relación positiva durante los días de semana y una relac
     \label{fig:corr_lineal}
 \end{figure}
 
-El análisis estadístico del modelo lineal entregó los siguientes resultados:
+El análisis estadístico del modelo lineal arrojó estimaciones diferenciadas para días de semana y fines de semana. Para los \textbf{días de semana}, el modelo ajustado se presenta en la \autoref{eq:lin_weekdays}, mientras que los indicadores asociados muestran un coeficiente de determinación elevado (\(R^2 = 0.92\)), una significancia global del modelo altamente robusta (\(F(1,22) = 256.70,\ p < 0.0001\)) y parámetros estadísticamente significativos tanto para el intercepto (\(\beta_0\), \(t = 4.08,\ p < 0.001\)) como para la pendiente (\(\beta_1\), \(t = 16.02,\ p < 0.0001\)).
 
-\begin{itemize}
-    \item \textbf{Días de semana:}
-    \begin{itemize}
-        \item Modelo ajustado: \( y = 0.1382\,x + 0.1072 \)
-        \item Coeficiente de determinación: \( R^2 = 0.92 \)
-        \item Significancia global: \( F(1, 22) = 256.70,\ p < 0.0001 \)
-        \item Parámetros significativos: \( \beta_1 \) (\(t = 16.02,\ p < 0.0001\)); \( \beta_0 \) (\(t = 4.08,\ p < 0.001\))
-    \end{itemize}
+\begin{equation}
+y = 0.1382\,x + 0.1072
+\label{eq:lin_weekdays}
+\end{equation}
 
-    \item \textbf{Fines de semana:}
-    \begin{itemize}
-        \item Modelo ajustado: \( y = 0.1205\,x + 0.0719 \)
-        \item Coeficiente de determinación: \( R^2 = 0.75 \)
-        \item Significancia global: \( F(1, 22) = 66.23,\ p < 0.0001 \)
-        \item Parámetros significativos: \( \beta_1 \) (\(t = 8.14,\ p < 0.0001\)); \( \beta_0 \) (\(t = 9.24,\ p < 0.0001\))
-    \end{itemize}
-\end{itemize}
+En el caso de los \textbf{fines de semana}, el modelo estimado se muestra en la \autoref{eq:lin_weekend}. Los resultados indican un ajuste más moderado que en días laborales, con un coeficiente de determinación de \(R^2 = 0.75\), aunque igualmente acompañado de una alta significancia global (\(F(1,22) = 66.23,\ p < 0.0001\)). Tanto el intercepto como la pendiente también resultaron estadísticamente significativos (\(\beta_0\), \(t = 9.24,\ p < 0.0001\); \(\beta_1\), \(t = 8.14,\ p < 0.0001\)).
 
-Los altos valores de \(R^2\) y la significancia de los coeficientes confirman que el número de reportes de congestión explica una proporción considerable de la variabilidad observada en los accidentes de tránsito por hora.
-Sin embargo, la existencia de correlación o ajuste lineal no implica causalidad; los resultados deben contrastarse con otras fuentes de información y variables contextuales para una interpretación integral.
+\begin{equation}
+y = 0.1205\,x + 0.0719
+\label{eq:lin_weekend}
+\end{equation}
 
-\subsubsection{Análisis de residuos y validación del modelo}
+En conjunto, los valores elevados de \(R^2\) y la significancia de los parámetros confirman que el número de reportes de congestión explica una fracción considerable de la variabilidad observada en la frecuencia de accidentes por hora. No obstante, es importante enfatizar que la existencia de una relación lineal no implica causalidad; la interpretación final requiere contrastar estos resultados con información contextual adicional y con otros factores potencialmente relevantes.
 
 Los gráficos Q-Q (\autoref{fig:qq_lin}) muestran una aproximación razonable a la distribución normal en ambos períodos. Para los días de semana, los puntos siguen la línea de referencia, con algunas desviaciones en los extremos, particularmente en los valores más altos. En el caso de fin de semana, la aproximación a la línea teórica es más consistente, con una distribución más cercana a la normal.
 
@@ -533,7 +533,7 @@ En resumen, el análisis confirma una relación lineal significativa entre conge
 A partir de la aplicación de la prueba de normalidad \textbf{D'Agostino–Pearson}, se obtuvo un valor de $p = 0.78$ para los días de semana y $p = 0.51$ para los fines de semana. En ambos casos, los valores de $p$ resultan superiores al nivel de significancia ($\alpha = 0.05$), por lo que no se rechaza la hipótesis nula de normalidad. Esto sugiere que los residuos del modelo se distribuyen aproximadamente de forma normal, indicando que las desviaciones entre los valores observados y los estimados son esencialmente aleatorias. En consecuencia, puede inferirse que la relación modelada no se encuentra significativamente afectada por variables omitidas ni por errores sistemáticos.
 
 
-\subsubsection{Modelo de correlación exponencial inversa}
+\subsection{Modelo de correlación exponencial inversa}
 
 El análisis de los residuos del modelo lineal reveló indicios de una estructura no capturada completamente por una relación estrictamente lineal, especialmente durante los fines de semana. Esta evidencia motivó la exploración de un modelo no lineal de tipo exponencial inverso, apropiado para representar situaciones en las que el efecto marginal de la congestión sobre la ocurrencia de accidentes disminuye progresivamente a medida que aumenta la densidad vehicular.
 
@@ -564,31 +564,21 @@ Los resultados del ajuste se presentan en la \autoref{fig:corr_exp}, mostrando u
     \label{fig:corr_exp}
 \end{figure}
 
-El análisis estadístico del modelo exponencial inverso entregó resultados significativos tanto para días de semana como para fin de semana:
+El análisis estadístico del modelo exponencial inverso mostró un ajuste significativo tanto para días de semana como para fines de semana. Para los \textbf{días de semana}, el modelo estimado corresponde a la forma presentada en la \autoref{eq:invexp_weekdays}. Los resultados indican un coeficiente de determinación elevado (\(R^2 = 0.9520,\ R^2_{\text{aj}} = 0.9499\)), junto con una significancia global robusta del modelo (\(F(2,22) = 218.32,\ p < 0.0001\)). Los parámetros obtenidos fueron estadísticamente significativos, con \(a = 0.2821\) (\(t = 13.80,\ p < 0.0001,\ \text{IC}_{95\%} = [0.2397,\;0.3245]\)) y \(b = -0.6468\) (\(t = -13.50,\ p < 0.0001,\ \text{IC}_{95\%} = [-0.7461,\;-0.5475]\)).
 
-\begin{itemize}
-    \item Para días de semana:
-    \begin{itemize}
-        \item Modelo ajustado: $y = \dfrac{0.2821}{x^{-0.6468}}$ \; (equivalente a $y = 0.2821\,x^{0.6468}$)
-        \item $R^2 = 0.9520$ \; ($R^2_{\text{aj}} = 0.9499$)
-        \item Significancia global: $F(2, 22) = 218.32$, $p < 0.0001$
-        \item Parámetros:
-              $a=0.2821$ \; ($t = 13.80$, $p < 0.0001$, IC 95\%: $[0.2397,\;0.3245]$), \;
-              $b=-0.6468$ \; ($t = -13.50$, $p < 0.0001$, IC 95\%: $[-0.7461,\;-0.5475]$)
-    \end{itemize}
+\begin{equation}
+y = 0.2821\,x^{-0.6468}
+\label{eq:invexp_weekdays}
+\end{equation}
 
-    \item Para fines de semana:
-    \begin{itemize}
-        \item Modelo ajustado: $y = \dfrac{0.1781}{x^{-0.3008}}$ \; (equivalente a $y = 0.1781\,x^{0.3008}$)
-        \item $R^2 = 0.7838$ \; ($R^2_{\text{aj}} = 0.7740$)
-        \item Significancia global: $F(2, 22) = 39.89$, $p < 0.0001$
-        \item Parámetros:
-              $a=0.1781$ \; ($t = 20.55$, $p < 0.0001$, IC 95\%: $[0.1602,\;0.1961]$), \;
-              $b=-0.3008$ \; ($t = -7.48$, $p < 0.0001$, IC 95\%: $[-0.3841,\;-0.2174]$)
-    \end{itemize}
-\end{itemize}
+En el caso de los \textbf{fines de semana}, el modelo ajustado —mostrado en la \autoref{eq:invexp_weekend}— refleja un comportamiento similar pero menos pronunciado. El ajuste es moderadamente alto (\(R^2 = 0.7838,\ R^2_{\text{aj}} = 0.7740\)) y también presenta una significancia global elevada (\(F(2,22) = 39.89,\ p < 0.0001\)). Los parámetros estimados resultaron significativos, con \(a = 0.1781\) (\(t = 20.55,\ p < 0.0001,\ \text{IC}_{95\%} = [0.1602,\;0.1961]\)) y \(b = -0.3008\) (\(t = -7.48,\ p < 0.0001,\ \text{IC}_{95\%} = [-0.3841,\;-0.2174]\)).
 
-Este análisis revela diferencias importantes en la dinámica de la relación congestión-accidentes entre períodos. Durante los días de semana, el exponente negativo de mayor magnitud ($-0.6319$) indica una relación más sensible entre las variables, mientras que en fines de semana el exponente menor ($-0.2776$) sugiere una relación menos pronunciada.
+\begin{equation}
+y = 0.1781\,x^{-0.3008}
+\label{eq:invexp_weekend}
+\end{equation}
+
+En conjunto, estos resultados evidencian diferencias claras en la sensibilidad de la relación congestión–accidentes entre ambos periodos. Durante los días de semana, el exponente de mayor magnitud en valor absoluto refleja una caída más marcada del efecto marginal conforme aumenta la congestión, mientras que en fines de semana la relación es sustancialmente más suave.
 
 Los gráficos de residuos (\autoref{fig:resid_exp}) muestran una dispersión relativamente aleatoria en torno a cero, sin evidencias claras de heterocedasticidad ni patrones sistemáticos, lo que respalda la validez del ajuste no lineal propuesto. En particular, para los días de semana, los residuos muestran una distribución uniforme con algunos valores extremos (entre -0.1 y 0.2), mientras que para los fines de semana, la dispersión es menor y más equilibrada (aproximadamente entre -0.05 y 0.05).
 
@@ -719,7 +709,7 @@ Estos resultados refuerzan la evidencia observada en la \autoref{ssec:freq_zone}
         \includegraphics[width=0.49\textwidth]{images/critical_4.png}
         \label{fig:critical_4}
     }
-    \caption{Intersecciones críticas — detalle con \textit{buffer} alrededor del centro del segmento (a: Nicolás Tirado / Pedro Aguirre Cerda, b: Salvador Allende / Edmundo Pérez Zujovic, c: Caparrosa / Pedro Aguirre Cerda, d: Tamarugos / Edmundo Pérez Zujovic)}
+    \caption{Intersecciones críticas — detalle con \textit{buffer} alrededor del centro del segmento (\textbf{a}: Nicolás Tirado / Pedro Aguirre Cerda, \textbf{b}: Salvador Allende / Edmundo Pérez Zujovic, \textbf{c}: Caparrosa / Pedro Aguirre Cerda, \textbf{d}: Tamarugos / Edmundo Pérez Zujovic)}
 \end{figure}
 
 \subsection{Selección del modelo de Machine Learning}
