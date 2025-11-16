@@ -40,4 +40,6 @@ analisis/**/*.woff
 analisis/**/*.js
 analisis/**/*.py
 thesis/build
-.python-version
+data.csv
+
+
