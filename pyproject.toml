@@ -103,7 +103,7 @@ dependencies = [
     "tomlkit==0.13.2",
     "typing-extensions==4.12.2",
     "tzdata==2024.2",
-    "urllib3==2.2.3",
+    "urllib3==2.6.3",
     "werkzeug==3.0.6",
     "wrapt==1.17.0",
     "xgboost==2.1.3",
